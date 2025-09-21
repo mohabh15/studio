@@ -4,18 +4,22 @@ import { useMemo } from 'react';
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
-import { type Transaction } from '@/lib/types';
-import { findCategory } from '@/lib/constants';
+import { type Transaction, type Category } from '@/lib/types';
+import { useI18n } from '@/hooks/use-i18n';
 
 type SpendingChartProps = {
   transactions: Transaction[];
+  categories: Category[];
 };
 
-export default function SpendingChart({ transactions }: SpendingChartProps) {
+export default function SpendingChart({ transactions, categories }: SpendingChartProps) {
+  const { t } = useI18n();
+  const findCategory = (id: string) => categories.find(c => c.id === id);
+
   const chartData = useMemo(() => {
     const expenseTransactions = transactions.filter(t => t.type === 'expense');
     const spendingByCategory = expenseTransactions.reduce((acc, t) => {
-      const categoryName = findCategory(t.category)?.name || 'Other';
+      const categoryName = findCategory(t.category)?.name || t('common.other');
       acc[categoryName] = (acc[categoryName] || 0) + t.amount;
       return acc;
     }, {} as Record<string, number>);
@@ -23,19 +27,19 @@ export default function SpendingChart({ transactions }: SpendingChartProps) {
     return Object.entries(spendingByCategory)
       .map(([name, total]) => ({ name, total }))
       .sort((a, b) => b.total - a.total);
-  }, [transactions]);
+  }, [transactions, categories, t]);
 
   const chartConfig = {
     total: {
-      label: 'Total',
+      label: t('common.total'),
     },
   };
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Spending Overview</CardTitle>
-        <CardDescription>A breakdown of your expenses by category for this month.</CardDescription>
+        <CardTitle>{t('dashboard.spending_overview.title')}</CardTitle>
+        <CardDescription>{t('dashboard.spending_overview.description')}</CardDescription>
       </CardHeader>
       <CardContent>
         {chartData.length > 0 ? (
@@ -54,7 +58,7 @@ export default function SpendingChart({ transactions }: SpendingChartProps) {
           </ChartContainer>
         ) : (
           <div className="flex h-[300px] w-full items-center justify-center text-muted-foreground">
-            No expense data to display.
+            {t('dashboard.spending_overview.no_data')}
           </div>
         )}
       </CardContent>

@@ -1,5 +1,3 @@
-import type { ElementType } from 'react';
-
 export type TransactionType = 'income' | 'expense';
 
 export type Transaction = {
@@ -15,7 +13,8 @@ export type Transaction = {
 export type Category = {
   id: string;
   name: string;
-  icon: ElementType;
+  icon: string;
+  type: TransactionType;
 };
 
 export type Budget = {

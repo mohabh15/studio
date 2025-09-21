@@ -34,11 +34,11 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Textarea } from '@/components/ui/textarea';
 import { Calendar } from '@/components/ui/calendar';
 import { useToast } from '@/hooks/use-toast';
-import { CATEGORIES } from '@/lib/constants';
-import type { Transaction, TransactionType } from '@/lib/types';
+import type { Transaction, TransactionType, Category } from '@/lib/types';
 import { Calendar as CalendarIcon, Loader2, ScanLine } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
+import { useI18n } from '@/hooks/use-i18n';
 
 const transactionSchema = z.object({
   type: z.enum(['income', 'expense']),
@@ -55,14 +55,17 @@ type AddTransactionDialogProps = {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
   onTransactionAdded: (transaction: Omit<Transaction, 'id'>) => void;
+  categories: Category[];
 };
 
 export default function AddTransactionDialog({
   isOpen,
   onOpenChange,
   onTransactionAdded,
+  categories,
 }: AddTransactionDialogProps) {
   const { toast } = useToast();
+  const { t } = useI18n();
   const [isScanning, setIsScanning] = useState(false);
   const [activeType, setActiveType] = useState<TransactionType>('expense');
 
@@ -76,15 +79,17 @@ export default function AddTransactionDialog({
   });
 
   useEffect(() => {
-    form.reset({
-      type: 'expense',
-      amount: 0,
-      date: new Date(),
-      category: '',
-      merchant: '',
-      notes: '',
-    });
-    setActiveType('expense');
+    if (isOpen) {
+      form.reset({
+        type: 'expense',
+        amount: 0,
+        date: new Date(),
+        category: '',
+        merchant: '',
+        notes: '',
+      });
+      setActiveType('expense');
+    }
   }, [isOpen, form]);
 
   useEffect(() => {
@@ -105,7 +110,7 @@ export default function AddTransactionDialog({
       if (result.error) {
         toast({
           variant: 'destructive',
-          title: 'Scan Failed',
+          title: t('add_transaction_dialog.scan_failed_title'),
           description: result.error,
         });
       } else if (result.success) {
@@ -113,11 +118,14 @@ export default function AddTransactionDialog({
         form.setValue('amount', parseFloat(amount) || 0);
         form.setValue('merchant', merchantName);
         if (date && !isNaN(new Date(date).getTime())) {
-          form.setValue('date', new Date(date));
+          // The AI may return a date with timezone, we need to adjust it to be local.
+          const localDate = new Date(date);
+          const adjustedDate = new Date(localDate.valueOf() + localDate.getTimezoneOffset() * 60 * 1000);
+          form.setValue('date', adjustedDate);
         }
         toast({
-          title: 'Scan Successful',
-          description: 'Receipt data has been filled in.',
+          title: t('add_transaction_dialog.scan_successful_title'),
+          description: t('add_transaction_dialog.scan_successful_desc'),
         });
       }
       setIsScanning(false);
@@ -125,8 +133,8 @@ export default function AddTransactionDialog({
     reader.onerror = () => {
       toast({
         variant: 'destructive',
-        title: 'Error',
-        description: 'Failed to read file.',
+        title: t('common.error'),
+        description: t('add_transaction_dialog.read_file_error'),
       });
       setIsScanning(false);
     };
@@ -139,17 +147,15 @@ export default function AddTransactionDialog({
     });
   };
 
-  const filteredCategories = CATEGORIES.filter(c =>
-    activeType === 'income' ? c.id.includes('income') || c.id === 'salary' || c.id === 'savings' : !c.id.includes('income') && c.id !== 'salary'
-  );
+  const filteredCategories = categories.filter(c => c.type === activeType);
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[480px]">
         <DialogHeader>
-          <DialogTitle>Add Transaction</DialogTitle>
+          <DialogTitle>{t('add_transaction_dialog.title')}</DialogTitle>
           <DialogDescription>
-            Manually enter a new transaction or scan a receipt to get started.
+            {t('add_transaction_dialog.description')}
           </DialogDescription>
         </DialogHeader>
         <div className="relative mt-4">
@@ -162,12 +168,12 @@ export default function AddTransactionDialog({
             {isScanning ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Scanning...
+                {t('add_transaction_dialog.scanning')}...
               </>
             ) : (
               <>
                 <ScanLine className="mr-2 h-4 w-4" />
-                Scan a Receipt
+                {t('add_transaction_dialog.scan_receipt')}
               </>
             )}
           </Button>
@@ -185,7 +191,7 @@ export default function AddTransactionDialog({
             <span className="w-full border-t" />
           </div>
           <span className="relative bg-background px-2 text-xs uppercase text-muted-foreground">
-            Or Enter Manually
+            {t('add_transaction_dialog.or_manual')}
           </span>
         </div>
 
@@ -197,14 +203,14 @@ export default function AddTransactionDialog({
                 variant={activeType === 'expense' ? 'default' : 'outline'}
                 onClick={() => setActiveType('expense')}
               >
-                Expense
+                {t('common.expense')}
               </Button>
               <Button
                 type="button"
                 variant={activeType === 'income' ? 'default' : 'outline'}
                 onClick={() => setActiveType('income')}
               >
-                Income
+                {t('common.income')}
               </Button>
             </div>
 
@@ -213,7 +219,7 @@ export default function AddTransactionDialog({
               name="amount"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Amount</FormLabel>
+                  <FormLabel>{t('add_transaction_dialog.amount')}</FormLabel>
                   <FormControl>
                     <Input type="number" placeholder="0.00" {...field} />
                   </FormControl>
@@ -227,7 +233,7 @@ export default function AddTransactionDialog({
                 name="date"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Date</FormLabel>
+                    <FormLabel>{t('add_transaction_dialog.date')}</FormLabel>
                     <Popover>
                       <PopoverTrigger asChild>
                         <FormControl>
@@ -238,7 +244,7 @@ export default function AddTransactionDialog({
                               !field.value && 'text-muted-foreground'
                             )}
                           >
-                            {field.value ? format(field.value, 'PPP') : <span>Pick a date</span>}
+                            {field.value ? format(field.value, 'PPP') : <span>{t('add_transaction_dialog.pick_a_date')}</span>}
                             <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                           </Button>
                         </FormControl>
@@ -262,11 +268,11 @@ export default function AddTransactionDialog({
                 name="category"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Category</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormLabel>{t('add_transaction_dialog.category')}</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select a category" />
+                          <SelectValue placeholder={t('add_transaction_dialog.select_category')} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -288,9 +294,9 @@ export default function AddTransactionDialog({
               name="merchant"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Merchant</FormLabel>
+                  <FormLabel>{t('add_transaction_dialog.merchant')}</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g., Amazon, Starbucks" {...field} />
+                    <Input placeholder={t('add_transaction_dialog.merchant_placeholder')} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -302,9 +308,9 @@ export default function AddTransactionDialog({
               name="notes"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Notes</FormLabel>
+                  <FormLabel>{t('add_transaction_dialog.notes')}</FormLabel>
                   <FormControl>
-                    <Textarea placeholder="Add a short note..." {...field} />
+                    <Textarea placeholder={t('add_transaction_dialog.notes_placeholder')} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -312,7 +318,7 @@ export default function AddTransactionDialog({
             />
 
             <DialogFooter>
-              <Button type="submit">Save Transaction</Button>
+              <Button type="submit">{t('add_transaction_dialog.save_transaction')}</Button>
             </DialogFooter>
           </form>
         </Form>

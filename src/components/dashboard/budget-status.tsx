@@ -1,14 +1,17 @@
 'use client';
 
 import { useMemo } from 'react';
+import * as LucideIcons from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import type { Transaction, Budget } from '@/lib/types';
-import { findCategory } from '@/lib/constants';
+import type { Transaction, Budget, Category } from '@/lib/types';
+import { useI18n } from '@/hooks/use-i18n';
+import { getIcon } from '@/lib/utils';
 
 type BudgetStatusProps = {
   transactions: Transaction[];
   budgets: Budget[];
+  categories: Category[];
 };
 
 const formatCurrency = (amount: number) => {
@@ -20,7 +23,8 @@ const formatCurrency = (amount: number) => {
   }).format(amount);
 };
 
-export default function BudgetStatus({ transactions, budgets }: BudgetStatusProps) {
+export default function BudgetStatus({ transactions, budgets, categories }: BudgetStatusProps) {
+  const { t } = useI18n();
   const budgetData = useMemo(() => {
     return budgets.map(budget => {
       const spent = transactions
@@ -28,23 +32,24 @@ export default function BudgetStatus({ transactions, budgets }: BudgetStatusProp
         .reduce((sum, t) => sum + t.amount, 0);
       const remaining = budget.amount - spent;
       const progress = (spent / budget.amount) * 100;
-      const category = findCategory(budget.category);
+      const category = categories.find(c => c.id === budget.category);
+      const Icon = category ? getIcon(category.icon as keyof typeof LucideIcons) : null;
       return {
         ...budget,
         spent,
         remaining,
         progress,
         categoryName: category?.name,
-        Icon: category?.icon,
+        Icon,
       };
     });
-  }, [transactions, budgets]);
+  }, [transactions, budgets, categories]);
 
   return (
     <Card className="flex flex-col">
       <CardHeader>
-        <CardTitle>Budget Status</CardTitle>
-        <CardDescription>How you're tracking against your budgets this month.</CardDescription>
+        <CardTitle>{t('dashboard.budget_status.title')}</CardTitle>
+        <CardDescription>{t('dashboard.budget_status.description')}</CardDescription>
       </CardHeader>
       <CardContent className="flex-1">
         {budgetData.length > 0 ? (
@@ -62,14 +67,15 @@ export default function BudgetStatus({ transactions, budgets }: BudgetStatusProp
                 </div>
                 <Progress value={budget.progress} aria-label={`${budget.categoryName} budget progress`} />
                 <p className="text-xs text-muted-foreground text-right">
-                  {formatCurrency(Math.abs(budget.remaining))} {budget.remaining >= 0 ? 'left' : 'over'}
+                  {formatCurrency(Math.abs(budget.remaining))}{' '}
+                  {budget.remaining >= 0 ? t('dashboard.budget_status.left') : t('dashboard.budget_status.over')}
                 </p>
               </div>
             ))}
           </div>
         ) : (
           <div className="flex h-full min-h-[200px] w-full items-center justify-center text-muted-foreground">
-            No budgets set.
+            {t('dashboard.budget_status.no_budgets')}
           </div>
         )}
       </CardContent>

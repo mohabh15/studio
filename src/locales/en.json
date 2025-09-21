@@ -1,0 +1,95 @@
+{
+  "app": {
+    "title": "BudgetWise"
+  },
+  "common": {
+    "income": "Income",
+    "expense": "Expense",
+    "other": "Other",
+    "total": "Total",
+    "actions": "Actions",
+    "edit": "Edit",
+    "delete": "Delete",
+    "save": "Save",
+    "cancel": "Cancel",
+    "error": "Error"
+  },
+  "header": {
+    "add_transaction": "Add Transaction",
+    "settings": "Settings",
+    "change_language": "Change Language"
+  },
+  "dashboard": {
+    "summary": {
+      "total_income": "Total Income",
+      "total_expenses": "Total Expenses",
+      "balance": "Balance",
+      "this_month": "This month",
+      "remaining_funds": "Remaining funds"
+    },
+    "spending_overview": {
+      "title": "Spending Overview",
+      "description": "A breakdown of your expenses by category for this month.",
+      "no_data": "No expense data to display."
+    },
+    "recent_transactions": {
+      "title": "Recent Transactions",
+      "description": "Your 5 most recent transactions.",
+      "details": "Details",
+      "date": "Date",
+      "amount": "Amount",
+      "no_transactions": "No transactions yet."
+    },
+    "budget_status": {
+      "title": "Budget Status",
+      "description": "How you're tracking against your budgets this month.",
+      "left": "left",
+      "over": "over",
+      "no_budgets": "No budgets set."
+    }
+  },
+  "add_transaction_dialog": {
+    "title": "Add Transaction",
+    "description": "Manually enter a new transaction or scan a receipt to get started.",
+    "scan_receipt": "Scan a Receipt",
+    "scanning": "Scanning",
+    "or_manual": "Or Enter Manually",
+    "amount": "Amount",
+    "date": "Date",
+    "pick_a_date": "Pick a date",
+    "category": "Category",
+    "select_category": "Select a category",
+    "merchant": "Merchant",
+    "merchant_placeholder": "e.g., Amazon, Starbucks",
+    "notes": "Notes",
+    "notes_placeholder": "Add a short note...",
+    "save_transaction": "Save Transaction",
+    "scan_failed_title": "Scan Failed",
+    "scan_successful_title": "Scan Successful",
+    "scan_successful_desc": "Receipt data has been filled in.",
+    "read_file_error": "Failed to read file."
+  },
+  "settings_page": {
+    "title": "Settings",
+    "description": "Manage your application settings and preferences.",
+    "expense_categories": "Expense Categories",
+    "manage_expense_categories": "Add, edit, or remove your expense categories.",
+    "add_category": "Add Category",
+    "category_name": "Category Name",
+    "income_categories": "Income Categories",
+    "manage_income_categories": "Add, edit, or remove your income categories.",
+    "delete_dialog_title": "Are you sure you want to delete this category?",
+    "delete_dialog_description": "This action cannot be undone. This will permanently delete the category."
+  },
+  "category_dialog": {
+    "add_title": "Add Category",
+    "add_description": "Create a new category for your transactions.",
+    "edit_title": "Edit Category",
+    "edit_description": "Update the details of your category.",
+    "name": "Name",
+    "name_placeholder": "e.g., Groceries",
+    "icon": "Icon",
+    "icon_placeholder": "Select an icon",
+    "type": "Type"
+  }
+}

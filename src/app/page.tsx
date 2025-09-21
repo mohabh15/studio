@@ -2,8 +2,9 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import { useLocalStorage } from '@/hooks/use-local-storage';
-import type { Transaction, Budget } from '@/lib/types';
+import type { Transaction, Budget, Category } from '@/lib/types';
 import { sampleBudgets, sampleTransactions } from '@/lib/sample-data';
+import { defaultCategories } from '@/lib/constants';
 import Header from '@/components/header';
 import SummaryCards from '@/components/dashboard/summary-cards';
 import SpendingChart from '@/components/dashboard/spending-chart';
@@ -16,6 +17,8 @@ export default function DashboardPage() {
   const [isClient, setIsClient] = useState(false);
   const [transactions, setTransactions] = useLocalStorage<Transaction[]>('transactions', []);
   const [budgets, setBudgets] = useLocalStorage<Budget[]>('budgets', []);
+  const [categories, setCategories] = useLocalStorage<Category[]>('categories', []);
+
   const [isAddTransactionOpen, setAddTransactionOpen] = useState(false);
 
   useEffect(() => {
@@ -27,7 +30,10 @@ export default function DashboardPage() {
     if (localStorage.getItem('budgets') === null) {
       setBudgets(sampleBudgets);
     }
-  }, [setBudgets, setTransactions]);
+    if (localStorage.getItem('categories') === null) {
+      setCategories(defaultCategories);
+    }
+  }, [setBudgets, setTransactions, setCategories]);
 
   const summary = useMemo(() => {
     return transactions.reduce(
@@ -61,10 +67,10 @@ export default function DashboardPage() {
           <SummaryCards income={summary.income} expense={summary.expense} />
           <div className="grid gap-4 md:gap-8 lg:grid-cols-2 xl:grid-cols-3">
             <div className="flex flex-col gap-4 xl:col-span-2">
-              <SpendingChart transactions={transactions} />
-              <RecentTransactions transactions={transactions} />
+              <SpendingChart transactions={transactions} categories={categories} />
+              <RecentTransactions transactions={transactions} categories={categories} />
             </div>
-            <BudgetStatus transactions={transactions} budgets={budgets} />
+            <BudgetStatus transactions={transactions} budgets={budgets} categories={categories} />
           </div>
         </main>
       </div>
@@ -72,6 +78,7 @@ export default function DashboardPage() {
         isOpen={isAddTransactionOpen}
         onOpenChange={setAddTransactionOpen}
         onTransactionAdded={handleTransactionAdded}
+        categories={categories}
       />
     </>
   );

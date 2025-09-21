@@ -2,13 +2,15 @@
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { type Transaction } from '@/lib/types';
-import { findCategory } from '@/lib/constants';
+import { type Transaction, type Category } from '@/lib/types';
 import { format } from 'date-fns';
+import * as LucideIcons from 'lucide-react';
+import { getIcon } from '@/lib/utils';
+import { useI18n } from '@/hooks/use-i18n';
 
 type RecentTransactionsProps = {
   transactions: Transaction[];
+  categories: Category[];
 };
 
 const formatCurrency = (amount: number, type: 'income' | 'expense') => {
@@ -19,31 +21,37 @@ const formatCurrency = (amount: number, type: 'income' | 'expense') => {
     }).format(amount)}`;
 };
 
-export default function RecentTransactions({ transactions }: RecentTransactionsProps) {
+export default function RecentTransactions({ transactions, categories }: RecentTransactionsProps) {
+  const { t } = useI18n();
+
   const recentTransactions = [...transactions]
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     .slice(0, 5);
 
+  const findCategory = (id: string): Category | undefined => {
+    return categories.find(c => c.id === id);
+  };
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Recent Transactions</CardTitle>
-        <CardDescription>Your 5 most recent transactions.</CardDescription>
+        <CardTitle>{t('dashboard.recent_transactions.title')}</CardTitle>
+        <CardDescription>{t('dashboard.recent_transactions.description')}</CardDescription>
       </CardHeader>
       <CardContent>
         {recentTransactions.length > 0 ? (
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Details</TableHead>
-                <TableHead className="hidden sm:table-cell">Date</TableHead>
-                <TableHead className="text-right">Amount</TableHead>
+                <TableHead>{t('dashboard.recent_transactions.details')}</TableHead>
+                <TableHead className="hidden sm:table-cell">{t('dashboard.recent_transactions.date')}</TableHead>
+                <TableHead className="text-right">{t('dashboard.recent_transactions.amount')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {recentTransactions.map((tx) => {
                 const category = findCategory(tx.category);
-                const Icon = category?.icon;
+                const Icon = category ? getIcon(category.icon as keyof typeof LucideIcons) : null;
                 return (
                   <TableRow key={tx.id}>
                     <TableCell>
@@ -74,7 +82,7 @@ export default function RecentTransactions({ transactions }: RecentTransactionsP
           </Table>
         ) : (
           <div className="flex h-[200px] w-full items-center justify-center text-muted-foreground">
-            No transactions yet.
+            {t('dashboard.recent_transactions.no_transactions')}
           </div>
         )}
       </CardContent>

@@ -1,0 +1,95 @@
+{
+  "app": {
+    "title": "BudgetWise"
+  },
+  "common": {
+    "income": "Ingresos",
+    "expense": "Gastos",
+    "other": "Otro",
+    "total": "Total",
+    "actions": "Acciones",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "error": "Error"
+  },
+  "header": {
+    "add_transaction": "Añadir Transacción",
+    "settings": "Ajustes",
+    "change_language": "Cambiar Idioma"
+  },
+  "dashboard": {
+    "summary": {
+      "total_income": "Ingresos Totales",
+      "total_expenses": "Gastos Totales",
+      "balance": "Balance",
+      "this_month": "Este mes",
+      "remaining_funds": "Fondos restantes"
+    },
+    "spending_overview": {
+      "title": "Resumen de Gastos",
+      "description": "Un desglose de tus gastos por categoría para este mes.",
+      "no_data": "No hay datos de gastos para mostrar."
+    },
+    "recent_transactions": {
+      "title": "Transacciones Recientes",
+      "description": "Tus 5 transacciones más recientes.",
+      "details": "Detalles",
+      "date": "Fecha",
+      "amount": "Cantidad",
+      "no_transactions": "Aún no hay transacciones."
+    },
+    "budget_status": {
+      "title": "Estado del Presupuesto",
+      "description": "Cómo vas con tus presupuestos este mes.",
+      "left": "restante",
+      "over": "excedido",
+      "no_budgets": "No hay presupuestos establecidos."
+    }
+  },
+  "add_transaction_dialog": {
+    "title": "Añadir Transacción",
+    "description": "Introduce manualmente una nueva transacción o escanea un recibo para empezar.",
+    "scan_receipt": "Escanear un Recibo",
+    "scanning": "Escaneando",
+    "or_manual": "O Introduce Manualmente",
+    "amount": "Cantidad",
+    "date": "Fecha",
+    "pick_a_date": "Elige una fecha",
+    "category": "Categoría",
+    "select_category": "Selecciona una categoría",
+    "merchant": "Comercio",
+    "merchant_placeholder": "p. ej., Amazon, Starbucks",
+    "notes": "Notas",
+    "notes_placeholder": "Añade una nota corta...",
+    "save_transaction": "Guardar Transacción",
+    "scan_failed_title": "Escaneo Fallido",
+    "scan_successful_title": "Escaneo Exitoso",
+    "scan_successful_desc": "Los datos del recibo han sido rellenados.",
+    "read_file_error": "Error al leer el archivo."
+  },
+  "settings_page": {
+    "title": "Ajustes",
+    "description": "Gestiona los ajustes y preferencias de tu aplicación.",
+    "expense_categories": "Categorías de Gastos",
+    "manage_expense_categories": "Añade, edita o elimina tus categorías de gastos.",
+    "add_category": "Añadir Categoría",
+    "category_name": "Nombre de la Categoría",
+    "income_categories": "Categorías de Ingresos",
+    "manage_income_categories": "Añade, edita o elimina tus categorías de ingresos.",
+    "delete_dialog_title": "¿Estás seguro de que quieres eliminar esta categoría?",
+    "delete_dialog_description": "Esta acción no se puede deshacer. Esto eliminará permanentemente la categoría."
+  },
+  "category_dialog": {
+    "add_title": "Añadir Categoría",
+    "add_description": "Crea una nueva categoría para tus transacciones.",
+    "edit_title": "Editar Categoría",
+    "edit_description": "Actualiza los detalles de tu categoría.",
+    "name": "Nombre",
+    "name_placeholder": "p. ej., Comestibles",
+    "icon": "Icono",
+    "icon_placeholder": "Selecciona un icono",
+    "type": "Tipo"
+  }
+}
