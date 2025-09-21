@@ -6,6 +6,7 @@ import type { Category, Transaction } from '@/lib/types';
 import { defaultCategories } from '@/lib/constants';
 import AddTransactionDialog from '../transactions/add-transaction-dialog';
 import BottomNav from './bottom-nav';
+import { ThemeToggle } from '../theme/theme-toggle';
 
 type AppLayoutProps = {
   children: React.ReactNode;
@@ -25,6 +26,9 @@ export default function AppLayout({ children }: AppLayoutProps) {
   return (
     <>
       <div className="flex min-h-screen w-full flex-col">
+        <div className="absolute right-4 top-4">
+          <ThemeToggle />
+        </div>
         <div className="pb-24">{children}</div>
         <BottomNav onAddTransaction={() => setAddTransactionOpen(true)} />
       </div>
