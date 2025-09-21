@@ -9,17 +9,17 @@ import SummaryCards from '@/components/dashboard/summary-cards';
 import SpendingChart from '@/components/dashboard/spending-chart';
 import RecentTransactions from '@/components/dashboard/recent-transactions';
 import BudgetStatus from '@/components/dashboard/budget-status';
-import AddTransactionDialog from '@/components/transactions/add-transaction-dialog';
 import DashboardSkeleton from '@/components/dashboard/dashboard-skeleton';
 import AppLayout from '@/components/layout/app-layout';
+import { Wallet } from 'lucide-react';
+import { useI18n } from '@/hooks/use-i18n';
 
 export default function DashboardPage() {
+  const { t } = useI18n();
   const [isClient, setIsClient] = useState(false);
   const [transactions, setTransactions] = useLocalStorage<Transaction[]>('transactions', []);
   const [budgets, setBudgets] = useLocalStorage<Budget[]>('budgets', []);
   const [categories, setCategories] = useLocalStorage<Category[]>('categories', []);
-
-  const [isAddTransactionOpen, setAddTransactionOpen] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
@@ -50,19 +50,19 @@ export default function DashboardPage() {
     );
   }, [transactions]);
 
-  const handleTransactionAdded = (newTx: Omit<Transaction, 'id'>) => {
-    const fullTx = { ...newTx, id: new Date().toISOString() };
-    setTransactions(prev => [fullTx, ...prev]);
-    setAddTransactionOpen(false);
-  };
-
   if (!isClient) {
     return <DashboardSkeleton />;
   }
 
   return (
     <>
-      <AppLayout onAddTransaction={() => setAddTransactionOpen(true)}>
+      <AppLayout>
+        <header className="flex items-center gap-2 p-4 sm:px-6 sm:py-4 border-b">
+          <Wallet className="h-7 w-7 text-primary" />
+          <h1 className="text-xl font-bold tracking-tight text-foreground">
+            {t('app.title')}
+          </h1>
+        </header>
         <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-6 lg:p-8">
           <SummaryCards income={summary.income} expense={summary.expense} />
           <div className="grid grid-cols-1 gap-4 md:gap-8 lg:grid-cols-3">
@@ -76,12 +76,6 @@ export default function DashboardPage() {
           </div>
         </main>
       </AppLayout>
-      <AddTransactionDialog
-        isOpen={isAddTransactionOpen}
-        onOpenChange={setAddTransactionOpen}
-        onTransactionAdded={handleTransactionAdded}
-        categories={categories}
-      />
     </>
   );
 }

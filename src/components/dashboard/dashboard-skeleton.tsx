@@ -5,11 +5,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 export default function DashboardSkeleton() {
   return (
     <>
-      <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-background px-4 sm:px-6">
+      <header className="flex h-16 items-center gap-4 border-b bg-background px-4 sm:px-6">
         <Skeleton className="h-9 w-36 rounded-md" />
-        <div className="ml-auto">
-          <Skeleton className="h-9 w-36 rounded-md" />
-        </div>
       </header>
       <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-6 lg:p-8">
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -100,6 +97,13 @@ export default function DashboardSkeleton() {
           </div>
         </div>
       </main>
+      <div className="fixed bottom-0 left-0 right-0 h-20 border-t bg-background">
+        <div className="mx-auto flex h-full max-w-md items-center justify-around">
+          {[...Array(3)].map((_, i) => (
+            <Skeleton key={i} className="h-10 w-16" />
+          ))}
+        </div>
+      </div>
     </>
   );
 }
