@@ -25,7 +25,7 @@ export default function Header({ onAddTransaction }: HeaderProps) {
         </h1>
       </Link>
       <div className="ml-auto flex items-center gap-2">
-        <Button onClick={onAddTransaction} size="sm">
+        <Button onClick={onAddTransaction} size="sm" variant="outline">
           <PlusCircle className="mr-2 h-4 w-4" />
           {t('header.add_transaction')}
         </Button>

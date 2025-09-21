@@ -36,7 +36,8 @@ export default function DashboardPage() {
   }, [setBudgets, setTransactions, setCategories]);
 
   const summary = useMemo(() => {
-    return transactions.reduce(
+    const currentMonthTxs = transactions.filter(tx => new Date(tx.date).getMonth() === new Date().getMonth());
+    return currentMonthTxs.reduce(
       (acc, transaction) => {
         if (transaction.type === 'income') {
           acc.income += transaction.amount;
@@ -61,16 +62,18 @@ export default function DashboardPage() {
 
   return (
     <>
-      <div className="flex min-h-screen w-full flex-col">
+      <div className="flex min-h-screen w-full flex-col bg-background">
         <Header onAddTransaction={() => setAddTransactionOpen(true)} />
         <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-6 lg:p-8">
           <SummaryCards income={summary.income} expense={summary.expense} />
-          <div className="grid gap-4 md:gap-8 lg:grid-cols-2 xl:grid-cols-3">
-            <div className="flex flex-col gap-4 xl:col-span-2">
-              <SpendingChart transactions={transactions} categories={categories} />
+          <div className="grid grid-cols-1 gap-4 md:gap-8 lg:grid-cols-3">
+            <div className="flex flex-col gap-4 lg:col-span-2">
               <RecentTransactions transactions={transactions} categories={categories} />
             </div>
-            <BudgetStatus transactions={transactions} budgets={budgets} categories={categories} />
+            <div className="flex flex-col gap-4">
+              <BudgetStatus transactions={transactions} budgets={budgets} categories={categories} />
+              <SpendingChart transactions={transactions} categories={categories} />
+            </div>
           </div>
         </main>
       </div>

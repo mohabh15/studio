@@ -7,6 +7,7 @@ import { Progress } from '@/components/ui/progress';
 import type { Transaction, Budget, Category } from '@/lib/types';
 import { useI18n } from '@/hooks/use-i18n';
 import { getIcon } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 
 type BudgetStatusProps = {
   transactions: Transaction[];
@@ -31,9 +32,9 @@ export default function BudgetStatus({ transactions, budgets, categories }: Budg
         .filter(t => t.type === 'expense' && t.category === budget.category)
         .reduce((sum, t) => sum + t.amount, 0);
       const remaining = budget.amount - spent;
-      const progress = (spent / budget.amount) * 100;
+      const progress = Math.min((spent / budget.amount) * 100, 100);
       const category = categories.find(c => c.id === budget.category);
-      const Icon = category ? getIcon(category.icon as keyof typeof LucideIcons) : null;
+      const Icon = category ? getIcon(category.icon as keyof typeof LucideIcons) : LucideIcons.Package;
       return {
         ...budget,
         spent,
@@ -58,24 +59,24 @@ export default function BudgetStatus({ transactions, budgets, categories }: Budg
               <div key={budget.id} className="flex flex-col gap-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    {budget.Icon && <budget.Icon className="h-5 w-5 text-muted-foreground" />}
+                    <budget.Icon className="h-5 w-5 text-muted-foreground" />
                     <span className="font-medium">{budget.categoryName}</span>
                   </div>
-                  <span className="text-sm text-muted-foreground">
-                    {formatCurrency(budget.spent)} / {formatCurrency(budget.amount)}
+                  <span className="text-sm font-semibold">
+                    {formatCurrency(budget.spent)}
                   </span>
                 </div>
                 <Progress value={budget.progress} aria-label={`${budget.categoryName} budget progress`} />
                 <p className="text-xs text-muted-foreground text-right">
-                  {formatCurrency(Math.abs(budget.remaining))}{' '}
-                  {budget.remaining >= 0 ? t('dashboard.budget_status.left') : t('dashboard.budget_status.over')}
+                  <span className="font-semibold">{formatCurrency(budget.amount)}</span> Budget
                 </p>
               </div>
             ))}
           </div>
         ) : (
-          <div className="flex h-full min-h-[200px] w-full items-center justify-center text-muted-foreground">
-            {t('dashboard.budget_status.no_budgets')}
+          <div className="flex h-full min-h-[200px] w-full flex-col items-center justify-center gap-4 rounded-md border-2 border-dashed">
+            <p className="text-center text-muted-foreground">{t('dashboard.budget_status.no_budgets')}</p>
+            <Button variant="outline" size="sm">Set Budgets</Button>
           </div>
         )}
       </CardContent>

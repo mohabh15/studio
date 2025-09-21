@@ -1,7 +1,7 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { TrendingUp, TrendingDown, Scale } from 'lucide-react';
+import { ArrowDown, ArrowUp, DollarSign } from 'lucide-react';
 import { useI18n } from '@/hooks/use-i18n';
 
 type SummaryCardsProps = {
@@ -25,7 +25,7 @@ export default function SummaryCards({ income, expense }: SummaryCardsProps) {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">{t('dashboard.summary.total_income')}</CardTitle>
-          <TrendingUp className="h-5 w-5 text-green-500" />
+          <ArrowUp className="h-5 w-5 text-primary" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{formatCurrency(income)}</div>
@@ -35,7 +35,7 @@ export default function SummaryCards({ income, expense }: SummaryCardsProps) {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">{t('dashboard.summary.total_expenses')}</CardTitle>
-          <TrendingDown className="h-5 w-5 text-red-500" />
+          <ArrowDown className="h-5 w-5 text-destructive" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{formatCurrency(expense)}</div>
@@ -45,7 +45,7 @@ export default function SummaryCards({ income, expense }: SummaryCardsProps) {
       <Card className="lg:col-span-1">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">{t('dashboard.summary.balance')}</CardTitle>
-          <Scale className="h-5 w-5 text-muted-foreground" />
+          <DollarSign className="h-5 w-5 text-muted-foreground" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{formatCurrency(balance)}</div>

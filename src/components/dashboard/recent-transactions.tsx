@@ -7,18 +7,13 @@ import { format } from 'date-fns';
 import * as LucideIcons from 'lucide-react';
 import { getIcon } from '@/lib/utils';
 import { useI18n } from '@/hooks/use-i18n';
+import { Badge } from '@/components/ui/badge';
 
-type RecentTransactionsProps = {
-  transactions: Transaction[];
-  categories: Category[];
-};
-
-const formatCurrency = (amount: number, type: 'income' | 'expense') => {
-    const sign = type === 'income' ? '+' : '-';
-    return `${sign} ${new Intl.NumberFormat('en-US', {
+const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
-    }).format(amount)}`;
+    }).format(amount);
 };
 
 export default function RecentTransactions({ transactions, categories }: RecentTransactionsProps) {
@@ -51,29 +46,25 @@ export default function RecentTransactions({ transactions, categories }: RecentT
             <TableBody>
               {recentTransactions.map((tx) => {
                 const category = findCategory(tx.category);
-                const Icon = category ? getIcon(category.icon as keyof typeof LucideIcons) : null;
+                const Icon = category ? getIcon(category.icon as keyof typeof LucideIcons) : LucideIcons.Package;
                 return (
                   <TableRow key={tx.id}>
                     <TableCell>
                       <div className="flex items-center gap-3">
-                        {Icon && (
-                          <div className="hidden h-10 w-10 items-center justify-center rounded-lg bg-muted sm:flex">
-                            <Icon className="h-5 w-5 text-muted-foreground" />
-                          </div>
-                        )}
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
+                          <Icon className="h-5 w-5 text-muted-foreground" />
+                        </div>
                         <div>
-                          <p className="font-medium">{category?.name || 'Transaction'}</p>
-                          <p className="text-sm text-muted-foreground">{tx.merchant || tx.notes}</p>
+                          <p className="font-medium">{tx.merchant || 'N/A'}</p>
+                          <p className="text-sm text-muted-foreground">{category?.name || 'Uncategorized'}</p>
                         </div>
                       </div>
                     </TableCell>
                     <TableCell className="hidden sm:table-cell">{format(new Date(tx.date), 'MMM d, yyyy')}</TableCell>
-                    <TableCell
-                      className={`text-right font-medium ${
-                        tx.type === 'income' ? 'text-green-500' : 'text-foreground'
-                      }`}
-                    >
-                      {formatCurrency(tx.amount, tx.type)}
+                    <TableCell className="text-right font-medium">
+                      <Badge variant={tx.type === 'income' ? 'default' : 'secondary'} className={tx.type === 'income' ? 'bg-green-500/20 text-green-500' : ''}>
+                        {tx.type === 'income' ? '+' : '-'} {formatCurrency(tx.amount)}
+                      </Badge>
                     </TableCell>
                   </TableRow>
                 );
@@ -81,11 +72,16 @@ export default function RecentTransactions({ transactions, categories }: RecentT
             </TableBody>
           </Table>
         ) : (
-          <div className="flex h-[200px] w-full items-center justify-center text-muted-foreground">
-            {t('dashboard.recent_transactions.no_transactions')}
+          <div className="flex h-[200px] w-full items-center justify-center rounded-md border-2 border-dashed">
+            <p className="text-muted-foreground">{t('dashboard.recent_transactions.no_transactions')}</p>
           </div>
         )}
       </CardContent>
     </Card>
   );
 }
+
+type RecentTransactionsProps = {
+  transactions: Transaction[];
+  categories: Category[];
+};
