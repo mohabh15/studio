@@ -1,11 +1,11 @@
 'use client';
 
 import { useMemo } from 'react';
-import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from 'recharts';
+import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { ChartTooltipContent } from '@/components/ui/chart';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { type Transaction } from '@/lib/types';
-import { CATEGORIES, findCategory } from '@/lib/constants';
+import { findCategory } from '@/lib/constants';
 
 type SpendingChartProps = {
   transactions: Transaction[];
@@ -25,6 +25,12 @@ export default function SpendingChart({ transactions }: SpendingChartProps) {
       .sort((a, b) => b.total - a.total);
   }, [transactions]);
 
+  const chartConfig = {
+    total: {
+      label: 'Total',
+    },
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -33,17 +39,19 @@ export default function SpendingChart({ transactions }: SpendingChartProps) {
       </CardHeader>
       <CardContent>
         {chartData.length > 0 ? (
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={chartData}>
-              <XAxis dataKey="name" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
-              <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `$${value}`} />
-              <Tooltip 
-                cursor={{ fill: 'hsl(var(--accent))', opacity: 0.3 }}
-                content={<ChartTooltipContent />}
-              />
-              <Bar dataKey="total" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
+          <ChartContainer config={chartConfig} className="min-h-[300px] w-full">
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={chartData}>
+                <XAxis dataKey="name" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
+                <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `$${value}`} />
+                <ChartTooltip 
+                  cursor={{ fill: 'hsl(var(--accent))', opacity: 0.3 }}
+                  content={<ChartTooltipContent />}
+                />
+                <Bar dataKey="total" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </ChartContainer>
         ) : (
           <div className="flex h-[300px] w-full items-center justify-center text-muted-foreground">
             No expense data to display.
