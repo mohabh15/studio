@@ -1,5 +1,7 @@
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { PlusCircle, Languages } from 'lucide-react';
+import { PlusCircle, Languages, Wallet, Home, List, Settings } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -7,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useI18n } from '@/hooks/use-i18n';
-import { SidebarTrigger } from './ui/sidebar';
+import { cn } from '@/lib/utils';
 
 type HeaderProps = {
   onAddTransaction?: () => void;
@@ -15,10 +17,45 @@ type HeaderProps = {
 
 export default function Header({ onAddTransaction }: HeaderProps) {
   const { t, setLocale, locale } = useI18n();
+  const pathname = usePathname();
+
+  const navItems = [
+    { href: '/', label: t('nav.home'), icon: Home },
+    { href: '/transactions', label: t('nav.transactions'), icon: List },
+    { href: '/settings', label: t('nav.settings'), icon: Settings },
+  ];
 
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-background px-4 sm:px-6">
-      <SidebarTrigger className="md:hidden" />
+      <Link href="/" className="flex items-center gap-2 mr-6">
+        <Wallet className="h-7 w-7 text-primary" />
+        <h1 className="text-xl font-bold tracking-tight text-foreground hidden md:block">
+          {t('app.title')}
+        </h1>
+      </Link>
+
+      <nav className="flex-1">
+        <ul className="flex items-center gap-4">
+          {navItems.map(item => (
+            <li key={item.href}>
+              <Link href={item.href} legacyBehavior passHref>
+                <a
+                  className={cn(
+                    'flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+                    pathname === item.href
+                      ? 'bg-accent text-accent-foreground'
+                      : 'text-muted-foreground hover:bg-accent/50'
+                  )}
+                >
+                  <item.icon className="h-5 w-5" />
+                  <span className="hidden sm:inline">{item.label}</span>
+                </a>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
       <div className="ml-auto flex items-center gap-2">
         {onAddTransaction && (
           <Button onClick={onAddTransaction} size="sm" variant="outline">
