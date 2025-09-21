@@ -17,10 +17,10 @@ export default function SpendingChart({ transactions, categories }: SpendingChar
   const findCategory = (id: string) => categories.find(c => c.id === id);
 
   const chartData = useMemo(() => {
-    const expenseTransactions = transactions.filter(t => t.type === 'expense');
-    const spendingByCategory = expenseTransactions.reduce((acc, t) => {
-      const categoryName = findCategory(t.category)?.name || t('common.other');
-      acc[categoryName] = (acc[categoryName] || 0) + t.amount;
+    const expenseTransactions = transactions.filter(tx => tx.type === 'expense');
+    const spendingByCategory = expenseTransactions.reduce((acc, tx) => {
+      const categoryName = findCategory(tx.category)?.name || t('common.other');
+      acc[categoryName] = (acc[categoryName] || 0) + tx.amount;
       return acc;
     }, {} as Record<string, number>);
 
