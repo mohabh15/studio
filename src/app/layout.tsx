@@ -4,7 +4,7 @@ import './globals.css';
 import { I18nProvider } from '@/context/i18n';
 
 export const metadata: Metadata = {
-  title: 'BudgetFlow',
+  title: 'Budget3M',
   description: 'Smart personal finance management',
 };
 
