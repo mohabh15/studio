@@ -38,18 +38,17 @@ export default function Header({ onAddTransaction }: HeaderProps) {
         <ul className="flex items-center gap-4">
           {navItems.map(item => (
             <li key={item.href}>
-              <Link href={item.href} legacyBehavior passHref>
-                <a
-                  className={cn(
-                    'flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors',
-                    pathname === item.href
-                      ? 'bg-accent text-accent-foreground'
-                      : 'text-muted-foreground hover:bg-accent/50'
-                  )}
-                >
-                  <item.icon className="h-5 w-5" />
-                  <span className="hidden sm:inline">{item.label}</span>
-                </a>
+              <Link
+                href={item.href}
+                className={cn(
+                  'flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+                  pathname === item.href
+                    ? 'bg-accent text-accent-foreground'
+                    : 'text-muted-foreground hover:bg-accent/50'
+                )}
+              >
+                <item.icon className="h-5 w-5" />
+                <span className="hidden sm:inline">{item.label}</span>
               </Link>
             </li>
           ))}
