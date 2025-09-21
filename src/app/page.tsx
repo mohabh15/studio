@@ -5,13 +5,13 @@ import { useLocalStorage } from '@/hooks/use-local-storage';
 import type { Transaction, Budget, Category } from '@/lib/types';
 import { sampleBudgets, sampleTransactions } from '@/lib/sample-data';
 import { defaultCategories } from '@/lib/constants';
-import Header from '@/components/header';
 import SummaryCards from '@/components/dashboard/summary-cards';
 import SpendingChart from '@/components/dashboard/spending-chart';
 import RecentTransactions from '@/components/dashboard/recent-transactions';
 import BudgetStatus from '@/components/dashboard/budget-status';
 import AddTransactionDialog from '@/components/transactions/add-transaction-dialog';
 import DashboardSkeleton from '@/components/dashboard/dashboard-skeleton';
+import AppLayout from '@/components/layout/app-layout';
 
 export default function DashboardPage() {
   const [isClient, setIsClient] = useState(false);
@@ -52,7 +52,7 @@ export default function DashboardPage() {
 
   const handleTransactionAdded = (newTx: Omit<Transaction, 'id'>) => {
     const fullTx = { ...newTx, id: new Date().toISOString() };
-    setTransactions(prev => [...prev, fullTx]);
+    setTransactions(prev => [fullTx, ...prev]);
     setAddTransactionOpen(false);
   };
 
@@ -62,8 +62,7 @@ export default function DashboardPage() {
 
   return (
     <>
-      <div className="flex min-h-screen w-full flex-col bg-background">
-        <Header onAddTransaction={() => setAddTransactionOpen(true)} />
+      <AppLayout onAddTransaction={() => setAddTransactionOpen(true)}>
         <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-6 lg:p-8">
           <SummaryCards income={summary.income} expense={summary.expense} />
           <div className="grid grid-cols-1 gap-4 md:gap-8 lg:grid-cols-3">
@@ -76,7 +75,7 @@ export default function DashboardPage() {
             </div>
           </div>
         </main>
-      </div>
+      </AppLayout>
       <AddTransactionDialog
         isOpen={isAddTransactionOpen}
         onOpenChange={setAddTransactionOpen}

@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useLocalStorage } from '@/hooks/use-local-storage';
-import Header from '@/components/header';
 import { defaultCategories } from '@/lib/constants';
 import type { Category, TransactionType } from '@/lib/types';
 import { Button } from '@/components/ui/button';
@@ -29,7 +28,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-
+import AppLayout from '@/components/layout/app-layout';
 
 export default function SettingsPage() {
   const { t } = useI18n();
@@ -122,8 +121,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="flex min-h-screen w-full flex-col">
-      <Header onAddTransaction={() => {}} />
+    <AppLayout>
       <main className="flex-1 p-4 md:p-6 lg:p-8">
         <div className="mb-6">
           <h1 className="text-3xl font-bold tracking-tight">{t('settings_page.title')}</h1>
@@ -196,6 +194,6 @@ export default function SettingsPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+    </AppLayout>
   );
 }

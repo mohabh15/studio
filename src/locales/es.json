@@ -14,6 +14,11 @@
     "cancel": "Cancelar",
     "error": "Error"
   },
+  "nav": {
+    "home": "Inicio",
+    "transactions": "Transacciones",
+    "settings": "Ajustes"
+  },
   "header": {
     "add_transaction": "Añadir Transacción",
     "settings": "Ajustes",
@@ -47,6 +52,12 @@
       "over": "excedido",
       "no_budgets": "No hay presupuestos establecidos."
     }
+  },
+  "transactions_page": {
+    "title": "Transacciones",
+    "description": "Ve y gestiona todas tus transacciones.",
+    "all_transactions": "Todas las Transacciones",
+    "no_transactions": "No hay transacciones para mostrar."
   },
   "add_transaction_dialog": {
     "title": "Añadir Transacción",

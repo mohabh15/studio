@@ -14,6 +14,11 @@
     "cancel": "Cancel",
     "error": "Error"
   },
+  "nav": {
+    "home": "Home",
+    "transactions": "Transactions",
+    "settings": "Settings"
+  },
   "header": {
     "add_transaction": "Add Transaction",
     "settings": "Settings",
@@ -47,6 +52,12 @@
       "over": "over",
       "no_budgets": "No budgets set."
     }
+  },
+  "transactions_page": {
+    "title": "Transactions",
+    "description": "View and manage all your transactions.",
+    "all_transactions": "All Transactions",
+    "no_transactions": "No transactions to display."
   },
   "add_transaction_dialog": {
     "title": "Add Transaction",
