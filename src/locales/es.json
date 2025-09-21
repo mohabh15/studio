@@ -12,12 +12,15 @@
     "delete": "Eliminar",
     "save": "Guardar",
     "cancel": "Cancelar",
-    "error": "Error"
+    "error": "Error",
+    "amount": "Cantidad",
+    "category": "Categoría"
   },
   "nav": {
-    "home": "Inicio",
+    "overview": "Visión General",
     "transactions": "Transacciones",
-    "settings": "Ajustes"
+    "settings": "Ajustes",
+    "budgets": "Presupuestos"
   },
   "header": {
     "add_transaction": "Añadir Transacción",
@@ -104,5 +107,21 @@
     "icon": "Icono",
     "icon_placeholder": "Selecciona un icono",
     "type": "Tipo"
+  },
+  "budgets_page": {
+    "title": "Presupuestos",
+    "description": "Establece y gestiona tus presupuestos mensuales.",
+    "all_budgets": "Todos los Presupuestos",
+    "no_budgets": "No hay presupuestos para mostrar. Crea uno para empezar.",
+    "add_budget": "Añadir Presupuesto",
+    "delete_dialog_title": "¿Estás seguro de que quieres eliminar este presupuesto?",
+    "delete_dialog_description": "Esta acción no se puede deshacer. Esto eliminará permanentemente el presupuesto."
+  },
+  "budget_dialog": {
+    "add_title": "Añadir Presupuesto",
+    "add_description": "Crea un nuevo presupuesto mensual para una categoría.",
+    "edit_title": "Editar Presupuesto",
+    "edit_description": "Actualiza la cantidad de tu presupuesto.",
+    "select_category": "Selecciona una categoría"
   }
 }

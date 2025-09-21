@@ -8,6 +8,7 @@ import type { Transaction, Budget, Category } from '@/lib/types';
 import { useI18n } from '@/hooks/use-i18n';
 import { getIcon } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 type BudgetStatusProps = {
   transactions: Transaction[];
@@ -27,9 +28,12 @@ const formatCurrency = (amount: number) => {
 export default function BudgetStatus({ transactions, budgets, categories }: BudgetStatusProps) {
   const { t } = useI18n();
   const budgetData = useMemo(() => {
+    const currentMonthTxs = transactions.filter(
+      tx => new Date(tx.date).getMonth() === new Date().getMonth() && tx.type === 'expense'
+    );
     return budgets.map(budget => {
-      const spent = transactions
-        .filter(t => t.type === 'expense' && t.category === budget.category)
+      const spent = currentMonthTxs
+        .filter(t => t.category === budget.category)
         .reduce((sum, t) => sum + t.amount, 0);
       const remaining = budget.amount - spent;
       const progress = Math.min((spent / budget.amount) * 100, 100);
@@ -76,7 +80,9 @@ export default function BudgetStatus({ transactions, budgets, categories }: Budg
         ) : (
           <div className="flex h-full min-h-[200px] w-full flex-col items-center justify-center gap-4 rounded-md border-2 border-dashed">
             <p className="text-center text-muted-foreground">{t('dashboard.budget_status.no_budgets')}</p>
-            <Button variant="outline" size="sm">Set Budgets</Button>
+            <Button asChild variant="outline" size="sm">
+              <Link href="/budgets">{t('budgets_page.add_budget')}</Link>
+            </Button>
           </div>
         )}
       </CardContent>

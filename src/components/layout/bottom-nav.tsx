@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Home, List, Settings, Plus } from 'lucide-react';
+import { Home, List, Settings, Plus, Wallet } from 'lucide-react';
 import { useI18n } from '@/hooks/use-i18n';
 import { cn } from '@/lib/utils';
 
@@ -16,8 +16,9 @@ export default function BottomNav({ onAddTransaction }: BottomNavProps) {
   const pathname = usePathname();
 
   const navItems = [
-    { href: '/', label: t('nav.home'), icon: Home },
+    { href: '/', label: t('nav.overview'), icon: Home },
     { href: '/transactions', label: t('nav.transactions'), icon: List },
+    { href: '/budgets', label: t('nav.budgets'), icon: Wallet },
     { href: '/settings', label: t('nav.settings'), icon: Settings },
   ];
 
@@ -25,7 +26,7 @@ export default function BottomNav({ onAddTransaction }: BottomNavProps) {
     <div className="fixed bottom-0 left-0 right-0 z-40 border-t bg-background/95 backdrop-blur-sm">
       <nav className="mx-auto flex h-20 max-w-md items-center">
         <div className="flex flex-1 items-center justify-around">
-          {navItems.slice(0, 1).map(item => (
+          {navItems.slice(0, 2).map(item => (
             <Link
               key={item.href}
               href={item.href}
@@ -56,7 +57,7 @@ export default function BottomNav({ onAddTransaction }: BottomNavProps) {
         )}
 
         <div className="flex flex-1 items-center justify-around">
-          {navItems.slice(1).map(item => (
+          {navItems.slice(2).map(item => (
             <Link
               key={item.href}
               href={item.href}

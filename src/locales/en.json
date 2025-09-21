@@ -12,12 +12,15 @@
     "delete": "Delete",
     "save": "Save",
     "cancel": "Cancel",
-    "error": "Error"
+    "error": "Error",
+    "amount": "Amount",
+    "category": "Category"
   },
   "nav": {
-    "home": "Home",
+    "overview": "Overview",
     "transactions": "Transactions",
-    "settings": "Settings"
+    "settings": "Settings",
+    "budgets": "Budgets"
   },
   "header": {
     "add_transaction": "Add Transaction",
@@ -104,5 +107,21 @@
     "icon": "Icon",
     "icon_placeholder": "Select an icon",
     "type": "Type"
+  },
+  "budgets_page": {
+    "title": "Budgets",
+    "description": "Set and manage your monthly budgets.",
+    "all_budgets": "All Budgets",
+    "no_budgets": "No budgets to display. Create one to get started.",
+    "add_budget": "Add Budget",
+    "delete_dialog_title": "Are you sure you want to delete this budget?",
+    "delete_dialog_description": "This action cannot be undone. This will permanently delete the budget."
+  },
+  "budget_dialog": {
+    "add_title": "Add Budget",
+    "add_description": "Create a new monthly budget for a category.",
+    "edit_title": "Edit Budget",
+    "edit_description": "Update the amount for your budget.",
+    "select_category": "Select a category"
   }
 }
