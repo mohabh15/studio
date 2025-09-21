@@ -7,7 +7,7 @@ import type { Category, TransactionType } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { PlusCircle, Trash2, Edit, MoreHorizontal } from 'lucide-react';
+import { PlusCircle, Trash2, Edit, MoreHorizontal, Languages } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -31,7 +31,7 @@ import {
 import AppLayout from '@/components/layout/app-layout';
 
 export default function SettingsPage() {
-  const { t } = useI18n();
+  const { t, setLocale, locale } = useI18n();
   const [isClient, setIsClient] = useState(false);
   const [categories, setCategories] = useLocalStorage<Category[]>('categories', []);
   const [isDialogOpen, setDialogOpen] = useState(false);
@@ -129,6 +129,31 @@ export default function SettingsPage() {
         </div>
 
         <div className="grid gap-6">
+          <Card>
+            <CardHeader>
+                <CardTitle>{t('settings_page.language_title')}</CardTitle>
+                <CardDescription>{t('settings_page.language_description')}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="w-full justify-between">
+                    <span>{locale === 'en' ? 'English' : 'Español'}</span>
+                    <Languages className="h-4 w-4 text-muted-foreground" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
+                  <DropdownMenuItem onClick={() => setLocale('en')} disabled={locale === 'en'}>
+                    English
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setLocale('es')} disabled={locale === 'es'}>
+                    Español
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </CardContent>
+          </Card>
+
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <div>

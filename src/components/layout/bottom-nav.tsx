@@ -3,13 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Home, List, Settings, Plus, Languages } from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { Home, List, Settings, Plus } from 'lucide-react';
 import { useI18n } from '@/hooks/use-i18n';
 import { cn } from '@/lib/utils';
 
@@ -18,7 +12,7 @@ type BottomNavProps = {
 };
 
 export default function BottomNav({ onAddTransaction }: BottomNavProps) {
-  const { t, setLocale, locale } = useI18n();
+  const { t } = useI18n();
   const pathname = usePathname();
 
   const navItems = [
@@ -46,22 +40,6 @@ export default function BottomNav({ onAddTransaction }: BottomNavProps) {
               <span className="text-xs font-medium">{item.label}</span>
             </Link>
           ))}
-           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="text-muted-foreground">
-                <Languages className="h-6 w-6" />
-                <span className="sr-only">{t('header.change_language')}</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="center" side="top" className="mb-2">
-              <DropdownMenuItem onClick={() => setLocale('en')} disabled={locale === 'en'}>
-                English
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setLocale('es')} disabled={locale === 'es'}>
-                Español
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
         </div>
 
         {onAddTransaction && (

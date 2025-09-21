@@ -83,6 +83,8 @@
   "settings_page": {
     "title": "Settings",
     "description": "Manage your application settings and preferences.",
+    "language_title": "Language",
+    "language_description": "Choose your preferred language.",
     "expense_categories": "Expense Categories",
     "manage_expense_categories": "Add, edit, or remove your expense categories.",
     "add_category": "Add Category",
