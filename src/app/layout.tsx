@@ -3,6 +3,7 @@ import { Toaster } from '@/components/ui/toaster';
 import './globals.css';
 import { I18nProvider } from '@/context/i18n';
 import { ThemeProvider } from 'next-themes';
+import ThemeColorSetter from '@/components/theme/ThemeColorSetter';
 
 export const metadata: Metadata = {
   title: 'Budget3M',
@@ -18,6 +19,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+        <meta name="theme-color" content="#000000" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
@@ -28,6 +30,7 @@ export default function RootLayout({
       <body className="font-body antialiased">
         <I18nProvider>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            <ThemeColorSetter />
             {children}
             <Toaster />
           </ThemeProvider>
