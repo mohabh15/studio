@@ -14,6 +14,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { ThemeToggle } from '@/components/theme/theme-toggle';
 import { getIcon } from '@/lib/utils';
 import CategoryDialog from '@/components/settings/category-dialog';
 import { useI18n } from '@/hooks/use-i18n';
@@ -40,10 +41,29 @@ export default function SettingsPage() {
 
   useEffect(() => {
     setIsClient(true);
-    if (localStorage.getItem('categories') === null) {
+  }, []);
+
+  // Efecto separado para inicializar las categorías solo una vez
+  useEffect(() => {
+    if (!isClient) return; // Solo ejecutar cuando el cliente esté listo
+    
+    const storedCategories = localStorage.getItem('categories');
+    const needsUpdate = storedCategories && JSON.parse(storedCategories).some(
+      (cat: Category) => !cat.name.startsWith('categories.')
+    );
+
+    if (!storedCategories) {
       setCategories(defaultCategories);
+    } else if (needsUpdate) {
+      // Actualizar las categorías existentes para usar las claves de traducción
+      const parsedCategories = JSON.parse(storedCategories) as Category[];
+      const updatedCategories = parsedCategories.map(cat => ({
+        ...cat,
+        name: cat.name.startsWith('categories.') ? cat.name : `categories.${cat.id}`
+      }));
+      setCategories(updatedCategories);
     }
-  }, [setCategories]);
+  }, [isClient]);
 
   const handleAddCategory = () => {
     setEditingCategory(null);
@@ -67,14 +87,20 @@ export default function SettingsPage() {
   }
 
   const handleSaveCategory = (categoryData: Omit<Category, 'id'>) => {
+    // Si el nombre ya es una clave de traducción, lo usamos tal cual
+    const nameKey = categoryData.name.startsWith('categories.') 
+      ? categoryData.name 
+      : `categories.${categoryData.name.toLowerCase().replace(/\s+/g, '_')}`;
+
     if (editingCategory) {
-      // Edit
+      // Edit - mantener el ID existente
       setCategories(prev =>
-        prev.map(c => (c.id === editingCategory.id ? { ...categoryData, id: c.id } : c))
+        prev.map(c => (c.id === editingCategory.id ? { ...categoryData, name: nameKey, id: c.id } : c))
       );
     } else {
-      // Add
-      setCategories(prev => [...prev, { ...categoryData, id: new Date().toISOString() }]);
+      // Add - usar el nombre sin el prefijo como ID
+      const id = nameKey.replace('categories.', '');
+      setCategories(prev => [...prev, { ...categoryData, name: nameKey, id }]);
     }
     setDialogOpen(false);
   };
@@ -89,7 +115,7 @@ export default function SettingsPage() {
             <TableCell>
               <div className="flex items-center gap-3">
                 <Icon className="h-5 w-5 text-muted-foreground" />
-                <span className="font-medium">{category.name}</span>
+                <span className="font-medium">{t(category.name)}</span>
               </div>
             </TableCell>
             <TableCell className="text-right">
@@ -122,8 +148,11 @@ export default function SettingsPage() {
 
   return (
     <AppLayout>
-      <main className="flex-1 p-4 md:p-6 lg:p-8">
-        <div className="mb-6">
+      <main className="flex-1 space-y-4 p-4 md:p-6 lg:p-8">
+        <div className="absolute right-4 top-4">
+          <ThemeToggle />
+        </div>
+        <div>
           <h1 className="text-3xl font-bold tracking-tight">{t('settings_page.title')}</h1>
           <p className="text-muted-foreground">{t('settings_page.description')}</p>
         </div>
@@ -153,6 +182,7 @@ export default function SettingsPage() {
               </DropdownMenu>
             </CardContent>
           </Card>
+
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">

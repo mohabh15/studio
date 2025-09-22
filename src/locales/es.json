@@ -14,10 +14,24 @@
     "cancel": "Cancelar",
     "error": "Error",
     "amount": "Cantidad",
-    "category": "Categoría"
+    "category": "Categoría",
+    "uncategorized": "Sin categoría"
+  },
+  "categories": {
+    "groceries": "Comestibles",
+    "rent": "Alquiler y Servicios",
+    "transport": "Transporte",
+    "clothing": "Ropa",
+    "entertainment": "Entretenimiento",
+    "health": "Salud",
+    "gifts": "Regalos",
+    "other_expense": "Otros Gastos",
+    "salary": "Salario",
+    "savings": "Ahorros",
+    "other_income": "Otros Ingresos"
   },
   "nav": {
-    "overview": "Visión General",
+    "overview": "Visión\nGeneral",
     "transactions": "Transacciones",
     "settings": "Ajustes",
     "budgets": "Presupuestos"
@@ -88,6 +102,10 @@
     "description": "Gestiona los ajustes y preferencias de tu aplicación.",
     "language_title": "Idioma",
     "language_description": "Elige tu idioma preferido.",
+    "appearance": "Apariencia",
+    "manage_appearance": "Personaliza el aspecto de la aplicación.",
+    "theme": "Tema",
+    "theme_description": "Cambia entre tema claro y oscuro.",
     "expense_categories": "Categorías de Gastos",
     "manage_expense_categories": "Añade, edita o elimina tus categorías de gastos.",
     "add_category": "Añadir Categoría",

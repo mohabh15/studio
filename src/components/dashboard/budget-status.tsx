@@ -44,7 +44,7 @@ export default function BudgetStatus({ transactions, budgets, categories }: Budg
         spent,
         remaining,
         progress,
-        categoryName: category?.name,
+        categoryName: t(category?.name || ''),
         Icon,
       };
     });

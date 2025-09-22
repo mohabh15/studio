@@ -14,7 +14,21 @@
     "cancel": "Cancel",
     "error": "Error",
     "amount": "Amount",
-    "category": "Category"
+    "category": "Category",
+    "uncategorized": "Uncategorized"
+  },
+  "categories": {
+    "groceries": "Groceries",
+    "rent": "Rent & Utilities",
+    "transport": "Transport",
+    "clothing": "Clothing",
+    "entertainment": "Entertainment",
+    "health": "Health",
+    "gifts": "Gifts",
+    "other_expense": "Other Expense",
+    "salary": "Salary",
+    "savings": "Savings",
+    "other_income": "Other Income"
   },
   "nav": {
     "overview": "Overview",

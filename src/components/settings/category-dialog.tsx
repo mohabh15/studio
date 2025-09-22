@@ -29,14 +29,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { iconNames, getIcon } from '@/lib/utils';
+import { commonIconNames, getIcon } from '@/lib/utils';
+import * as LucideIcons from 'lucide-react';
 import type { Category } from '@/lib/types';
 import { useI18n } from '@/hooks/use-i18n';
 import { ScrollArea } from '../ui/scroll-area';
 
 const categorySchema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  icon: z.string().min(1, 'Icon is required'),
+  name: z.string().min(1, { message: 'Name is required' }),
+  icon: z.string().min(1, { message: 'Icon is required' }),
   type: z.enum(['income', 'expense']),
 });
 
@@ -68,7 +69,16 @@ export default function CategoryDialog({
 
   useEffect(() => {
     if (category) {
-      form.reset(category);
+      // Si el nombre es una clave de traducción (empieza con 'categories.'), 
+      // extraemos el nombre base
+      const name = category.name.startsWith('categories.') 
+        ? category.name.replace('categories.', '')
+        : category.name;
+      
+      form.reset({
+        ...category,
+        name
+      });
     } else {
       form.reset({
         name: '',
@@ -79,7 +89,16 @@ export default function CategoryDialog({
   }, [category, form, isOpen]);
 
   const onSubmit = (values: CategoryFormValues) => {
-    onSave(values);
+    // Crear un ID para la categoría basado en el nombre (solo para nuevas categorías)
+    const categoryId = values.name.toLowerCase().replace(/\s+/g, '_');
+    
+    // Asegurarse de que el nombre use el formato de traducción
+    const processedValues = {
+      ...values,
+      name: `categories.${categoryId}`
+    };
+    
+    onSave(processedValues);
   };
 
   return (
@@ -122,8 +141,8 @@ export default function CategoryDialog({
                     </FormControl>
                     <SelectContent>
                       <ScrollArea className="h-72">
-                        {iconNames.map(iconName => {
-                          const Icon = getIcon(iconName as any);
+                        {commonIconNames.map(iconName => {
+                          const Icon = getIcon(iconName as keyof typeof LucideIcons);
                           return (
                             <SelectItem key={iconName} value={iconName}>
                               <div className="flex items-center gap-2">

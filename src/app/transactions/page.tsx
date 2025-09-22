@@ -84,7 +84,7 @@ export default function TransactionsPage() {
                             </div>
                             <div>
                               <p className="font-medium">{tx.merchant || 'N/A'}</p>
-                              <p className="text-sm text-muted-foreground">{category?.name || 'Uncategorized'}</p>
+                              <p className="text-sm text-muted-foreground">{category ? t(category.name) : t('common.uncategorized')}</p>
                             </div>
                           </div>
                         </TableCell>
