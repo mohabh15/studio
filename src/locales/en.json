@@ -36,11 +36,6 @@
     "settings": "Settings",
     "budgets": "Budgets"
   },
-  "header": {
-    "add_transaction": "Add Transaction",
-    "settings": "Settings",
-    "change_language": "Change Language"
-  },
   "dashboard": {
     "summary": {
       "total_income": "Total Income",
