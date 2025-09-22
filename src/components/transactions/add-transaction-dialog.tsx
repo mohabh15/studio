@@ -151,14 +151,14 @@ export default function AddTransactionDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[480px]">
-        <DialogHeader>
+      <DialogContent className="sm:max-w-[480px] p-6">
+        <DialogHeader className="space-y-2">
           <DialogTitle>{t('add_transaction_dialog.title')}</DialogTitle>
           <DialogDescription>
             {t('add_transaction_dialog.description')}
           </DialogDescription>
         </DialogHeader>
-        <div className="relative mt-4">
+        <div className="relative mt-3">
           <Button
             variant="outline"
             className="w-full"
@@ -186,7 +186,7 @@ export default function AddTransactionDialog({
           />
         </div>
 
-        <div className="relative my-4 flex items-center justify-center">
+        <div className="relative my-3 flex items-center justify-center">
           <div className="absolute inset-0 flex items-center">
             <span className="w-full border-t" />
           </div>
@@ -196,7 +196,7 @@ export default function AddTransactionDialog({
         </div>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
             <div className="grid grid-cols-2 gap-4">
               <Button
                 type="button"
@@ -278,7 +278,7 @@ export default function AddTransactionDialog({
                       <SelectContent>
                         {filteredCategories.map(cat => (
                           <SelectItem key={cat.id} value={cat.id}>
-                            {cat.name}
+                            {t(cat.name)}
                           </SelectItem>
                         ))}
                       </SelectContent>
