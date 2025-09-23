@@ -1,11 +1,9 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { View, ScrollView, StyleSheet } from 'react-native';
-import { Text, Card, FAB, Portal } from 'react-native-paper';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
-
 import { useI18n } from '../hooks/useI18n';
-import { useAsyncStorage } from '../hooks/useAsyncStorage';
+import { useRealtimeTransactions, useRealtimeBudgets, useRealtimeCategories } from '../hooks/use-realtime';
+import { FirestoreSyncStatus } from '../components/FirestoreSyncStatus';
+import { FirestoreConfig } from '../components/FirestoreConfig';
+import { FirestoreTestPanel } from '../components/FirestoreTestPanel';
 import { Transaction, Budget, Category } from '../types';
 import { sampleTransactions, sampleBudgets } from '../data/sampleData';
 import { defaultCategories } from '../constants/categories';
@@ -14,32 +12,91 @@ import SummaryCards from '../components/SummaryCards';
 import RecentTransactions from '../components/RecentTransactions';
 import BudgetStatus from '../components/BudgetStatus';
 import AddTransactionModal from '../components/AddTransactionModal';
+import { transactionService, budgetService, categoryService } from '../lib/firestore';
+import { useFirestoreTransactionsContext } from '@/context/firestore-transactions-context';
 
 export default function DashboardScreen() {
   const { t } = useI18n();
   const [isAddModalVisible, setAddModalVisible] = useState(false);
+  const [isCreatingTransaction, setIsCreatingTransaction] = useState(false);
   
-  const [transactions, setTransactions, transactionsLoaded] = useAsyncStorage<Transaction[]>('transactions', []);
-  const [budgets, setBudgets, budgetsLoaded] = useAsyncStorage<Budget[]>('budgets', []);
-  const [categories, setCategories, categoriesLoaded] = useAsyncStorage<Category[]>('categories', []);
+  // Intentar usar el contexto de transacciones si está disponible
+  let transactionsContext;
+  try {
+    transactionsContext = useFirestoreTransactionsContext();
+  } catch (error) {
+    // El contexto no está disponible, usar el hook realtime normal
+    transactionsContext = null;
+  }
+  
+  const { 
+    transactions: realtimeTransactions, 
+    loading: realtimeLoading, 
+    error: realtimeError 
+  } = useRealtimeTransactions();
+  
+  // Usar el contexto si está disponible, sino el realtime
+  const transactions = transactionsContext?.transactions || realtimeTransactions;
+  const transactionsLoading = transactionsContext?.loading ?? realtimeLoading;
+  const transactionsError = transactionsContext?.error ?? realtimeError;
+  
+  const { 
+    budgets, 
+    loading: budgetsLoading, 
+    error: budgetsError 
+  } = useRealtimeBudgets();
+  
+  const { 
+    categories, 
+    loading: categoriesLoading, 
+    error: categoriesError 
+  } = useRealtimeCategories();
 
-  useEffect(() => {
-    if (transactionsLoaded && transactions.length === 0) {
-      setTransactions(sampleTransactions);
-    }
-  }, [transactionsLoaded, transactions.length, setTransactions]);
 
-  useEffect(() => {
-    if (budgetsLoaded && budgets.length === 0) {
-      setBudgets(sampleBudgets);
-    }
-  }, [budgetsLoaded, budgets.length, setBudgets]);
 
+  // Inicializar datos de ejemplo si no hay datos en Firestore
   useEffect(() => {
-    if (categoriesLoaded && categories.length === 0) {
-      setCategories(defaultCategories);
+    const hasInitialized = sessionStorage.getItem('budget3m_initialized');
+    if (hasInitialized) return;
+    
+    const initializeSampleData = async () => {
+      try {
+        // Crear transacciones de ejemplo solo si no hay ninguna
+        if (!transactionsLoading && transactions.length === 0 && !transactionsError) {
+          for (const transaction of sampleTransactions) {
+            await transactionService.createTransaction(transaction);
+          }
+        }
+        
+        // Crear presupuestos de ejemplo solo si no hay ninguno
+        if (!budgetsLoading && budgets.length === 0 && !budgetsError) {
+          for (const budget of sampleBudgets) {
+            await budgetService.createBudget(budget);
+          }
+        }
+        
+        // Crear categorías por defecto solo si no hay ninguna
+        if (!categoriesLoading && categories.length === 0 && !categoriesError) {
+          for (const category of defaultCategories) {
+            await categoryService.createCategory(category);
+          }
+        }
+        
+        // Marcar como inicializado para evitar duplicados en futuras cargas
+        sessionStorage.setItem('budget3m_initialized', 'true');
+      } catch (error) {
+        console.error('Error al inicializar datos de ejemplo:', error);
+      }
+    };
+
+    // Solo inicializar si no hay datos en ninguna colección
+    const shouldInitialize = !transactionsLoading && !budgetsLoading && !categoriesLoading &&
+                            transactions.length === 0 && budgets.length === 0 && categories.length === 0;
+    
+    if (shouldInitialize) {
+      initializeSampleData();
     }
-  }, [categoriesLoaded, categories.length, setCategories]);
+  }, [transactions.length, budgets.length, categories.length, transactionsLoading, budgetsLoading, categoriesLoading, transactionsError, budgetsError, categoriesError]);
 
   const summary = useMemo(() => {
     const currentMonthTxs = transactions.filter(tx => 
@@ -59,94 +116,129 @@ export default function DashboardScreen() {
   }, [transactions]);
 
   const handleAddTransaction = async (newTransaction: Omit<Transaction, 'id'>) => {
-    const transaction = {
-      ...newTransaction,
-      id: Date.now().toString(),
-    };
-    await setTransactions(prev => [transaction, ...prev]);
-    setAddModalVisible(false);
+    setIsCreatingTransaction(true);
+    try {
+      // Validaciones básicas
+      if (!newTransaction.amount || newTransaction.amount <= 0) {
+        throw new Error('El monto debe ser mayor a 0');
+      }
+      
+      if (!newTransaction.category) {
+        throw new Error('Debe seleccionar una categoría');
+      }
+      
+      if (!newTransaction.merchant || newTransaction.merchant.trim() === '') {
+        throw new Error('Debe ingresar un comerciante');
+      }
+
+      // Validar fecha no futura
+      const transactionDate = new Date(newTransaction.date);
+      const today = new Date();
+      if (transactionDate > today) {
+        throw new Error('La fecha no puede ser futura');
+      }
+
+      // Usar el contexto si está disponible, sino el servicio directo
+      if (transactionsContext?.addTransaction) {
+        await transactionsContext.addTransaction(newTransaction);
+      } else {
+        await transactionService.createTransaction(newTransaction);
+      }
+      
+      setAddModalVisible(false);
+    } catch (error) {
+      console.error('Error al crear transacción:', error);
+      // Aquí podrías añadir una notificación de error
+      alert(error instanceof Error ? error.message : 'Error al crear la transacción');
+    } finally {
+      setIsCreatingTransaction(false);
+    }
   };
 
-  if (!transactionsLoaded || !budgetsLoaded || !categoriesLoaded) {
+  if (transactionsLoading || budgetsLoading || categoriesLoading) {
     return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.loadingContainer}>
-          <Text>Loading...</Text>
-        </View>
-      </SafeAreaView>
+      <div className="min-h-screen bg-gray-50">
+        {/* Panel de pruebas visible incluso durante la carga */}
+        <div className="bg-gradient-to-r from-blue-100 to-purple-100 border-b-4 border-blue-500 shadow-lg">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="py-8">
+              <FirestoreTestPanel />
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Cargando...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (transactionsError || budgetsError || categoriesError) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md">
+          <div className="flex items-center mb-3">
+            <svg className="w-5 h-5 text-red-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+            </svg>
+            <h3 className="text-red-800 font-semibold">Error</h3>
+          </div>
+          <p className="text-red-700 text-sm">
+            Error al cargar datos: {transactionsError || budgetsError || categoriesError}
+          </p>
+        </div>
+      </div>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        <View style={styles.header}>
-          <Ionicons name="wallet" size={28} color="#2E8B57" />
-          <Text style={styles.headerTitle}>{t('app.title')}</Text>
-        </View>
+    <div className="min-h-screen bg-gray-50">
+      {/* Panel de pruebas en la parte superior - ULTRA VISIBLE */}
+      <div className="bg-gradient-to-r from-blue-100 to-purple-100 border-b-4 border-blue-500 shadow-lg">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="py-8">
+            <FirestoreTestPanel />
+          </div>
+        </div>
+      </div>
 
-        <SummaryCards income={summary.income} expense={summary.expense} />
-        
-        <View style={styles.content}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Estado de sincronización y configuración */}
+        <div className="mb-8 space-y-4">
+          <FirestoreSyncStatus />
+          <FirestoreConfig />
+        </div>
+
+        {/* Encabezado */}
+        <div className="mb-8">
+          <div className="flex items-center mb-6">
+            <svg className="w-8 h-8 text-green-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+            </svg>
+            <h1 className="text-3xl font-bold text-gray-900">{t('app.title')}</h1>
+          </div>
+          
+          <SummaryCards income={summary.income} expense={summary.expense} />
+        </div>
+
+        {/* Contenido principal */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <RecentTransactions transactions={transactions} categories={categories} />
           <BudgetStatus transactions={transactions} budgets={budgets} categories={categories} />
-        </View>
-      </ScrollView>
+        </div>
+      </div>
 
-      <Portal>
-        <FAB
-          icon="plus"
-          style={styles.fab}
-          onPress={() => setAddModalVisible(true)}
-        />
-        <AddTransactionModal
-          visible={isAddModalVisible}
-          onDismiss={() => setAddModalVisible(false)}
-          onSave={handleAddTransaction}
-          categories={categories}
-        />
-      </Portal>
-    </SafeAreaView>
+      {/* Modal para añadir transacción - AHORA FUNCIONAL */}
+      <AddTransactionModal
+        visible={isAddModalVisible}
+        onDismiss={() => setAddModalVisible(false)}
+        onSave={handleAddTransaction}
+        categories={categories}
+        isLoading={isCreatingTransaction}
+      />
+    </div>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F0F0F0',
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  scrollView: {
-    flex: 1,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    backgroundColor: '#FFFFFF',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginLeft: 8,
-    color: '#1F2937',
-  },
-  content: {
-    padding: 16,
-    gap: 16,
-  },
-  fab: {
-    position: 'absolute',
-    margin: 16,
-    right: 0,
-    bottom: 80,
-    backgroundColor: '#2E8B57',
-  },
-});

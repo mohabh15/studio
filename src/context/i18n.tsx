@@ -18,12 +18,13 @@ const translations: Record<Locale, any> = { en, es };
 export const I18nContext = createContext<I18nContextType | null>(null);
 
 export function I18nProvider({ children }: { children: React.ReactNode }) {
-  const [storedLocale, setStoredLocale] = useLocalStorage<Locale>('locale', 'en');
-  const [locale, setLocale] = useState<Locale>(storedLocale);
   const [isClient, setIsClient] = useState(false);
+  const [storedLocale, setStoredLocale] = useLocalStorage<Locale>('locale', 'en');
+  const [locale, setLocale] = useState<Locale>('en');
 
   useEffect(() => {
     setIsClient(true);
+    setLocale(storedLocale);
   }, []);
 
   useEffect(() => {

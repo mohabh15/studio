@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useLocalStorage } from '@/hooks/use-local-storage';
+import { useFirestoreTransactionsContext } from '@/context/firestore-transactions-context';
 import { Transaction, Category } from '@/lib/types';
 import { sampleTransactions } from '@/lib/sample-data';
 import { defaultCategories } from '@/lib/constants';
@@ -23,21 +24,17 @@ const formatCurrency = (amount: number) => {
 };
 
 
-export default function TransactionsPage() {
+// Componente interno que usa el contexto
+function TransactionsContent() {
   const { t } = useI18n();
-  const [isClient, setIsClient] = useState(false);
-  const [transactions, setTransactions] = useLocalStorage<Transaction[]>('transactions', []);
+  const { transactions, loading, error } = useFirestoreTransactionsContext();
   const [categories, setCategories] = useLocalStorage<Category[]>('categories', []);
 
   useEffect(() => {
-    setIsClient(true);
-    if (localStorage.getItem('transactions') === null) {
-      setTransactions(sampleTransactions);
-    }
     if (localStorage.getItem('categories') === null) {
       setCategories(defaultCategories);
     }
-  }, [setTransactions, setCategories]);
+  }, [setCategories]);
   
   const sortedTransactions = [...transactions].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   
@@ -45,12 +42,20 @@ export default function TransactionsPage() {
     return categories.find(c => c.id === id);
   };
 
-  if (!isClient) {
+  if (loading) {
     return <DashboardSkeleton />;
   }
 
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <p className="text-red-500">Error al cargar transacciones: {error}</p>
+      </div>
+    );
+  }
+
   return (
-    <AppLayout>
+    <>
       <main className="flex-1 p-4 md:p-6 lg:p-8">
         <div className="mb-6">
           <h1 className="text-3xl font-bold tracking-tight">{t('transactions_page.title')}</h1>
@@ -107,6 +112,25 @@ export default function TransactionsPage() {
           </CardContent>
         </Card>
       </main>
+    </>
+  );
+}
+
+// Componente principal que envuelve todo en AppLayout
+export default function TransactionsPage() {
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (!isClient) {
+    return <DashboardSkeleton />;
+  }
+
+  return (
+    <AppLayout>
+      <TransactionsContent />
     </AppLayout>
   );
 }

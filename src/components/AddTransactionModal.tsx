@@ -1,19 +1,41 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
-import { Modal, Portal, Text, TextInput, Button, SegmentedButtons, Card } from 'react-native-paper';
-import { Picker } from '@react-native-picker/picker';
-import DatePicker from 'react-native-date-picker';
-import * as ImagePicker from 'expo-image-picker';
-import { Ionicons } from '@expo/vector-icons';
-
-import { useI18n } from '../hooks/useI18n';
-import { Transaction, TransactionType, Category } from '../types';
+import { useI18n } from '@/hooks/use-i18n';
+import { Transaction, TransactionType, Category } from '@/types';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Calendar } from '@/components/ui/calendar';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { CalendarIcon, Scan } from 'lucide-react';
+import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
 
 type AddTransactionModalProps = {
   visible: boolean;
   onDismiss: () => void;
   onSave: (transaction: Omit<Transaction, 'id'>) => void;
   categories: Category[];
+  isLoading?: boolean;
 };
 
 export default function AddTransactionModal({ 
@@ -29,8 +51,8 @@ export default function AddTransactionModal({
   const [category, setCategory] = useState('');
   const [merchant, setMerchant] = useState('');
   const [notes, setNotes] = useState('');
-  const [showDatePicker, setShowDatePicker] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     if (visible) {
@@ -41,6 +63,7 @@ export default function AddTransactionModal({
       setCategory('');
       setMerchant('');
       setNotes('');
+      setIsSaving(false);
     }
   }, [visible]);
 
@@ -49,239 +72,207 @@ export default function AddTransactionModal({
   const handleScanReceipt = async () => {
     try {
       setIsScanning(true);
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [4, 3],
-        quality: 1,
-      });
-
-      if (!result.canceled) {
-        // Here you would implement OCR scanning
-        // For now, we'll just show a success message
-        setMerchant('Scanned Store');
+      // Simular escaneo de recibo
+      setTimeout(() => {
+        setMerchant('Tienda de Prueba');
         setAmount('25.99');
-      }
+        setIsScanning(false);
+      }, 2000);
     } catch (error) {
       console.error('Error scanning receipt:', error);
-    } finally {
       setIsScanning(false);
     }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!amount || !category) return;
 
-    const transaction: Omit<Transaction, 'id'> = {
-      type,
-      amount: parseFloat(amount),
-      date: date.toISOString(),
-      category,
-      merchant: merchant || undefined,
-      notes: notes || undefined,
-    };
+    setIsSaving(true);
 
-    onSave(transaction);
+    try {
+      const transaction: Omit<Transaction, 'id'> = {
+        type,
+        amount: parseFloat(amount),
+        date: date.toISOString(),
+        category,
+        merchant: merchant || undefined,
+        notes: notes || undefined,
+      };
+
+      // Solo llamar al callback onSave - el componente padre se encarga de guardar
+      onSave(transaction);
+      
+      // Cerrar el modal
+      onDismiss();
+    } catch (error) {
+      console.error('Error al guardar transacción:', error);
+      alert('Error al guardar la transacción. Por favor, intenta de nuevo.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
-  const typeButtons = [
-    { value: 'expense', label: t('common.expense') },
-    { value: 'income', label: t('common.income') },
-  ];
+  if (!visible) return null;
 
   return (
-    <Portal>
-      <Modal visible={visible} onDismiss={onDismiss} contentContainerStyle={styles.modal}>
-        <ScrollView showsVerticalScrollIndicator={false}>
-          <Text style={styles.title}>{t('add_transaction_dialog.title')}</Text>
-          <Text style={styles.subtitle}>{t('add_transaction_dialog.description')}</Text>
+    <Dialog open={visible} onOpenChange={onDismiss}>
+      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>{t('add_transaction_dialog.title')}</DialogTitle>
+          <DialogDescription>
+            {t('add_transaction_dialog.description')}
+          </DialogDescription>
+        </DialogHeader>
 
+        <div className="grid gap-4 py-4">
+          {/* Botón de escaneo */}
           <Button
-            mode="outlined"
-            onPress={handleScanReceipt}
-            loading={isScanning}
+            variant="outline"
+            onClick={handleScanReceipt}
             disabled={isScanning}
-            style={styles.scanButton}
-            icon={() => <Ionicons name="scan" size={20} color="#2E8B57" />}
+            className="w-full"
           >
-            {isScanning ? t('add_transaction_dialog.scanning') : t('add_transaction_dialog.scan_receipt')}
+            {isScanning ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2"></div>
+                {t('add_transaction_dialog.scanning')}
+              </>
+            ) : (
+              <>
+                <Scan className="mr-2 h-4 w-4" />
+                {t('add_transaction_dialog.scan_receipt')}
+              </>
+            )}
           </Button>
 
-          <View style={styles.divider}>
-            <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>{t('add_transaction_dialog.or_manual')}</Text>
-            <View style={styles.dividerLine} />
-          </View>
+          {/* Divisor */}
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-background px-2 text-muted-foreground">
+                {t('add_transaction_dialog.or_manual')}
+              </span>
+            </div>
+          </div>
 
-          <SegmentedButtons
-            value={type}
-            onValueChange={(value) => setType(value as TransactionType)}
-            buttons={typeButtons}
-            style={styles.segmentedButtons}
-          />
+          {/* Tipo de transacción */}
+          <div className="grid grid-cols-2 gap-2">
+             <Button
+               variant={type === 'expense' ? 'destructive' : 'outline'}
+               onClick={() => setType('expense')}
+             >
+               {t('common.expense')}
+             </Button>
+             <Button
+               variant={type === 'income' ? 'default' : 'outline'}
+               onClick={() => setType('income')}
+             >
+               {t('common.income')}
+             </Button>
+           </div>
 
-          <TextInput
-            label={t('add_transaction_dialog.amount')}
-            value={amount}
-            onChangeText={setAmount}
-            keyboardType="numeric"
-            mode="outlined"
-            style={styles.input}
-          />
+          {/* Monto */}
+          <div className="grid gap-2">
+            <Label htmlFor="amount">{t('add_transaction_dialog.amount')}</Label>
+            <Input
+              id="amount"
+              type="number"
+              step="0.01"
+              placeholder="0.00"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+            />
+          </div>
 
-          <View style={styles.row}>
-            <View style={styles.halfWidth}>
-              <Button
-                mode="outlined"
-                onPress={() => setShowDatePicker(true)}
-                style={styles.dateButton}
-              >
-                {date.toLocaleDateString()}
-              </Button>
-            </View>
-
-            <View style={styles.halfWidth}>
-              <Card style={styles.pickerCard}>
-                <Picker
-                  selectedValue={category}
-                  onValueChange={setCategory}
-                  style={styles.picker}
-                >
-                  <Picker.Item 
-                    label={t('add_transaction_dialog.select_category')} 
-                    value="" 
+          {/* Fecha y Categoría */}
+          <div className="grid grid-cols-2 gap-4">
+            {/* Fecha */}
+            <div className="grid gap-2">
+              <Label>{t('add_transaction_dialog.date')}</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className={cn(
+                    "justify-start text-left font-normal",
+                    !date && "text-muted-foreground"
+                  )}>
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {format(date, "PPP")}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                  <Calendar
+                    mode="single"
+                    selected={date}
+                    onSelect={(day) => day && setDate(day)}
+                    initialFocus
                   />
+                </PopoverContent>
+              </Popover>
+            </div>
+
+            {/* Categoría */}
+            <div className="grid gap-2">
+              <Label htmlFor="category">{t('add_transaction_dialog.category')}</Label>
+              <Select value={category} onValueChange={setCategory}>
+                <SelectTrigger id="category">
+                  <SelectValue placeholder={t('add_transaction_dialog.select_category')} />
+                </SelectTrigger>
+                <SelectContent>
                   {filteredCategories.map(cat => (
-                    <Picker.Item 
-                      key={cat.id} 
-                      label={t(cat.name)} 
-                      value={cat.id} 
-                    />
+                    <SelectItem key={cat.id} value={cat.id}>
+                      {t(cat.name)}
+                    </SelectItem>
                   ))}
-                </Picker>
-              </Card>
-            </View>
-          </View>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
 
-          <TextInput
-            label={t('add_transaction_dialog.merchant')}
-            value={merchant}
-            onChangeText={setMerchant}
-            mode="outlined"
-            style={styles.input}
-            placeholder={t('add_transaction_dialog.merchant_placeholder')}
-          />
+          {/* Comerciante */}
+          <div className="grid gap-2">
+            <Label htmlFor="merchant">{t('add_transaction_dialog.merchant')}</Label>
+            <Input
+              id="merchant"
+              placeholder={t('add_transaction_dialog.merchant_placeholder')}
+              value={merchant}
+              onChange={(e) => setMerchant(e.target.value)}
+            />
+          </div>
 
-          <TextInput
-            label={t('add_transaction_dialog.notes')}
-            value={notes}
-            onChangeText={setNotes}
-            mode="outlined"
-            multiline
-            numberOfLines={3}
-            style={styles.input}
-            placeholder={t('add_transaction_dialog.notes_placeholder')}
-          />
+          {/* Notas */}
+          <div className="grid gap-2">
+            <Label htmlFor="notes">{t('add_transaction_dialog.notes')}</Label>
+            <Textarea
+              id="notes"
+              placeholder={t('add_transaction_dialog.notes_placeholder')}
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              rows={3}
+            />
+          </div>
+        </div>
 
-          <View style={styles.buttonRow}>
-            <Button mode="outlined" onPress={onDismiss} style={styles.button}>
-              {t('common.cancel')}
-            </Button>
-            <Button 
-              mode="contained" 
-              onPress={handleSave} 
-              style={styles.button}
-              disabled={!amount || !category}
-            >
-              {t('add_transaction_dialog.save_transaction')}
-            </Button>
-          </View>
-        </ScrollView>
-
-        <DatePicker
-          modal
-          open={showDatePicker}
-          date={date}
-          mode="date"
-          onConfirm={(selectedDate) => {
-            setShowDatePicker(false);
-            setDate(selectedDate);
-          }}
-          onCancel={() => setShowDatePicker(false)}
-        />
-      </Modal>
-    </Portal>
+        <DialogFooter>
+          <Button variant="outline" onClick={onDismiss} disabled={isSaving}>
+            {t('common.cancel')}
+          </Button>
+          <Button 
+            onClick={handleSave} 
+            disabled={!amount || !category || isSaving}
+          >
+            {isSaving ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2"></div>
+                Guardando...
+              </>
+            ) : (
+              t('add_transaction_dialog.save_transaction')
+            )}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
-
-const styles = StyleSheet.create({
-  modal: {
-    backgroundColor: 'white',
-    padding: 20,
-    margin: 20,
-    borderRadius: 8,
-    maxHeight: '90%',
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: '#6B7280',
-    marginBottom: 16,
-  },
-  scanButton: {
-    marginBottom: 16,
-  },
-  divider: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: 16,
-  },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: '#E5E7EB',
-  },
-  dividerText: {
-    marginHorizontal: 16,
-    fontSize: 12,
-    color: '#6B7280',
-    textTransform: 'uppercase',
-  },
-  segmentedButtons: {
-    marginBottom: 16,
-  },
-  input: {
-    marginBottom: 16,
-  },
-  row: {
-    flexDirection: 'row',
-    gap: 8,
-    marginBottom: 16,
-  },
-  halfWidth: {
-    flex: 1,
-  },
-  dateButton: {
-    height: 56,
-    justifyContent: 'center',
-  },
-  pickerCard: {
-    height: 56,
-    justifyContent: 'center',
-  },
-  picker: {
-    height: 56,
-  },
-  buttonRow: {
-    flexDirection: 'row',
-    gap: 8,
-    marginTop: 16,
-  },
-  button: {
-    flex: 1,
-  },
-});

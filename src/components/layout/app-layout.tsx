@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useLocalStorage } from '@/hooks/use-local-storage';
+import { FirestoreTransactionsProvider, useFirestoreTransactionsContext } from '@/context/firestore-transactions-context';
 import type { Category, Transaction } from '@/lib/types';
 import { defaultCategories } from '@/lib/constants';
 import AddTransactionDialog from '../transactions/add-transaction-dialog';
@@ -12,15 +13,19 @@ type AppLayoutProps = {
   children: React.ReactNode;
 };
 
-export default function AppLayout({ children }: AppLayoutProps) {
+// Componente interno que usa el contexto
+function AppLayoutContent({ children }: AppLayoutProps) {
   const [isAddTransactionOpen, setAddTransactionOpen] = useState(false);
-  const [, setTransactions] = useLocalStorage<Transaction[]>('transactions', []);
+  const { addTransaction } = useFirestoreTransactionsContext();
   const [categories] = useLocalStorage<Category[]>('categories', defaultCategories);
 
-  const handleTransactionAdded = (newTx: Omit<Transaction, 'id'>) => {
-    const fullTx = { ...newTx, id: new Date().toISOString() };
-    setTransactions(prev => [fullTx, ...prev]);
-    setAddTransactionOpen(false);
+  const handleTransactionAdded = async (newTx: Omit<Transaction, 'id'>) => {
+    try {
+      await addTransaction(newTx);
+      setAddTransactionOpen(false);
+    } catch (err) {
+      console.error('Error al guardar transacción:', err);
+    }
   };
   
   return (
@@ -36,5 +41,14 @@ export default function AppLayout({ children }: AppLayoutProps) {
         categories={categories}
       />
     </>
+  );
+}
+
+// Componente principal que provee el contexto
+export default function AppLayout({ children }: AppLayoutProps) {
+  return (
+    <FirestoreTransactionsProvider>
+      <AppLayoutContent>{children}</AppLayoutContent>
+    </FirestoreTransactionsProvider>
   );
 }

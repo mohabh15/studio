@@ -140,11 +140,26 @@ export default function AddTransactionDialog({
     };
   };
 
-  const onSubmit = (values: TransactionFormValues) => {
-    onTransactionAdded({
-      ...values,
-      date: values.date.toISOString(),
-    });
+  const onSubmit = async (values: TransactionFormValues) => {
+    try {
+      // Solo pasar los datos al callback del padre - el padre se encarga de guardar
+      const transactionData = {
+        ...values,
+        date: values.date.toISOString(),
+      };
+      
+      console.log('Enviando transacción al componente padre:', transactionData);
+      
+      // El componente padre se encarga de guardar en Firestore
+      onTransactionAdded(transactionData as any);
+    } catch (error) {
+      console.error('Error al procesar transacción:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'No se pudo guardar la transacción. Por favor, intenta de nuevo.',
+      });
+    }
   };
 
   const filteredCategories = categories.filter(c => c.type === activeType);
