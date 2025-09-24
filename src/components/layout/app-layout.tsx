@@ -1,9 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { useLocalStorage } from '@/hooks/use-local-storage';
 import type { Category, Transaction } from '@/lib/types';
-import { defaultCategories } from '@/lib/constants';
+import { useFirestoreTransactions, useFirestoreCategories } from '@/hooks/use-firestore';
 import AddTransactionDialog from '../transactions/add-transaction-dialog';
 import BottomNav from './bottom-nav';
 import { ThemeToggle } from '../theme/theme-toggle';
@@ -14,12 +13,11 @@ type AppLayoutProps = {
 
 export default function AppLayout({ children }: AppLayoutProps) {
   const [isAddTransactionOpen, setAddTransactionOpen] = useState(false);
-  const [, setTransactions] = useLocalStorage<Transaction[]>('transactions', []);
-  const [categories] = useLocalStorage<Category[]>('categories', defaultCategories);
+  const { addTransaction } = useFirestoreTransactions();
+  const { categories } = useFirestoreCategories();
 
-  const handleTransactionAdded = (newTx: Omit<Transaction, 'id'>) => {
-    const fullTx = { ...newTx, id: new Date().toISOString() };
-    setTransactions(prev => [fullTx, ...prev]);
+  const handleTransactionAdded = async (newTx: Omit<Transaction, 'id'>) => {
+    await addTransaction(newTx);
     setAddTransactionOpen(false);
   };
   

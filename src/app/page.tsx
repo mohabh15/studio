@@ -1,10 +1,8 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { useLocalStorage } from '@/hooks/use-local-storage';
 import type { Transaction, Budget, Category } from '@/lib/types';
-import { sampleBudgets, sampleTransactions } from '@/lib/sample-data';
-import { defaultCategories } from '@/lib/constants';
+import { useFirestoreTransactions, useFirestoreBudgets, useFirestoreCategories } from '@/hooks/use-firestore';
 import SummaryCards from '@/components/dashboard/summary-cards';
 import SpendingChart from '@/components/dashboard/spending-chart';
 import RecentTransactions from '@/components/dashboard/recent-transactions';
@@ -13,30 +11,37 @@ import DashboardSkeleton from '@/components/dashboard/dashboard-skeleton';
 import AppLayout from '@/components/layout/app-layout';
 import { Wallet } from 'lucide-react';
 import { useI18n } from '@/hooks/use-i18n';
+import { useSelectedYear } from '@/hooks/use-selected-year';
 
 export default function DashboardPage() {
   const { t } = useI18n();
+  const { selectedYear } = useSelectedYear();
   const [isClient, setIsClient] = useState(false);
-  const [transactions, setTransactions] = useLocalStorage<Transaction[]>('transactions', []);
-  const [budgets, setBudgets] = useLocalStorage<Budget[]>('budgets', []);
-  const [categories, setCategories] = useLocalStorage<Category[]>('categories', []);
+  const { transactions: allTransactions, loading: transactionsLoading } = useFirestoreTransactions();
+  const { budgets: allBudgets, loading: budgetsLoading } = useFirestoreBudgets();
+  const { categories, loading: categoriesLoading } = useFirestoreCategories();
 
   useEffect(() => {
     setIsClient(true);
-    // On first load, if there is no data, populate with sample data.
-    if (localStorage.getItem('transactions') === null) {
-      setTransactions(sampleTransactions);
-    }
-    if (localStorage.getItem('budgets') === null) {
-      setBudgets(sampleBudgets);
-    }
-    if (localStorage.getItem('categories') === null) {
-      setCategories(defaultCategories);
-    }
-  }, [setBudgets, setTransactions, setCategories]);
+  }, []);
+
+  const transactions = useMemo(() => {
+    return allTransactions.filter(tx => new Date(tx.date).getFullYear() === selectedYear);
+  }, [allTransactions, selectedYear]);
+
+  const budgets = useMemo(() => {
+    return allBudgets.filter(budget => {
+      // Assuming budgets are yearly, or filter by year if they have dates
+      // For now, return all, or add year to budgets
+      return true; // TODO: filter budgets by year if applicable
+    });
+  }, [allBudgets, selectedYear]);
 
   const summary = useMemo(() => {
-    const currentMonthTxs = transactions.filter(tx => new Date(tx.date).getMonth() === new Date().getMonth());
+    const currentMonthTxs = transactions.filter(tx => {
+      const txDate = new Date(tx.date);
+      return txDate.getMonth() === new Date().getMonth() && txDate.getFullYear() === new Date().getFullYear();
+    });
     return currentMonthTxs.reduce(
       (acc, transaction) => {
         if (transaction.type === 'income') {
@@ -50,7 +55,7 @@ export default function DashboardPage() {
     );
   }, [transactions]);
 
-  if (!isClient) {
+  if (!isClient || transactionsLoading || budgetsLoading || categoriesLoading) {
     return <DashboardSkeleton />;
   }
 
@@ -67,11 +72,11 @@ export default function DashboardPage() {
           <SummaryCards income={summary.income} expense={summary.expense} />
           <div className="grid grid-cols-1 gap-4 md:gap-8 lg:grid-cols-3">
             <div className="flex flex-col gap-4 lg:col-span-2">
+              <SpendingChart transactions={transactions} categories={categories} />
               <RecentTransactions transactions={transactions} categories={categories} />
             </div>
             <div className="flex flex-col gap-4">
               <BudgetStatus transactions={transactions} budgets={budgets} categories={categories} />
-              <SpendingChart transactions={transactions} categories={categories} />
             </div>
           </div>
         </main>

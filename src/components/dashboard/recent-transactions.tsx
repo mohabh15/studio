@@ -56,7 +56,11 @@ export default function RecentTransactions({ transactions, categories }: RecentT
                         </div>
                         <div>
                           <p className="font-medium">{tx.merchant || 'N/A'}</p>
-                          <p className="text-sm text-muted-foreground">{category ? t(category.name) : t('common.uncategorized')}</p>
+                          <p className="text-sm text-muted-foreground">{category ? (() => {
+                            const stripped = category.name.replace(/^categories\./, '');
+                            const translated = t(`categories.${stripped}`);
+                            return translated === `categories.${stripped}` ? stripped.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) : translated;
+                          })() : t('common.uncategorized')}</p>
                         </div>
                       </div>
                     </TableCell>

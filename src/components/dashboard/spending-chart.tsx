@@ -17,9 +17,19 @@ export default function SpendingChart({ transactions, categories }: SpendingChar
   const findCategory = (id: string) => categories.find(c => c.id === id);
 
   const chartData = useMemo(() => {
-    const expenseTransactions = transactions.filter(tx => tx.type === 'expense');
+    const currentMonth = new Date();
+    const expenseTransactions = transactions.filter(tx => {
+      if (tx.type !== 'expense') return false;
+      const txDate = new Date(tx.date);
+      return txDate.getMonth() === currentMonth.getMonth() && txDate.getFullYear() === currentMonth.getFullYear();
+    });
     const spendingByCategory = expenseTransactions.reduce((acc, transaction) => {
-      const categoryName = findCategory(transaction.category)?.name || t('common.other');
+      const category = findCategory(transaction.category);
+      const categoryName = category ? (() => {
+        const stripped = category.name.replace(/^categories\./, '');
+        const translated = t(`categories.${stripped}`);
+        return translated === `categories.${stripped}` ? stripped.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) : translated;
+      })() : t('common.other');
       acc[categoryName] = (acc[categoryName] || 0) + transaction.amount;
       return acc;
     }, {} as Record<string, number>);

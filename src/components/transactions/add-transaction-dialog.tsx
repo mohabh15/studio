@@ -201,6 +201,7 @@ export default function AddTransactionDialog({
               <Button
                 type="button"
                 variant={activeType === 'expense' ? 'default' : 'outline'}
+                className={activeType === 'expense' ? 'bg-red-500 hover:bg-red-600 text-white' : 'hover:bg-red-500'}
                 onClick={() => setActiveType('expense')}
               >
                 {t('common.expense')}
@@ -278,7 +279,11 @@ export default function AddTransactionDialog({
                       <SelectContent>
                         {filteredCategories.map(cat => (
                           <SelectItem key={cat.id} value={cat.id}>
-                            {t(cat.name)}
+                            {(() => {
+                              const stripped = cat.name.replace(/^categories\./, '');
+                              const translated = t(`categories.${stripped}`);
+                              return translated === `categories.${stripped}` ? stripped.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) : translated;
+                            })()}
                           </SelectItem>
                         ))}
                       </SelectContent>

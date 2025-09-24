@@ -1,9 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useLocalStorage } from '@/hooks/use-local-storage';
-import { defaultCategories } from '@/lib/constants';
 import type { Category, Budget } from '@/lib/types';
+import { useFirestoreBudgets, useFirestoreCategories } from '@/hooks/use-firestore';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -17,6 +16,7 @@ import {
 import { getIcon } from '@/lib/utils';
 import BudgetDialog from '@/components/budgets/budget-dialog';
 import { useI18n } from '@/hooks/use-i18n';
+import { useSelectedYear } from '@/hooks/use-selected-year';
 import DashboardSkeleton from '@/components/dashboard/dashboard-skeleton';
 import {
   AlertDialog,
@@ -39,19 +39,18 @@ const formatCurrency = (amount: number) => {
 
 export default function BudgetsPage() {
   const { t } = useI18n();
+  const { selectedYear } = useSelectedYear();
   const [isClient, setIsClient] = useState(false);
-  const [categories, setCategories] = useLocalStorage<Category[]>('categories', []);
-  const [budgets, setBudgets] = useLocalStorage<Budget[]>('budgets', []);
+  const { budgets: allBudgets, loading: budgetsLoading, addBudget, updateBudget, deleteBudget } = useFirestoreBudgets();
+  const { categories, loading: categoriesLoading } = useFirestoreCategories();
+  const budgets = allBudgets; // TODO: filter by year if budgets have year
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [editingBudget, setEditingBudget] = useState<Budget | null>(null);
   const [deletingBudget, setDeletingBudget] = useState<Budget | null>(null);
 
   useEffect(() => {
     setIsClient(true);
-    if (localStorage.getItem('categories') === null) {
-      setCategories(defaultCategories);
-    }
-  }, [setCategories]);
+  }, []);
 
   const handleAddBudget = () => {
     setEditingBudget(null);
@@ -67,22 +66,20 @@ export default function BudgetsPage() {
     setDeletingBudget(budget);
   }
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (deletingBudget) {
-      setBudgets(prev => prev.filter(b => b.id !== deletingBudget.id));
+      await deleteBudget(deletingBudget.id);
       setDeletingBudget(null);
     }
   }
 
-  const handleSaveBudget = (budgetData: Omit<Budget, 'id'>) => {
+  const handleSaveBudget = async (budgetData: Omit<Budget, 'id'>) => {
     if (editingBudget) {
       // Edit
-      setBudgets(prev =>
-        prev.map(b => (b.id === editingBudget.id ? { ...budgetData, id: b.id } : b))
-      );
+      await updateBudget(editingBudget.id, budgetData);
     } else {
       // Add
-      setBudgets(prev => [...prev, { ...budgetData, id: new Date().toISOString() }]);
+      await addBudget(budgetData);
     }
     setDialogOpen(false);
   };
@@ -91,7 +88,7 @@ export default function BudgetsPage() {
     return categories.find(c => c.id === id);
   };
 
-  if (!isClient) {
+  if (!isClient || budgetsLoading || categoriesLoading) {
     return <DashboardSkeleton />;
   }
 
@@ -132,7 +129,11 @@ export default function BudgetsPage() {
                         <TableCell>
                           <div className="flex items-center gap-3">
                             {Icon && <Icon className="h-5 w-5 text-muted-foreground" />}
-                            <span className="font-medium">{category ? t(category.name) : t('common.uncategorized')}</span>
+                            <span className="font-medium">{category ? (() => {
+                              const stripped = category.name.replace(/^categories\./, '');
+                              const translated = t(`categories.${stripped}`);
+                              return translated === `categories.${stripped}` ? stripped.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) : translated;
+                            })() : t('common.uncategorized')}</span>
                           </div>
                         </TableCell>
                         <TableCell className="text-right">{formatCurrency(budget.amount)}</TableCell>
@@ -148,7 +149,7 @@ export default function BudgetsPage() {
                                 <Edit className="mr-2 h-4 w-4" />
                                 <span>{t('common.edit')}</span>
                               </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleDeleteBudget(budget)} className="text-destructive">
+                              <DropdownMenuItem onClick={() => handleDeleteBudget(budget)} className="text-destructive hover:!bg-red-500 hover:!text-white">
                                 <Trash2 className="mr-2 h-4 w-4" />
                                 <span>{t('common.delete')}</span>
                               </DropdownMenuItem>
