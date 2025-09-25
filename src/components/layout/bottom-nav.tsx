@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Home, List, Settings, Plus, Wallet, CreditCard } from 'lucide-react';
 import { useI18n } from '@/hooks/use-i18n';
+import { useShowDebts } from '@/hooks/use-show-debts';
 import { cn } from '@/lib/utils';
 
 type BottomNavProps = {
@@ -13,15 +14,18 @@ type BottomNavProps = {
 
 export default function BottomNav({ onAddTransaction }: BottomNavProps) {
   const { t } = useI18n();
+  const { showDebts } = useShowDebts();
   const pathname = usePathname();
 
-  const navItems = [
+  const allNavItems = [
     { href: '/', label: t('nav.overview'), icon: Home },
     { href: '/transactions', label: t('nav.transactions'), icon: List },
-    { href: '/debts', label: 'Deudas', icon: CreditCard },
+    { href: '/debts', label: 'Deudas', icon: CreditCard, show: showDebts },
     { href: '/budgets', label: t('nav.budgets'), icon: Wallet },
     { href: '/settings', label: t('nav.settings'), icon: Settings },
   ];
+
+  const navItems = allNavItems.filter(item => item.show !== false);
 
   const NavLink = ({ item }: { item: typeof navItems[0] }) => (
     <Link

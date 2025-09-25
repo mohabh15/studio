@@ -109,6 +109,8 @@
   "settings_page": {
     "title": "Settings",
     "description": "Manage your application settings and preferences.",
+    "preferences_title": "Preferences",
+    "preferences_description": "Configure your application preferences.",
     "language_title": "Language",
     "language_description": "Choose your preferred language.",
     "expense_categories": "Expense Categories",

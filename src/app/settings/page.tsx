@@ -6,7 +6,7 @@ import { useFirestoreCategories } from '@/hooks/use-firestore';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { PlusCircle, Trash2, Edit, MoreHorizontal, Languages, RotateCcw } from 'lucide-react';
+import { PlusCircle, Trash2, Edit, MoreHorizontal, Languages, RotateCcw, Eye, EyeOff } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,11 +20,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 import { ThemeToggle } from '@/components/theme/theme-toggle';
 import { getIcon } from '@/lib/utils';
 import CategoryDialog from '@/components/settings/category-dialog';
 import { useI18n } from '@/hooks/use-i18n';
 import { useSelectedYear } from '@/hooks/use-selected-year';
+import { useShowDebts } from '@/hooks/use-show-debts';
 import DashboardSkeleton from '@/components/dashboard/dashboard-skeleton';
 import {
   AlertDialog,
@@ -43,6 +45,7 @@ import { toast } from '@/hooks/use-toast';
 export default function SettingsPage() {
   const { t, setLocale, locale } = useI18n();
   const { selectedYear, updateSelectedYear } = useSelectedYear();
+  const { showDebts, toggleShowDebts } = useShowDebts();
   const [isClient, setIsClient] = useState(false);
   const { categories, loading: categoriesLoading, addCategory, updateCategory, deleteCategory } = useFirestoreCategories();
   const [isDialogOpen, setDialogOpen] = useState(false);
@@ -195,47 +198,66 @@ export default function SettingsPage() {
         <div className="grid gap-6">
           <Card>
             <CardHeader>
-                <CardTitle>{t('settings_page.language_title')}</CardTitle>
-                <CardDescription>{t('settings_page.language_description')}</CardDescription>
+              <CardTitle>{t('settings_page.preferences_title')}</CardTitle>
+              <CardDescription>{t('settings_page.preferences_description')}</CardDescription>
             </CardHeader>
-            <CardContent>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="w-full justify-between">
-                    <span>{locale === 'en' ? 'English' : 'Español'}</span>
-                    <Languages className="h-4 w-4 text-muted-foreground" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
-                  <DropdownMenuItem onClick={() => setLocale('en')} disabled={locale === 'en'}>
-                    English
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setLocale('es')} disabled={locale === 'es'}>
-                    Español
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </CardContent>
-          </Card>
+            <CardContent className="space-y-6">
+              {/* Idioma */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">{t('settings_page.language_title')}</label>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" className="w-full justify-between">
+                      <span>{locale === 'en' ? 'English' : 'Español'}</span>
+                      <Languages className="h-4 w-4 text-muted-foreground" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
+                    <DropdownMenuItem onClick={() => setLocale('en')} disabled={locale === 'en'}>
+                      English
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setLocale('es')} disabled={locale === 'es'}>
+                      Español
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('settings_page.year_title')}</CardTitle>
-              <CardDescription>{t('settings_page.year_description')}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Select value={selectedYear.toString()} onValueChange={(value) => updateSelectedYear(parseInt(value, 10))}>
-                <SelectTrigger>
-                  <SelectValue placeholder={t('settings_page.select_year')} />
-                </SelectTrigger>
-                <SelectContent>
-                  {Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i).map(year => (
-                    <SelectItem key={year} value={year.toString()}>
-                      {year}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              {/* Año */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">{t('settings_page.year_title')}</label>
+                <Select value={selectedYear.toString()} onValueChange={(value) => updateSelectedYear(parseInt(value, 10))}>
+                  <SelectTrigger>
+                    <SelectValue placeholder={t('settings_page.select_year')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i).map(year => (
+                      <SelectItem key={year} value={year.toString()}>
+                        {year}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Mostrar/ocultar deudas */}
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <label className="text-sm font-medium">Mostrar gestión de deudas</label>
+                  <p className="text-sm text-muted-foreground">Activa o desactiva el acceso a la página de deudas</p>
+                </div>
+                <div className="flex items-center space-x-2">
+                  {showDebts ? (
+                    <Eye className="h-4 w-4 text-muted-foreground" />
+                  ) : (
+                    <EyeOff className="h-4 w-4 text-muted-foreground" />
+                  )}
+                  <Switch
+                    checked={showDebts}
+                    onCheckedChange={toggleShowDebts}
+                  />
+                </div>
+              </div>
             </CardContent>
           </Card>
 

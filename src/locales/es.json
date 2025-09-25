@@ -109,6 +109,8 @@
   "settings_page": {
     "title": "Ajustes",
     "description": "Gestiona los ajustes y preferencias de tu aplicación.",
+    "preferences_title": "Preferencias",
+    "preferences_description": "Configura las preferencias de tu aplicación.",
     "language_title": "Idioma",
     "language_description": "Elige tu idioma preferido.",
     "appearance": "Apariencia",

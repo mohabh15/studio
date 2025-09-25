@@ -3,6 +3,7 @@ import { Toaster } from '@/components/ui/toaster';
 import './globals.css';
 import { I18nProvider } from '@/context/i18n';
 import { ThemeProvider } from 'next-themes';
+import { UiPreferencesProvider } from '@/contexts/ui-preferences-context';
 
 export const metadata: Metadata = {
   title: 'Budget3M',
@@ -28,8 +29,10 @@ export default function RootLayout({
       <body className="font-body antialiased">
         <I18nProvider>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-            {children}
-            <Toaster />
+            <UiPreferencesProvider>
+              {children}
+              <Toaster />
+            </UiPreferencesProvider>
           </ThemeProvider>
         </I18nProvider>
       </body>
