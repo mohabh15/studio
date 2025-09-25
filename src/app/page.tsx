@@ -2,11 +2,12 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import type { Transaction, Budget, Category } from '@/lib/types';
-import { useFirestoreTransactions, useFirestoreBudgets, useFirestoreCategories } from '@/hooks/use-firestore';
+import { useFirestoreTransactions, useFirestoreBudgets, useFirestoreCategories, useFirestoreDebts } from '@/hooks/use-firestore';
 import SummaryCards from '@/components/dashboard/summary-cards';
 import SpendingChart from '@/components/dashboard/spending-chart';
 import RecentTransactions from '@/components/dashboard/recent-transactions';
 import BudgetStatus from '@/components/dashboard/budget-status';
+import DebtStatus from '@/components/dashboard/debt-status';
 import DashboardSkeleton from '@/components/dashboard/dashboard-skeleton';
 import AppLayout from '@/components/layout/app-layout';
 import { Wallet } from 'lucide-react';
@@ -20,6 +21,7 @@ export default function DashboardPage() {
   const { transactions: allTransactions, loading: transactionsLoading } = useFirestoreTransactions();
   const { budgets: allBudgets, loading: budgetsLoading } = useFirestoreBudgets();
   const { categories, loading: categoriesLoading } = useFirestoreCategories();
+  const { debts, loading: debtsLoading } = useFirestoreDebts();
 
   useEffect(() => {
     setIsClient(true);
@@ -55,7 +57,7 @@ export default function DashboardPage() {
     );
   }, [transactions]);
 
-  if (!isClient || transactionsLoading || budgetsLoading || categoriesLoading) {
+  if (!isClient || transactionsLoading || budgetsLoading || categoriesLoading || debtsLoading) {
     return <DashboardSkeleton />;
   }
 
@@ -77,6 +79,7 @@ export default function DashboardPage() {
             </div>
             <div className="flex flex-col gap-4">
               <BudgetStatus transactions={transactions} budgets={budgets} categories={categories} />
+              <DebtStatus debts={debts} />
             </div>
           </div>
         </main>

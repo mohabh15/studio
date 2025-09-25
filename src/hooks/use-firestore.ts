@@ -13,7 +13,7 @@ import {
   where,
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { Transaction, Category, Budget } from '@/lib/types';
+import { Transaction, Category, Budget, Debt, DebtPayment, DebtGoal } from '@/lib/types';
 
 // Hook for transactions
 export function useFirestoreTransactions() {
@@ -67,7 +67,32 @@ export function useFirestoreTransactions() {
       console.log('Deleting transaction from Firestore:', id);
       const docRef = doc(db, 'transactions', id);
       const docSnap = await getDoc(docRef);
+
       if (docSnap.exists()) {
+        const transactionData = docSnap.data();
+
+        // If it's a debt payment transaction, restore the amount to the debt
+        if (transactionData.category === 'debt' && transactionData.notes) {
+          // Extract debt ID from notes format: "Pago de deuda [debt_id]: ..."
+          const debtIdMatch = transactionData.notes.match(/Pago de deuda \[([^\]]+)\]/);
+          if (debtIdMatch) {
+            const debtId = debtIdMatch[1];
+            console.log('Restoring payment to debt:', debtId);
+
+            const debtDoc = await getDoc(doc(db, 'debts', debtId));
+            if (debtDoc.exists()) {
+              const currentDebt = debtDoc.data();
+              const restoredAmount = currentDebt.monto_actual + transactionData.amount;
+
+              // Update the debt with the restored amount
+              await updateDoc(doc(db, 'debts', debtId), {
+                monto_actual: restoredAmount
+              });
+              console.log('Debt amount restored:', debtId, 'new amount:', restoredAmount);
+            }
+          }
+        }
+
         console.log('Transaction exists, deleting...');
         await deleteDoc(docRef);
         console.log('Transaction deleted from Firestore, fetching updated list...');
@@ -75,6 +100,7 @@ export function useFirestoreTransactions() {
         console.error('Transaction does not exist:', id);
         throw new Error(`Transaction with id ${id} does not exist`);
       }
+
       await fetchTransactions();
       console.log('Transactions updated');
     } catch (err) {
@@ -253,5 +279,203 @@ export function useFirestoreBudgets() {
     updateBudget,
     deleteBudget,
     refetch: fetchBudgets,
+  };
+}
+
+// Hook for debts
+export function useFirestoreDebts() {
+  const [debts, setDebts] = useState<Debt[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchDebts = async () => {
+    try {
+      setLoading(true);
+      const querySnapshot = await getDocs(collection(db, 'debts'));
+      const data = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as Debt[];
+      setDebts(data);
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error fetching debts');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const addDebt = async (debt: Omit<Debt, 'id'>) => {
+    try {
+      await addDoc(collection(db, 'debts'), debt);
+      await fetchDebts();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error adding debt');
+    }
+  };
+
+  const updateDebt = async (id: string, updates: Partial<Debt>) => {
+    try {
+      const docRef = doc(db, 'debts', id);
+      await updateDoc(docRef, updates);
+      await fetchDebts();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error updating debt');
+    }
+  };
+
+  const deleteDebt = async (id: string) => {
+    try {
+      await deleteDoc(doc(db, 'debts', id));
+      await fetchDebts();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error deleting debt');
+    }
+  };
+
+  useEffect(() => {
+    fetchDebts();
+  }, []);
+
+  return {
+    debts,
+    loading,
+    error,
+    addDebt,
+    updateDebt,
+    deleteDebt,
+    refetch: fetchDebts,
+  };
+}
+
+// Hook for debt payments
+export function useFirestoreDebtPayments() {
+  const [debtPayments, setDebtPayments] = useState<DebtPayment[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchDebtPayments = async () => {
+    try {
+      setLoading(true);
+      const querySnapshot = await getDocs(collection(db, 'debt_payments'));
+      const data = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as DebtPayment[];
+      setDebtPayments(data);
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error fetching debt payments');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const addDebtPayment = async (payment: Omit<DebtPayment, 'id'>) => {
+    try {
+      await addDoc(collection(db, 'debt_payments'), payment);
+      await fetchDebtPayments();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error adding debt payment');
+    }
+  };
+
+  const updateDebtPayment = async (id: string, updates: Partial<DebtPayment>) => {
+    try {
+      const docRef = doc(db, 'debt_payments', id);
+      await updateDoc(docRef, updates);
+      await fetchDebtPayments();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error updating debt payment');
+    }
+  };
+
+  const deleteDebtPayment = async (id: string) => {
+    try {
+      await deleteDoc(doc(db, 'debt_payments', id));
+      await fetchDebtPayments();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error deleting debt payment');
+    }
+  };
+
+  useEffect(() => {
+    fetchDebtPayments();
+  }, []);
+
+  return {
+    debtPayments,
+    loading,
+    error,
+    addDebtPayment,
+    updateDebtPayment,
+    deleteDebtPayment,
+    refetch: fetchDebtPayments,
+  };
+}
+
+// Hook for debt goals
+export function useFirestoreDebtGoals() {
+  const [debtGoals, setDebtGoals] = useState<DebtGoal[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchDebtGoals = async () => {
+    try {
+      setLoading(true);
+      const querySnapshot = await getDocs(collection(db, 'debt_goals'));
+      const data = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as DebtGoal[];
+      setDebtGoals(data);
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error fetching debt goals');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const addDebtGoal = async (goal: Omit<DebtGoal, 'id'>) => {
+    try {
+      await addDoc(collection(db, 'debt_goals'), goal);
+      await fetchDebtGoals();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error adding debt goal');
+    }
+  };
+
+  const updateDebtGoal = async (id: string, updates: Partial<DebtGoal>) => {
+    try {
+      const docRef = doc(db, 'debt_goals', id);
+      await updateDoc(docRef, updates);
+      await fetchDebtGoals();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error updating debt goal');
+    }
+  };
+
+  const deleteDebtGoal = async (id: string) => {
+    try {
+      await deleteDoc(doc(db, 'debt_goals', id));
+      await fetchDebtGoals();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error deleting debt goal');
+    }
+  };
+
+  useEffect(() => {
+    fetchDebtGoals();
+  }, []);
+
+  return {
+    debtGoals,
+    loading,
+    error,
+    addDebtGoal,
+    updateDebtGoal,
+    deleteDebtGoal,
+    refetch: fetchDebtGoals,
   };
 }

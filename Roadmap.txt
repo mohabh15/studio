@@ -23,16 +23,15 @@ faltantes, priorizadas por impacto en UX, escalabilidad y funcionalidades core.
 
 ⏱️  ESFUERZO:
    Medio-Alto (2 semanas)
+   
 
 🛠️  PASOS DE IMPLEMENTACIÓN:
-   • Crear modelo de datos para deudas (tipo, monto, tasa_interes, pagos_minimos)
-   • Desarrollar página dedicada /debts con dashboard completo
-   • Implementar formulario para añadir/editar deudas con cálculos automáticos
-   • Crear calendario de pagos con recordatorios integrados
-   • Desarrollar estrategias de pago (bola de nieve vs avalancha)
-   • Añadir gráficos de progreso de reducción de deuda
-   • Integrar widget de resumen en dashboard principal
-   • Implementar notificaciones de pagos próximos
+   • Crear calendario de pagos con recordatorios integrados y alertas automáticas
+   • Desarrollar estrategias de pago (bola de nieve vs avalancha) con simuladores interactivos
+   • Añadir gráficos de progreso de reducción de deuda con proyecciones futuras
+   • Integrar widget de resumen en dashboard principal con métricas en tiempo real
+   • Implementar notificaciones de pagos próximos y recordatorios recurrentes
+   • Usar herramientas como appliedDiff para modificaciones iterativas y npm run build para pruebas de compilación, asegurando compatibilidad con ResponsiveContainer y PieChart de Recharts
 
 📦 DEPENDENCIAS:
    date-fns para cálculos de intereses

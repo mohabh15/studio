@@ -9,6 +9,7 @@ export const defaultCategories: Category[] = [
   { id: 'entertainment', name: 'categories.entertainment', icon: 'Clapperboard', type: 'expense' },
   { id: 'health', name: 'categories.health', icon: 'HeartPulse', type: 'expense' },
   { id: 'gifts', name: 'categories.gifts', icon: 'Gift', type: 'expense' },
+  { id: 'debt', name: 'categories.debt_payment', icon: 'CreditCard', type: 'expense' },
   { id: 'other_expense', name: 'categories.other_expense', icon: 'Briefcase', type: 'expense' },
   
   // Income
