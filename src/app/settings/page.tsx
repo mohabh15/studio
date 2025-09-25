@@ -246,14 +246,14 @@ export default function SettingsPage() {
                 <CardDescription>{t('settings_page.manage_expense_categories')}</CardDescription>
               </div>
               <div className="flex gap-2">
-                <Button variant="outline" className="h-10 flex-1" onClick={initializeDefaultCategories}>
+                {/* <Button variant="outline" className="h-10 flex-1" onClick={initializeDefaultCategories}>
                   <RotateCcw className="mr-2 h-4 w-4" />
                   {t('settings_page.initialize_categories')}
                 </Button>
                 <Button variant="destructive" className="h-10 flex-1" onClick={deleteAllCategories}>
                   <Trash2 className="mr-2 h-4 w-4" />
                   {t('settings_page.delete_all_categories')}
-                </Button>
+                </Button> */}
                 <Button className="h-10 flex-1" onClick={handleAddCategory}>
                   <PlusCircle className="mr-2 h-4 w-4" />
                   {t('settings_page.add_category')}

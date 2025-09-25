@@ -97,6 +97,14 @@
     "scan_successful_desc": "Receipt data has been filled in.",
     "read_file_error": "Failed to read file."
   },
+  "edit_transaction_title": "Edit Transaction",
+  "edit_transaction_description": "Update the transaction details.",
+  "delete_transaction_title": "Delete Transaction",
+  "delete_transaction_description": "Are you sure you want to delete this transaction? This action cannot be undone.",
+  "transaction_updated_title": "Transaction Updated",
+  "transaction_updated_desc": "The transaction has been updated successfully.",
+  "transaction_deleted_title": "Transaction Deleted",
+  "transaction_deleted_desc": "The transaction has been deleted successfully.",
   "settings_page": {
     "title": "Settings",
     "description": "Manage your application settings and preferences.",
@@ -155,6 +163,8 @@
     "add_description": "Create a new monthly budget for a category.",
     "edit_title": "Edit Budget",
     "edit_description": "Update the amount for your budget.",
-    "select_category": "Select a category"
+    "select_category": "Select a category",
+    "category_type_income": "Income",
+    "category_type_expense": "Expense"
   }
 }

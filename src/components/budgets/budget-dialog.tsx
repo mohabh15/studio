@@ -83,8 +83,7 @@ export default function BudgetDialog({
     onSave(values);
   };
 
-  const availableCategories = categories.filter(c => 
-    c.type === 'expense' && 
+  const availableCategories = categories.filter(c =>
     (budget ? c.id === budget.category : !existingBudgets.some(b => b.category === c.id))
   );
 
@@ -117,11 +116,19 @@ export default function BudgetDialog({
                       <ScrollArea className="h-72">
                         {availableCategories.map(cat => {
                           const Icon = getIcon(cat.icon as any);
+                          const categoryName = (() => {
+                            const stripped = cat.name.replace(/^categories\./, '');
+                            const translated = t(`categories.${stripped}`);
+                            return translated === `categories.${stripped}` ? stripped.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) : translated;
+                          })();
+                          const categoryType = cat.type === 'income' ? t('budget_dialog.category_type_income') : t('budget_dialog.category_type_expense');
+
                           return (
                             <SelectItem key={cat.id} value={cat.id}>
                               <div className="flex items-center gap-2">
                                 <Icon className="h-4 w-4" />
-                                <span>{cat.name}</span>
+                                <span>{categoryName}</span>
+                                <span className="text-xs text-muted-foreground ml-auto">({categoryType})</span>
                               </div>
                             </SelectItem>
                           );

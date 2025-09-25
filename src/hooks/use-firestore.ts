@@ -50,19 +50,35 @@ export function useFirestoreTransactions() {
 
   const updateTransaction = async (id: string, updates: Partial<Transaction>) => {
     try {
+      console.log('Updating transaction in Firestore:', id, updates);
       const docRef = doc(db, 'transactions', id);
       await updateDoc(docRef, updates);
+      console.log('Transaction updated successfully, fetching updated list...');
       await fetchTransactions();
+      console.log('Transactions updated');
     } catch (err) {
+      console.error('Error updating transaction:', err);
       setError(err instanceof Error ? err.message : 'Error updating transaction');
     }
   };
 
   const deleteTransaction = async (id: string) => {
     try {
-      await deleteDoc(doc(db, 'transactions', id));
+      console.log('Deleting transaction from Firestore:', id);
+      const docRef = doc(db, 'transactions', id);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        console.log('Transaction exists, deleting...');
+        await deleteDoc(docRef);
+        console.log('Transaction deleted from Firestore, fetching updated list...');
+      } else {
+        console.error('Transaction does not exist:', id);
+        throw new Error(`Transaction with id ${id} does not exist`);
+      }
       await fetchTransactions();
+      console.log('Transactions updated');
     } catch (err) {
+      console.error('Error deleting transaction:', err);
       setError(err instanceof Error ? err.message : 'Error deleting transaction');
     }
   };

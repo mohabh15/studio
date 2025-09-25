@@ -25,9 +25,35 @@ import {
 } from '@/components/ui/select';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
-import { CalendarIcon, Filter } from 'lucide-react';
+import { CalendarIcon, Filter, Edit, Trash2, MoreHorizontal } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Textarea } from '@/components/ui/textarea';
+import { toast } from '@/hooks/use-toast';
 
 const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -41,7 +67,7 @@ export default function TransactionsPage() {
   const { t } = useI18n();
   const { selectedYear } = useSelectedYear();
   const [isClient, setIsClient] = useState(false);
-  const { transactions: allTransactions, loading: transactionsLoading } = useFirestoreTransactions();
+  const { transactions: allTransactions, loading: transactionsLoading, updateTransaction, deleteTransaction } = useFirestoreTransactions();
   const { categories, loading: categoriesLoading } = useFirestoreCategories();
   const [filters, setFilters] = useState({
     category: '',
@@ -52,6 +78,9 @@ export default function TransactionsPage() {
     maxAmount: '',
   });
   const [showFilters, setShowFilters] = useState(false);
+  const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
+  const [deletingTransaction, setDeletingTransaction] = useState<Transaction | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
@@ -82,6 +111,66 @@ export default function TransactionsPage() {
       minAmount: '',
       maxAmount: '',
     });
+  };
+
+  const handleEditTransaction = (transaction: Transaction) => {
+    setEditingTransaction(transaction);
+    setIsEditDialogOpen(true);
+  };
+
+  const handleDeleteTransaction = (transaction: Transaction) => {
+    setDeletingTransaction(transaction);
+  };
+
+  const confirmDelete = async () => {
+    if (deletingTransaction) {
+      try {
+        console.log('Deleting transaction:', deletingTransaction.id);
+        await deleteTransaction(deletingTransaction.id);
+        console.log('Transaction deleted successfully');
+        setDeletingTransaction(null);
+        toast({
+          title: t('transaction_deleted_title'),
+          description: t('transaction_deleted_desc'),
+        });
+      } catch (error) {
+        console.error('Error deleting transaction:', error);
+        toast({
+          title: t('common.error'),
+          description: 'Error deleting transaction',
+          variant: 'destructive',
+        });
+      }
+    }
+  };
+
+  const handleSaveEdit = async (formData: any) => {
+    if (editingTransaction) {
+      try {
+        const updates = {
+          type: formData.type,
+          amount: parseFloat(formData.amount),
+          date: formData.date.toISOString(),
+          category: formData.category,
+          merchant: formData.merchant || null,
+          notes: formData.notes || null,
+        };
+        await updateTransaction(editingTransaction.id, updates);
+        setIsEditDialogOpen(false);
+        setEditingTransaction(null);
+        toast({
+          title: t('transaction_updated_title'),
+          description: t('transaction_updated_desc'),
+        });
+      } catch (error) {
+        console.error('Error updating transaction:', error);
+        toast({
+          title: t('common.error'),
+          description: 'Error updating transaction',
+          variant: 'destructive',
+        });
+      }
+    }
   };
 
   if (!isClient || transactionsLoading || categoriesLoading) {
@@ -230,6 +319,7 @@ export default function TransactionsPage() {
                     <TableHead>{t('dashboard.recent_transactions.details')}</TableHead>
                     <TableHead className="hidden sm:table-cell">{t('dashboard.recent_transactions.date')}</TableHead>
                     <TableHead className="text-right">{t('dashboard.recent_transactions.amount')}</TableHead>
+                    <TableHead className="text-right">{t('common.actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -259,6 +349,25 @@ export default function TransactionsPage() {
                             {tx.type === 'income' ? '+' : '-'} {formatCurrency(tx.amount)}
                           </Badge>
                         </TableCell>
+                        <TableCell className="text-right">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon">
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                              <DropdownMenuItem onClick={() => handleEditTransaction(tx)}>
+                                <Edit className="mr-2 h-4 w-4" />
+                                <span>{t('common.edit')}</span>
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleDeleteTransaction(tx)} className="text-destructive">
+                                <Trash2 className="mr-2 h-4 w-4" />
+                                <span>{t('common.delete')}</span>
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
                       </TableRow>
                     );
                   })}
@@ -271,7 +380,167 @@ export default function TransactionsPage() {
             )}
           </CardContent>
         </Card>
+
+        {/* Edit Transaction Dialog */}
+        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>{t('edit_transaction_title')}</DialogTitle>
+              <DialogDescription>{t('edit_transaction_description')}</DialogDescription>
+            </DialogHeader>
+            {editingTransaction && (
+              <EditTransactionForm
+                transaction={editingTransaction}
+                categories={categories}
+                onSave={handleSaveEdit}
+                onCancel={() => setIsEditDialogOpen(false)}
+                t={t}
+              />
+            )}
+          </DialogContent>
+        </Dialog>
+
+        {/* Delete Confirmation Dialog */}
+        <AlertDialog open={!!deletingTransaction} onOpenChange={() => setDeletingTransaction(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>{t('delete_transaction_title')}</AlertDialogTitle>
+              <AlertDialogDescription>
+                {t('delete_transaction_description')}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel onClick={() => setDeletingTransaction(null)}>{t('common.cancel')}</AlertDialogCancel>
+              <AlertDialogAction onClick={confirmDelete} type="button">{t('common.delete')}</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </main>
     </AppLayout>
+  );
+}
+
+// Edit Transaction Form Component
+function EditTransactionForm({ transaction, categories, onSave, onCancel, t }: {
+  transaction: Transaction;
+  categories: Category[];
+  onSave: (data: any) => void;
+  onCancel: () => void;
+  t: (key: string) => string;
+}) {
+  const [formData, setFormData] = useState({
+    type: transaction.type,
+    amount: transaction.amount.toString(),
+    date: new Date(transaction.date),
+    category: transaction.category,
+    merchant: transaction.merchant || '',
+    notes: transaction.notes || '',
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSave(formData);
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <Label htmlFor="edit-type">{t('add_transaction_dialog.type')}</Label>
+        <Select value={formData.type} onValueChange={(value) => setFormData(prev => ({ ...prev, type: value as 'income' | 'expense' }))}>
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="income">{t('common.income')}</SelectItem>
+            <SelectItem value="expense">{t('common.expense')}</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div>
+        <Label htmlFor="edit-amount">{t('add_transaction_dialog.amount')}</Label>
+        <Input
+          id="edit-amount"
+          type="number"
+          step="0.01"
+          value={formData.amount}
+          onChange={(e) => setFormData(prev => ({ ...prev, amount: e.target.value }))}
+          required
+        />
+      </div>
+
+      <div>
+        <Label>{t('add_transaction_dialog.date')}</Label>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              className={cn(
+                'w-full justify-start text-left font-normal',
+                !formData.date && 'text-muted-foreground'
+              )}
+            >
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {formData.date ? format(formData.date, 'PPP') : t('add_transaction_dialog.pick_a_date')}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0">
+            <Calendar
+              mode="single"
+              selected={formData.date}
+              onSelect={(date) => date && setFormData(prev => ({ ...prev, date }))}
+              initialFocus
+            />
+          </PopoverContent>
+        </Popover>
+      </div>
+
+      <div>
+        <Label htmlFor="edit-category">{t('add_transaction_dialog.category')}</Label>
+        <Select value={formData.category} onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}>
+          <SelectTrigger>
+            <SelectValue placeholder={t('add_transaction_dialog.select_category')} />
+          </SelectTrigger>
+          <SelectContent>
+            {categories.map(cat => (
+              <SelectItem key={cat.id} value={cat.id}>
+                {(() => {
+                  const stripped = cat.name.replace(/^categories\./, '');
+                  const translated = t(`categories.${stripped}`);
+                  return translated === `categories.${stripped}` ? stripped.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) : translated;
+                })()}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div>
+        <Label htmlFor="edit-merchant">{t('add_transaction_dialog.merchant')}</Label>
+        <Input
+          id="edit-merchant"
+          value={formData.merchant}
+          onChange={(e) => setFormData(prev => ({ ...prev, merchant: e.target.value }))}
+          placeholder={t('add_transaction_dialog.merchant_placeholder')}
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="edit-notes">{t('add_transaction_dialog.notes')}</Label>
+        <Textarea
+          id="edit-notes"
+          value={formData.notes}
+          onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
+          placeholder={t('add_transaction_dialog.notes_placeholder')}
+        />
+      </div>
+
+      <DialogFooter>
+        <Button type="button" variant="outline" onClick={onCancel}>
+          {t('common.cancel')}
+        </Button>
+        <Button type="submit">{t('common.save')}</Button>
+      </DialogFooter>
+    </form>
   );
 }

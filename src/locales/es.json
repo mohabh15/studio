@@ -97,6 +97,14 @@
     "scan_successful_desc": "Los datos del recibo han sido rellenados.",
     "read_file_error": "Error al leer el archivo."
   },
+  "edit_transaction_title": "Editar Transacción",
+  "edit_transaction_description": "Actualiza los detalles de la transacción.",
+  "delete_transaction_title": "Eliminar Transacción",
+  "delete_transaction_description": "¿Estás seguro de que quieres eliminar esta transacción? Esta acción no se puede deshacer.",
+  "transaction_updated_title": "Transacción Actualizada",
+  "transaction_updated_desc": "La transacción ha sido actualizada exitosamente.",
+  "transaction_deleted_title": "Transacción Eliminada",
+  "transaction_deleted_desc": "La transacción ha sido eliminada exitosamente.",
   "settings_page": {
     "title": "Ajustes",
     "description": "Gestiona los ajustes y preferencias de tu aplicación.",
@@ -159,6 +167,8 @@
     "add_description": "Crea un nuevo presupuesto mensual para una categoría.",
     "edit_title": "Editar Presupuesto",
     "edit_description": "Actualiza la cantidad de tu presupuesto.",
-    "select_category": "Selecciona una categoría"
+    "select_category": "Selecciona una categoría",
+    "category_type_income": "Ingreso",
+    "category_type_expense": "Gasto"
   }
 }
