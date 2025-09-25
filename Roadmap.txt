@@ -1,0 +1,605 @@
+================================================================================
+🚀                           ROADMAP COMPREHENSIVO
+================================================================================
+                           APP DE GESTIÓN DE PRESUPUESTOS
+
+Basándose en el análisis del código existente de la aplicación de gestión de
+presupuestos, aquí está un roadmap comprehensivo de características importantes
+faltantes, priorizadas por impacto en UX, escalabilidad y funcionalidades core.
+
+================================================================================
+🔥                           PRIORIDAD ALTA
+================================================================================
+                        FUNCIONALIDADES CORE ESENCIALES
+
+--------------------------------------------------------------------------------
+1. GESTIÓN DE DEUDAS
+--------------------------------------------------------------------------------
+📝 DESCRIPCIÓN:
+   Sistema completo para rastrear y gestionar todas las deudas financieras.
+
+🎯 IMPACTO:
+   Control total sobre pasivos financieros, planificación de pagos, libertad financiera.
+
+⏱️  ESFUERZO:
+   Medio-Alto (2 semanas)
+
+🛠️  PASOS DE IMPLEMENTACIÓN:
+   • Crear modelo de datos para deudas (tipo, monto, tasa_interes, pagos_minimos)
+   • Desarrollar página dedicada /debts con dashboard completo
+   • Implementar formulario para añadir/editar deudas con cálculos automáticos
+   • Crear calendario de pagos con recordatorios integrados
+   • Desarrollar estrategias de pago (bola de nieve vs avalancha)
+   • Añadir gráficos de progreso de reducción de deuda
+   • Integrar widget de resumen en dashboard principal
+   • Implementar notificaciones de pagos próximos
+
+📦 DEPENDENCIAS:
+   date-fns para cálculos de intereses
+
+✨ CARACTERÍSTICAS ESPECÍFICAS:
+   • Préstamos personales, hipotecas, tarjetas de crédito, préstamos estudiantiles
+   • Cálculo automático de intereses compuestos y pagos mínimos
+   • Visualización de deuda total vs patrimonio neto
+   • Estrategias de pago inteligentes (avalancha vs bola de nieve)
+   • Proyecciones de tiempo para saldar deudas completamente
+   • Calendario integrado con recordatorios automáticos
+   • Exportación de planes de pago en PDF
+   • Dashboard dedicado con métricas clave
+
+🎨 UBICACIÓN EN APP:
+   • Nueva página /debts accesible desde bottom navigation
+   • Widget resumen en dashboard principal
+   • Integración con calendario de transacciones
+
+⚠️  EDGE CASES:
+   • Deudas con intereses variables (tarjetas de crédito)
+   • Refinanciamiento y consolidación de deudas
+   • Deudas compartidas (préstamos conjuntos)
+   • Cambios en tasas de interés
+   • Pagos extraordinarios y recálculos
+
+--------------------------------------------------------------------------------
+2. SISTEMA DE AUTENTICACIÓN Y USUARIOS MÚLTIPLES
+--------------------------------------------------------------------------------
+📝 DESCRIPCIÓN:
+   Permitir que múltiples usuarios tengan sus propios datos separados.
+
+🎯 IMPACTO:
+   Escalabilidad, privacidad, UX multi-usuario.
+
+⏱️  ESFUERZO:
+   Alto (2-3 semanas)
+
+🛠️  PASOS DE IMPLEMENTACIÓN:
+   • Integrar Firebase Authentication
+   • Modificar hooks para filtrar datos por usuario
+   • Añadir páginas de login/registro
+   • Actualizar todas las consultas de Firestore con where('userId', '==', currentUser.uid)
+
+📦 DEPENDENCIAS:
+   firebase/auth
+
+⚠️  EDGE CASES:
+   Migración de datos existentes, compartir presupuestos familiares
+
+--------------------------------------------------------------------------------
+3. REPORTES Y ANÁLISIS AVANZADOS
+--------------------------------------------------------------------------------
+📝 DESCRIPCIÓN:
+   Gráficos detallados, tendencias, comparaciones mensuales/anuales.
+
+🎯 IMPACTO:
+   UX mejorada, insights financieros.
+
+⏱️  ESFUERZO:
+   Medio-Alto (1-2 semanas)
+
+🛠️  PASOS:
+   • Crear componente de reportes con múltiples gráficos
+   • Implementar filtros por rango de fechas
+   • Añadir exportación a PDF/CSV
+   • Tendencias y proyecciones
+
+📦 DEPENDENCIAS:
+   recharts (ya incluido), jspdf para exportación
+
+--------------------------------------------------------------------------------
+4. NOTIFICACIONES Y RECORDATORIOS
+--------------------------------------------------------------------------------
+📝 DESCRIPCIÓN:
+   Alertas para límites de presupuesto, recordatorios de pagos.
+
+🎯 IMPACTO:
+   Mejora retención y engagement.
+
+⏱️  ESFUERZO:
+   Medio (1 semana)
+
+🛠️  PASOS:
+   • Sistema de notificaciones in-app
+   • Integración con Service Workers para push notifications
+   • Configuración de umbrales personalizables
+   • Recordatorios recurrentes
+
+================================================================================
+📊                           PRIORIDAD MEDIA
+================================================================================
+                     MEJORAS DE UX Y FUNCIONALIDAD
+
+--------------------------------------------------------------------------------
+5. GESTIÓN DE CUENTAS Y SUBCUENTAS
+--------------------------------------------------------------------------------
+📝 DESCRIPCIÓN:
+   Organizar transacciones por cuentas bancarias, efectivo, tarjetas.
+
+🎯 IMPACTO:
+   Mejor organización financiera.
+
+⏱️  ESFUERZO:
+   Medio (1 semana)
+
+🛠️  PASOS:
+   • Modelo de datos para cuentas
+   • UI para transferencias entre cuentas
+   • Balance general por cuenta
+   • Integración con dashboard
+
+--------------------------------------------------------------------------------
+6. CATEGORIZACIÓN AUTOMÁTICA CON IA
+--------------------------------------------------------------------------------
+📝 DESCRIPCIÓN:
+   Usar IA para sugerir categorías basadas en descripción/merchant.
+
+🎯 IMPACTO:
+   Reduce fricción en data entry.
+
+⏱️  ESFUERZO:
+   Medio-Alto (1-2 semanas)
+
+🛠️  PASOS:
+   • Integrar con Google AI (ya configurado)
+   • Entrenar modelo con datos históricos
+   • Sugerencias automáticas en formulario de transacción
+   • Opción de corrección manual
+
+--------------------------------------------------------------------------------
+7. PRESUPUESTOS RECURRENTES Y META-PRESUPUESTOS
+--------------------------------------------------------------------------------
+📝 DESCRIPCIÓN:
+   Presupuestos mensuales automáticos, objetivos de ahorro a largo plazo.
+
+🎯 IMPACTO:
+   Planificación financiera mejorada.
+
+⏱️  ESFUERZO:
+   Medio (1 semana)
+
+🛠️  PASOS:
+   • Sistema de plantillas de presupuesto
+   • Presupuestos recurrentes automáticos
+   • Metas de ahorro con visualización de progreso
+   • Alertas de progreso
+
+--------------------------------------------------------------------------------
+8. IMPORTACIÓN/EXPORTACIÓN DE DATOS
+--------------------------------------------------------------------------------
+📝 DESCRIPCIÓN:
+   Importar desde bancos, exportar datos para contabilidad.
+
+🎯 IMPACTO:
+   Facilita adopción y backup.
+
+⏱️  ESFUERZO:
+   Medio (1 semana)
+
+🛠️  PASOS:
+   • Parser para archivos CSV de bancos
+   • Validación de datos importados
+   • Exportación completa de datos
+   • Backup automático a cloud
+
+================================================================================
+🔧                       PRIORIDAD MEDIA-BAJA
+================================================================================
+                  MEJORAS TÉCNICAS Y ESCALABILIDAD
+
+--------------------------------------------------------------------------------
+9. OFFLINE-FIRST ARCHITECTURE
+--------------------------------------------------------------------------------
+📝 DESCRIPCIÓN:
+   Funcionalidad completa sin conexión a internet.
+
+🎯 IMPACTO:
+   Usabilidad en áreas con mala conectividad.
+
+⏱️  ESFUERZO:
+   Alto (2-3 semanas)
+
+🛠️  PASOS:
+   • Implementar service workers avanzados
+   • Sincronización automática al reconectar
+   • Conflict resolution para datos offline
+   • Cache inteligente de datos
+
+--------------------------------------------------------------------------------
+10. OPTIMIZACIÓN DE RENDIMIENTO
+--------------------------------------------------------------------------------
+📝 DESCRIPCIÓN:
+   Lazy loading, virtualización, optimización de queries.
+
+🎯 IMPACTO:
+   Mejor rendimiento con datos grandes.
+
+⏱️  ESFUERZO:
+   Medio (1 semana)
+
+🛠️  PASOS:
+   • Virtualización de listas largas
+   • Lazy loading de componentes
+   • Optimización de queries de Firestore
+   • Memoización inteligente
+
+--------------------------------------------------------------------------------
+11. SISTEMA DE BACKUP Y RECUPERACIÓN
+--------------------------------------------------------------------------------
+📝 DESCRIPCIÓN:
+   Backup automático, restauración de datos eliminados.
+
+🎯 IMPACTO:
+   Seguridad y confianza del usuario.
+
+⏱️  ESFUERZO:
+   Medio (1 semana)
+
+🛠️  PASOS:
+   • Backup automático a Firebase Storage
+   • Papelera de reciclaje para datos eliminados
+   • Restauración selectiva
+   • Historial de cambios
+
+================================================================================
+🎨                           PRIORIDAD BAJA
+================================================================================
+                         MEJORAS DE UX/UI
+
+--------------------------------------------------------------------------------
+12. PERSONALIZACIÓN AVANZADA
+--------------------------------------------------------------------------------
+📝 DESCRIPCIÓN:
+   Temas personalizados, widgets del dashboard configurables.
+
+🎯 IMPACTO:
+   Experiencia más personalizada.
+
+⏱️  ESFUERZO:
+   Medio (1 semana)
+
+🛠️  PASOS:
+   • Constructor de temas
+   • Dashboard widgets arrastrables
+   • Shortcuts personalizables
+   • Preferencias de visualización
+
+--------------------------------------------------------------------------------
+13. MODO COLABORATIVO
+--------------------------------------------------------------------------------
+📝 DESCRIPCIÓN:
+   Compartir presupuestos con familiares/parejas.
+
+🎯 IMPACTO:
+   Uso familiar del app.
+
+⏱️  ESFUERZO:
+   Alto (2-3 semanas)
+
+🛠️  PASOS:
+   • Invitaciones y permisos
+   • Sincronización en tiempo real
+   • Resolución de conflictos
+   • Notificaciones de cambios
+
+--------------------------------------------------------------------------------
+14. INTEGRACIONES EXTERNAS
+--------------------------------------------------------------------------------
+📝 DESCRIPCIÓN:
+   Conectar con bancos, tarjetas de crédito, apps financieras.
+
+🎯 IMPACTO:
+   Reduce entrada manual de datos.
+
+⏱️  ESFUERZO:
+   Alto (3-4 semanas)
+
+🛠️  PASOS:
+   • APIs de bancos (Plaid, Stripe)
+   • Webhooks para transacciones automáticas
+   • Sincronización bidireccional
+   • Mapeo automático de categorías
+
+--------------------------------------------------------------------------------
+15. GAMIFICACIÓN Y HÁBITOS FINANCIEROS
+--------------------------------------------------------------------------------
+📝 DESCRIPCIÓN:
+   Logros, streaks, consejos personalizados.
+
+🎯 IMPACTO:
+   Aumenta engagement y retención.
+
+⏱️  ESFUERZO:
+   Medio-Alto (2 semanas)
+
+🛠️  PASOS:
+   • Sistema de logros y badges
+   • Streaks de presupuesto cumplido
+   • Consejos basados en comportamiento
+   • Comparaciones sociales anónimas
+
+================================================================================
+📱                       PRIORIDAD BAJA
+================================================================================
+                     CARACTERÍSTICAS AVANZADAS
+
+--------------------------------------------------------------------------------
+16. APLICACIÓN MÓVIL NATIVA
+--------------------------------------------------------------------------------
+📝 DESCRIPCIÓN:
+   Apps iOS/Android nativas.
+
+🎯 IMPACTO:
+   Acceso móvil mejorado.
+
+⏱️  ESFUERZO:
+   Muy Alto (4-6 semanas)
+
+🛠️  PASOS:
+   • React Native o Flutter
+   • Sincronización con web app
+   • Notificaciones push nativas
+   • Integración con sensores (NFC para pagos)
+
+--------------------------------------------------------------------------------
+17. ANÁLISIS PREDICTIVO CON IA
+--------------------------------------------------------------------------------
+📝 DESCRIPCIÓN:
+   Predicciones de gastos futuros, alertas inteligentes.
+
+🎯 IMPACTO:
+   Planificación financiera proactiva.
+
+⏱️  ESFUERZO:
+   Alto (3-4 semanas)
+
+🛠️  PASOS:
+   • Modelos de machine learning
+   • Análisis de patrones históricos
+   • Predicciones de presupuesto
+   • Recomendaciones automáticas
+
+================================================================================
+📊                       GRÁFICOS PROPUESTOS
+================================================================================
+                        PARA EL DASHBOARD
+
+--------------------------------------------------------------------------------
+1. GRÁFICO DE TENDENCIAS MENSUALES (LINE CHART)
+--------------------------------------------------------------------------------
+📍 UBICACIÓN:
+   Panel lateral izquierdo del dashboard
+
+✨ BENEFICIOS:
+   • Ver patrones estacionales
+   • Comparar rendimiento mensual
+   • Identificar tendencias de crecimiento/disminución
+
+--------------------------------------------------------------------------------
+2. GRÁFICO CIRCULAR DE RESUMEN DE GASTOS (PIE CHART) - GRÁFICO PRINCIPAL
+--------------------------------------------------------------------------------
+📍 UBICACIÓN:
+   Panel principal derecho - CONVIERTE el gráfico de barras actual en circular
+
+✨ BENEFICIOS:
+   • Resumen visual inmediato de distribución de gastos (PIE CHART)
+   • Proporciones claras por categoría con porcentajes
+   • Mejor UX para vista general de gastos
+   • Más intuitivo que barras para distribución porcentual
+   • Fácil identificación de categorías principales
+
+--------------------------------------------------------------------------------
+2b. GRÁFICO DETALLADO DE GASTOS POR CATEGORÍA (BAR CHART)
+--------------------------------------------------------------------------------
+📍 UBICACIÓN:
+   Sección expandible o modal para vista detallada
+
+✨ BENEFICIOS:
+   • Vista detallada cuando se necesita precisión
+   • Comparación exacta de montos
+   • Análisis profundo de categorías específicas
+
+--------------------------------------------------------------------------------
+3. GRÁFICO DE FLUJO DE EFECTIVO (AREA CHART)
+--------------------------------------------------------------------------------
+📍 UBICACIÓN:
+   Nueva fila en el dashboard
+
+✨ BENEFICIOS:
+   • Ver la salud financiera general
+   • Identificar períodos de ahorro/gasto excesivo
+   • Proyección de tendencias futuras
+
+--------------------------------------------------------------------------------
+4. GRÁFICO DE PRESUPUESTOS VS REALIDAD (PROGRESS BARS)
+--------------------------------------------------------------------------------
+📍 UBICACIÓN:
+   Mejorar el componente BudgetStatus existente
+
+✨ BENEFICIOS:
+   • Visión clara del cumplimiento de presupuestos
+   • Alertas visuales cuando se acerca al límite
+   • Motivación para mantener disciplina
+
+--------------------------------------------------------------------------------
+5. GRÁFICO DE INGRESOS POR CATEGORÍA (DONUT CHART)
+--------------------------------------------------------------------------------
+📍 UBICACIÓN:
+   Complemento al gráfico de gastos
+
+✨ BENEFICIOS:
+   • Diversificación de ingresos
+   • Identificación de fuentes principales
+   • Planificación de ingresos futuros
+
+--------------------------------------------------------------------------------
+6. GRÁFICO DE COMPARACIÓN AÑO ANTERIOR (DUAL AXIS CHART)
+--------------------------------------------------------------------------------
+📍 UBICACIÓN:
+   Nueva sección de análisis
+
+✨ BENEFICIOS:
+   • Contexto histórico
+   • Medición de progreso anual
+   • Identificación de mejoras/deterioros
+
+--------------------------------------------------------------------------------
+7. GRÁFICO DE GASTOS DIARIOS (HEATMAP CALENDAR)
+--------------------------------------------------------------------------------
+📍 UBICACIÓN:
+   Widget compacto en el dashboard
+
+✨ BENEFICIOS:
+   • Identificar patrones diarios
+   • Días de alto gasto
+   • Hábitos de consumo
+
+--------------------------------------------------------------------------------
+8. GRÁFICO DE PROYECCIÓN DE AHORRO (PROJECTION CHART)
+--------------------------------------------------------------------------------
+📍 UBICACIÓN:
+   Sección de objetivos financieros
+
+✨ BENEFICIOS:
+   • Motivación a largo plazo
+   • Planificación financiera
+   • Metas realistas
+
+--------------------------------------------------------------------------------
+9. GRÁFICO DE ROI POR CATEGORÍA (BUBBLE CHART)
+--------------------------------------------------------------------------------
+📍 UBICACIÓN:
+   Análisis avanzado (opcional)
+
+✨ BENEFICIOS:
+   • Optimización de gastos
+   • Identificar gastos de "alto valor"
+   • Decisiones informadas
+
+--------------------------------------------------------------------------------
+11. GRÁFICO DE PROGRESO DE DEUDAS (AREA CHART)
+--------------------------------------------------------------------------------
+📍 UBICACIÓN:
+   Dashboard de deudas (/debts)
+
+✨ BENEFICIOS:
+   • Visualización clara de reducción de deuda a lo largo del tiempo
+   • Motivación para continuar pagando deudas
+   • Proyección de fecha estimada de libertad financiera
+   • Comparación de diferentes estrategias de pago
+
+--------------------------------------------------------------------------------
+12. GRÁFICO DE FLUJO DE FONDOS (SANKEY DIAGRAM)
+--------------------------------------------------------------------------------
+📍 UBICACIÓN:
+   Vista general financiera
+
+✨ BENEFICIOS:
+   • Entendimiento holístico del flujo de dinero
+   • Identificación de fugas financieras
+   • Optimización del flujo de efectivo
+
+================================================================================
+🎯                       RECOMENDACIONES DE IMPLEMENTACIÓN
+================================================================================
+
+--------------------------------------------------------------------------------
+FASE 1 (1-2 MESES): CORE ESSENTIALS
+--------------------------------------------------------------------------------
+1. ✅ Gestión de deudas
+2. ✅ Autenticación de usuarios
+3. ✅ Reportes avanzados
+4. ✅ Notificaciones
+
+--------------------------------------------------------------------------------
+FASE 2 (2-3 MESES): UX ENHANCEMENTS
+--------------------------------------------------------------------------------
+5. ✅ Gestión de cuentas
+6. ✅ Categorización automática
+7. ✅ Presupuestos recurrentes
+8. ✅ Importación/exportación
+
+--------------------------------------------------------------------------------
+FASE 3 (3-4 MESES): ADVANCED FEATURES
+--------------------------------------------------------------------------------
+9. ✅ Offline-first
+10. ✅ Optimización de rendimiento
+11. ✅ Sistema de backup
+12. ✅ Personalización avanzada
+
+--------------------------------------------------------------------------------
+FASE 4 (4+ MESES): FUTURE GROWTH
+--------------------------------------------------------------------------------
+13. ✅ Modo colaborativo
+14. ✅ Integraciones externas
+15. ✅ Gamificación
+16. ✅ Apps móviles
+17. ✅ IA predictiva
+
+================================================================================
+⚠️                        CONSIDERACIONES IMPORTANTES
+================================================================================
+
+🔒 ESCALABILIDAD:
+   Todas las nuevas características deben considerar crecimiento de datos
+
+🔐 PRIVACIDAD:
+   Implementar encriptación para datos sensibles
+
+⚡ PERFORMANCE:
+   Monitorear y optimizar queries de Firestore
+
+🧪 TESTING:
+   Cobertura completa de tests para nuevas funcionalidades
+
+📚 DOCUMENTACIÓN:
+   Mantener documentación técnica actualizada
+
+================================================================================
+🎨                       UBICACIÓN PROPUESTA EN EL DASHBOARD
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          SUMMARY CARDS                                      │
+│                    (ingresos/gastos/balance)                               │
+├─────────────────────┬───────────────────────────────────────────────────────┤
+│    TENDENCIAS       │        RESUMEN DE GASTOS                             │
+│    MENSUALES        │        (PIE CHART - PRINCIPAL)                       │
+│    (LINE CHART)     ├───────────────────────────────────────────────────────┤
+│                     │        DETALLE POR CATEGORÍA                          │
+│                     │        (BARRAS - EXPANDIBLE)                         │
+├─────────────────────┼───────────────────────────────────────────────────────┤
+│   RECENT            │        BUDGET STATUS                                 │
+│   TRANSACTIONS      │      (PROGRESS BARS MEJORADAS)                      │
+├─────────────────────┬───────────────────────────────────────────────────────┤
+│   💳 DEBT STATUS    │        FLUJO DE EFECTIVO (AREA CHART)                │
+│   (Widget)          │                                                      │
+└─────────────────────┴───────────────────────────────────────────────────────┘
+
+================================================================================
+🏆                           CONCLUSIÓN
+================================================================================
+
+Este roadmap proporciona una visión clara de cómo evolucionar la aplicación
+desde una herramienta básica de presupuesto hacia una PLATAFORMA FINANCIERA
+COMPREHENSIVA Y COMPETITIVA con 17 características principales, insights
+valiosos y una experiencia de usuario excepcional.
+
+¡El futuro de las finanzas personales está aquí! 🚀💰💳
