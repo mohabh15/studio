@@ -10,18 +10,19 @@ import { useI18n } from '@/hooks/use-i18n';
 type SpendingChartProps = {
   transactions: Transaction[];
   categories: Category[];
+  selectedYear: number;
+  selectedMonth: number;
 };
 
-export default function SpendingChart({ transactions, categories }: SpendingChartProps) {
+export default function SpendingChart({ transactions, categories, selectedYear, selectedMonth }: SpendingChartProps) {
   const { t } = useI18n();
   const findCategory = (id: string) => categories.find(c => c.id === id);
 
   const chartData = useMemo(() => {
-    const currentMonth = new Date();
     const expenseTransactions = transactions.filter(tx => {
       if (tx.type !== 'expense') return false;
       const txDate = new Date(tx.date);
-      return txDate.getMonth() === currentMonth.getMonth() && txDate.getFullYear() === currentMonth.getFullYear();
+      return txDate.getMonth() === selectedMonth && txDate.getFullYear() === selectedYear;
     });
     const spendingByCategory = expenseTransactions.reduce((acc, transaction) => {
       const category = findCategory(transaction.category);
@@ -37,7 +38,7 @@ export default function SpendingChart({ transactions, categories }: SpendingChar
     return Object.entries(spendingByCategory)
       .map(([name, total]) => ({ name, total }))
       .sort((a, b) => b.total - a.total);
-  }, [transactions, categories, t]);
+  }, [transactions, categories, t, selectedYear, selectedMonth]);
 
   // Colores únicos y contrastantes para el pie chart
   const COLORS = [

@@ -14,6 +14,8 @@ type BudgetStatusProps = {
   transactions: Transaction[];
   budgets: Budget[];
   categories: Category[];
+  selectedYear: number;
+  selectedMonth: number;
 };
 
 const formatCurrency = (amount: number) => {
@@ -23,11 +25,13 @@ const formatCurrency = (amount: number) => {
   }).format(amount)} €`;
 };
 
-export default function BudgetStatus({ transactions, budgets, categories }: BudgetStatusProps) {
+export default function BudgetStatus({ transactions, budgets, categories, selectedYear, selectedMonth }: BudgetStatusProps) {
   const { t } = useI18n();
   const budgetData = useMemo(() => {
     const currentMonthTxs = transactions.filter(
-      tx => new Date(tx.date).getMonth() === new Date().getMonth() && tx.type === 'expense'
+      tx => new Date(tx.date).getMonth() === selectedMonth &&
+            new Date(tx.date).getFullYear() === selectedYear &&
+            tx.type === 'expense'
     );
     return budgets.map(budget => {
       const spent = currentMonthTxs
@@ -46,7 +50,7 @@ export default function BudgetStatus({ transactions, budgets, categories }: Budg
         Icon,
       };
     });
-  }, [transactions, budgets, categories]);
+  }, [transactions, budgets, categories, selectedYear, selectedMonth, t]);
 
   return (
     <Card className="flex flex-col">

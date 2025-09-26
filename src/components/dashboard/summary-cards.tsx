@@ -7,6 +7,8 @@ import { useI18n } from '@/hooks/use-i18n';
 type SummaryCardsProps = {
   income: number;
   expense: number;
+  selectedYear: number;
+  selectedMonth: number;
 };
 
 const formatCurrency = (amount: number) => {
@@ -16,9 +18,14 @@ const formatCurrency = (amount: number) => {
   }).format(amount)} €`;
 };
 
-export default function SummaryCards({ income, expense }: SummaryCardsProps) {
+export default function SummaryCards({ income, expense, selectedYear, selectedMonth }: SummaryCardsProps) {
   const { t } = useI18n();
   const balance = income - expense;
+
+  const getMonthName = (month: number) => {
+    const date = new Date(selectedYear, month, 1);
+    return date.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
+  };
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -39,7 +46,7 @@ export default function SummaryCards({ income, expense }: SummaryCardsProps) {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{formatCurrency(income)}</div>
-          <p className="text-xs text-muted-foreground">{t('dashboard.summary.this_month')}</p>
+          <p className="text-xs text-muted-foreground">{getMonthName(selectedMonth)}</p>
         </CardContent>
       </Card>
       <Card>
@@ -49,7 +56,7 @@ export default function SummaryCards({ income, expense }: SummaryCardsProps) {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{formatCurrency(expense)}</div>
-          <p className="text-xs text-muted-foreground">{t('dashboard.summary.this_month')}</p>
+          <p className="text-xs text-muted-foreground">{getMonthName(selectedMonth)}</p>
         </CardContent>
       </Card>
     </div>
