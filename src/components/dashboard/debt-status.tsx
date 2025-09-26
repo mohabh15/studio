@@ -4,9 +4,11 @@ import { useMemo } from 'react';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
 import { TrendingUp, DollarSign, AlertTriangle, CreditCard } from 'lucide-react';
 import { Debt } from '@/lib/types';
 import { useI18n } from '@/hooks/use-i18n';
+import { useFirestoreDebtPayments } from '@/hooks/use-firestore';
 
 type DebtStatusProps = {
   debts: Debt[];
@@ -21,13 +23,21 @@ const formatCurrency = (amount: number) => {
 
 export default function DebtStatus({ debts }: DebtStatusProps) {
   const { t } = useI18n();
+  const { debtPayments } = useFirestoreDebtPayments();
 
   const debtSummary = useMemo(() => {
-    const totalDebt = debts.reduce((sum, debt) => sum + debt.monto_actual, 0);
+    const totalCurrentDebt = debts.reduce((sum, debt) => sum + debt.monto_actual, 0);
+    const totalOriginalDebt = debts.reduce((sum, debt) => sum + debt.monto, 0);
     const totalMinimumPayments = debts.reduce((sum, debt) => sum + debt.pagos_minimos, 0);
     const averageInterestRate = debts.length > 0
       ? debts.reduce((sum, debt) => sum + debt.tasa_interes, 0) / debts.length
       : 0;
+
+    // Calcular total pagado
+    const totalPaid = debtPayments.reduce((sum, payment) => sum + payment.amount, 0);
+
+    // Calcular progreso (cuánto se ha reducido la deuda original)
+    const progress = totalOriginalDebt > 0 ? ((totalOriginalDebt - totalCurrentDebt) / totalOriginalDebt) * 100 : 0;
 
     // Próximos vencimientos (próximos 30 días)
     const upcomingPayments = debts.filter(debt => {
@@ -38,13 +48,16 @@ export default function DebtStatus({ debts }: DebtStatusProps) {
     });
 
     return {
-      totalDebt,
+      totalCurrentDebt,
+      totalOriginalDebt,
+      totalPaid,
+      progress,
       totalMinimumPayments,
       averageInterestRate,
       upcomingPayments: upcomingPayments.length,
       totalDebts: debts.length,
     };
-  }, [debts]);
+  }, [debts, debtPayments]);
 
   if (debts.length === 0) {
     return (
@@ -75,13 +88,30 @@ export default function DebtStatus({ debts }: DebtStatusProps) {
         <CreditCard className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold mb-2">{formatCurrency(debtSummary.totalDebt)}</div>
+        <div className="text-2xl font-bold mb-2">{formatCurrency(debtSummary.totalCurrentDebt)}</div>
         <p className="text-xs text-muted-foreground mb-4">
           {debtSummary.totalDebts} deuda{debtSummary.totalDebts !== 1 ? 's' : ''} •
           Tasa promedio: {debtSummary.averageInterestRate.toFixed(1)}%
         </p>
 
+        {/* Barra de progreso */}
+        <div className="mb-4">
+          <div className="flex items-center justify-between text-sm mb-2">
+            <span>Progreso de reducción</span>
+            <span className="font-medium">{debtSummary.progress.toFixed(1)}%</span>
+          </div>
+          <Progress value={debtSummary.progress} className="h-2" />
+        </div>
+
         <div className="space-y-2">
+          <div className="flex items-center justify-between text-sm">
+            <span className="flex items-center gap-1">
+              <DollarSign className="h-3 w-3" />
+              Total pagado
+            </span>
+            <span className="font-medium">{formatCurrency(debtSummary.totalPaid)}</span>
+          </div>
+
           <div className="flex items-center justify-between text-sm">
             <span className="flex items-center gap-1">
               <TrendingUp className="h-3 w-3" />
@@ -101,11 +131,18 @@ export default function DebtStatus({ debts }: DebtStatusProps) {
           )}
         </div>
 
-        <Link href="/debts" className="mt-4 block">
-          <Button size="sm" variant="outline" className="w-full">
-            Ver Detalles
-          </Button>
-        </Link>
+        <div className="mt-4 space-y-2">
+          <Link href="/debts/projections" className="block">
+            <Button size="sm" className="w-full">
+              📊 Ver Proyecciones
+            </Button>
+          </Link>
+          <Link href="/debts" className="block">
+            <Button size="sm" variant="outline" className="w-full">
+              Ver Detalles
+            </Button>
+          </Link>
+        </div>
       </CardContent>
     </Card>
   );

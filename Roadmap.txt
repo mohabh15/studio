@@ -29,9 +29,8 @@ faltantes, priorizadas por impacto en UX, escalabilidad y funcionalidades core.
    • Crear calendario de pagos con recordatorios integrados y alertas automáticas
    • Desarrollar estrategias de pago (bola de nieve vs avalancha) con simuladores interactivos
    • Añadir gráficos de progreso de reducción de deuda con proyecciones futuras
-   • Integrar widget de resumen en dashboard principal con métricas en tiempo real
+   • Integrar widget de resumen en dashboard principal con métricas en tiempo real -> Echo
    • Implementar notificaciones de pagos próximos y recordatorios recurrentes
-   • Usar herramientas como appliedDiff para modificaciones iterativas y npm run build para pruebas de compilación, asegurando compatibilidad con ResponsiveContainer y PieChart de Recharts
 
 📦 DEPENDENCIAS:
    date-fns para cálculos de intereses

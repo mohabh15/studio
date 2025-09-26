@@ -24,7 +24,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { PlusCircle, TrendingUp, DollarSign, Calendar, AlertTriangle, MoreHorizontal, Edit, Trash2, CreditCard } from 'lucide-react';
+import { PlusCircle, TrendingUp, DollarSign, Calendar, AlertTriangle, MoreHorizontal, Edit, Trash2, CreditCard, BarChart3 } from 'lucide-react';
+import Link from 'next/link';
 import DebtDialog from '@/components/debts/debt-dialog';
 import DebtPaymentDialog from '@/components/debts/debt-payment-dialog';
 import DebtCharts from '@/components/debts/debt-charts';
@@ -209,8 +210,18 @@ export default function DebtsPage() {
         {/* Lista de deudas */}
         <Card>
           <CardHeader>
-            <CardTitle>Todas las Deudas</CardTitle>
-            <CardDescription>Lista completa de tus deudas activas</CardDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>Todas las Deudas</CardTitle>
+                <CardDescription>Lista completa de tus deudas activas</CardDescription>
+              </div>
+              <Link href="/debts/projections">
+                <Button variant="outline" size="sm">
+                  <BarChart3 className="mr-2 h-4 w-4" />
+                  Ver Proyecciones
+                </Button>
+              </Link>
+            </div>
           </CardHeader>
           <CardContent>
             {debts.length > 0 ? (
