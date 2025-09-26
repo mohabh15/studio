@@ -13,10 +13,10 @@ type DebtStatusProps = {
 };
 
 const formatCurrency = (amount: number) => {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-  }).format(amount);
+  return `${new Intl.NumberFormat('es-ES', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(amount)} €`;
 };
 
 export default function DebtStatus({ debts }: DebtStatusProps) {

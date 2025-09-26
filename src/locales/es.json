@@ -34,6 +34,7 @@
   "nav": {
     "overview": "Visión\nGeneral",
     "transactions": "Transacciones",
+    "debts": "Deudas",
     "settings": "Ajustes",
     "budgets": "Presupuestos"
   },

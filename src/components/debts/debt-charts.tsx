@@ -26,10 +26,10 @@ const COLORS = [
 ];
 
 const formatCurrency = (value: number) => {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-  }).format(value);
+  return `${new Intl.NumberFormat('es-ES', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(value)} €`;
 };
 
 const CustomTooltip = ({ active, payload, label }: any) => {

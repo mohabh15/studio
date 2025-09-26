@@ -97,10 +97,10 @@ export default function DebtPaymentDialog({ isOpen, onOpenChange, onSave, debts 
   };
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(amount);
+    return `${new Intl.NumberFormat('es-ES', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(amount)} €`;
   };
 
   return (

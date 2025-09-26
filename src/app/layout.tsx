@@ -8,6 +8,9 @@ import { UiPreferencesProvider } from '@/contexts/ui-preferences-context';
 export const metadata: Metadata = {
   title: 'Budget3M',
   description: 'Smart personal finance management',
+  icons: {
+    icon: '/icono.png',
+  },
 };
 
 export default function RootLayout({
@@ -19,6 +22,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+        <link rel="icon" href="/icono.png" type="image/png" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link

@@ -30,10 +30,10 @@ import DebtPaymentDialog from '@/components/debts/debt-payment-dialog';
 import DebtCharts from '@/components/debts/debt-charts';
 
 const formatCurrency = (amount: number) => {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-  }).format(amount);
+  return `${new Intl.NumberFormat('es-ES', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(amount)} €`;
 };
 
 export default function DebtsPage() {

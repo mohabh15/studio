@@ -20,7 +20,7 @@ export default function BottomNav({ onAddTransaction }: BottomNavProps) {
   const allNavItems = [
     { href: '/', label: t('nav.overview'), icon: Home },
     { href: '/transactions', label: t('nav.transactions'), icon: List },
-    { href: '/debts', label: 'Deudas', icon: CreditCard, show: showDebts },
+    { href: '/debts', label: t('nav.debts'), icon: CreditCard, show: showDebts },
     { href: '/budgets', label: t('nav.budgets'), icon: Wallet },
     { href: '/settings', label: t('nav.settings'), icon: Settings },
   ];

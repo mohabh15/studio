@@ -34,6 +34,7 @@
   "nav": {
     "overview": "Overview",
     "transactions": "Transactions",
+    "debts": "Debts",
     "settings": "Settings",
     "budgets": "Budgets"
   },
