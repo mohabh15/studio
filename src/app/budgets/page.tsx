@@ -101,7 +101,7 @@ export default function BudgetsPage() {
             <p className="text-muted-foreground">{t('budgets_page.description')}</p>
           </div>
           <Button size="sm" onClick={handleAddBudget}>
-            <PlusCircle className="mr-2 h-4 w-4" />
+            <PlusCircle className="mr-1 h-4 w-4" />
             {t('budgets_page.add_budget')}
           </Button>
         </div>

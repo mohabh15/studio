@@ -138,17 +138,17 @@ export default function DebtsPage() {
             <h1 className="text-3xl font-bold tracking-tight">Gestión de Deudas</h1>
             <p className="text-muted-foreground">Controla y administra todas tus deudas financieras</p>
           </div>
-          <div className="flex gap-2">
-            <Button size="sm" variant="outline" onClick={() => setPaymentDialogOpen(true)}>
-              <CreditCard className="mr-2 h-4 w-4" />
-              Registrar Pago
-            </Button>
-            <Button size="sm" onClick={() => {
+          <div className="flex flex-col gap-2 md:flex-row">
+            <Button onClick={() => {
               setEditingDebt(null);
               setDialogOpen(true);
-            }}>
-              <PlusCircle className="mr-2 h-4 w-4" />
+            }} className="h-8 px-3 text-sm md:h-9 md:px-3 md:text-sm md:order-2">
+              <PlusCircle className="mr-1 h-4 w-4" />
               Añadir Deuda
+            </Button>
+            <Button variant="outline" onClick={() => setPaymentDialogOpen(true)} className="h-8 px-3 text-sm md:h-9 md:px-3 md:text-sm md:order-1">
+              <CreditCard className="mr-1 h-4 w-4" />
+              Registrar Pago
             </Button>
           </div>
         </div>

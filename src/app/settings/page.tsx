@@ -277,7 +277,7 @@ export default function SettingsPage() {
                   {t('settings_page.delete_all_categories')}
                 </Button> */}
                 <Button className="h-10 flex-1" onClick={handleAddCategory}>
-                  <PlusCircle className="mr-2 h-4 w-4" />
+                  <PlusCircle className="mr-1 h-4 w-4" />
                   {t('settings_page.add_category')}
                 </Button>
               </div>
