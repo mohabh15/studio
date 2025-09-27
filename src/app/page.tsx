@@ -13,7 +13,7 @@ import DebtStatus from '@/components/dashboard/debt-status';
 import DashboardSkeleton from '@/components/dashboard/dashboard-skeleton';
 import MonthSelector from '@/components/dashboard/month-selector';
 import AppLayout from '@/components/layout/app-layout';
-import { Wallet, AlertCircle, LogOut } from 'lucide-react';
+import { Wallet, AlertCircle, LogOut, Settings } from 'lucide-react';
 import { useI18n } from '@/hooks/use-i18n';
 import { useSelectedMonth } from '@/hooks/use-selected-month';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -23,6 +23,8 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
@@ -149,6 +151,22 @@ export default function DashboardPage() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="end" forceMount>
+                <DropdownMenuLabel className="font-normal">
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium leading-none">
+                      {user?.displayName || user?.email?.split('@')[0] || 'Usuario'}
+                    </p>
+                    <p className="text-xs leading-none text-muted-foreground">
+                      {user?.email}
+                    </p>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => router.push('/settings')}>
+                  <Settings className="mr-2 h-4 w-4" />
+                  <span>{t('nav.settings') || 'Configuración'}</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout}>
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>{t('logout') || 'Cerrar sesión'}</span>

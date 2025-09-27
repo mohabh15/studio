@@ -207,12 +207,12 @@ export default function SettingsPage() {
   return (
     <AppLayout>
       <main className="flex-1 space-y-4 p-4 md:p-6 lg:p-8">
-        <div className="absolute right-4 top-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">{t('settings_page.title')}</h1>
+            <p className="text-muted-foreground">{t('settings_page.description')}</p>
+          </div>
           <ThemeToggle />
-        </div>
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">{t('settings_page.title')}</h1>
-          <p className="text-muted-foreground">{t('settings_page.description')}</p>
         </div>
 
         <div className="grid gap-6">

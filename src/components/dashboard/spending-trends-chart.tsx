@@ -37,7 +37,7 @@ export default function SpendingTrendsChart({ transactions }: SpendingTrendsChar
       months.push({
         year: date.getFullYear(),
         month: date.getMonth(),
-        label: formatMonthName(date.getFullYear(), date.getMonth(), locale),
+        label: formatMonthName(date.getFullYear(), date.getMonth(), locale, true),
       });
     }
 
@@ -103,11 +103,11 @@ export default function SpendingTrendsChart({ transactions }: SpendingTrendsChar
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis
                   dataKey="month"
-                  tick={{ fontSize: isMobile ? 12 : 14 }}
+                  tick={{ fontSize: isMobile ? 11 : 12 }}
                   interval={0}
-                  angle={isMobile ? -45 : 0}
-                  textAnchor={isMobile ? 'end' : 'middle'}
-                  height={isMobile ? 60 : 40}
+                  angle={isMobile ? -45 : -15}
+                  textAnchor={isMobile ? 'end' : 'end'}
+                  height={isMobile ? 70 : 60}
                 />
                 <YAxis
                   tick={{ fontSize: isMobile ? 12 : 14 }}
