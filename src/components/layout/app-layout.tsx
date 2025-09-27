@@ -28,7 +28,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
   return (
     <>
       <div className="flex min-h-screen w-full flex-col">
-        <div className="pb-30 sm:pb-34">{children}</div>
+        <div className="pb-20 sm:pb-24">{children}</div>
 
         {/* Botón flotante para añadir transacción - justo encima de la navbar */}
         <div className="fixed bottom-24 right-4 z-50 sm:bottom-28 sm:right-6">

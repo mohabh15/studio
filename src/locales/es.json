@@ -56,6 +56,12 @@
       "description": "Un desglose de tus gastos por categoría para este mes.",
       "no_data": "No hay datos de gastos para mostrar."
     },
+    "spending_trends": {
+      "title": "Tendencias de Gastos",
+      "description": "Evolución mensual de los gastos totales para identificar patrones estacionales.",
+      "no_data": "No hay datos de tendencias para mostrar.",
+      "total": "Total"
+    },
     "recent_transactions": {
       "title": "Transacciones Recientes",
       "description": "Tus 5 transacciones más recientes.",

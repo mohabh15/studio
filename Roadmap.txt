@@ -601,3 +601,39 @@ COMPREHENSIVA Y COMPETITIVA con 17 características principales, insights
 valiosos y una experiencia de usuario excepcional.
 
 ¡El futuro de las finanzas personales está aquí! 🚀💰💳
+
+
+
+
+Gráficos sugeridos:
+Gráfico de pastel (Pie Chart): Para mostrar la distribución de gastos por categorías (ej. alimentación, 
+transporte, entretenimiento). Esto complementaría el spending-chart.tsx existente y permitiría ver porcentajes de 
+cada categoría en un período seleccionado.
+
+Gráfico de barras (Bar Chart): Para comparar ingresos vs. gastos mensuales, o el estado de presupuestos (ej. 
+presupuesto asignado vs. gastado por categoría). Podría basarse en datos de budget-status.tsx para resaltar excedentes o déficits.
+
+Gráfico de líneas (Line Chart): Para tendencias de gastos a lo largo del tiempo (ej. evolución mensual 
+o anual de gastos totales). Útil para identificar patrones estacionales y comparar con proyecciones futuras.
+
+Gráfico de área (Area Chart): Similar al de líneas, pero para mostrar acumulación de deudas o pagos a lo largo 
+del tiempo, integrando datos de debt-projections.ts y strategy-comparison.tsx.
+
+Gráfico de dona (Donut Chart): Una variante del pastel para mostrar la composición de deudas activas 
+(ej. porcentaje por tipo de deuda: hipoteca, tarjetas, préstamos). Podría enlazarse con debt-status.tsx 
+para resaltar pagos pendientes.
+
+Gráfico de progreso (Progress Bar Chart): Para visualizar el progreso hacia metas de ahorro o reducción 
+de deudas (ej. porcentaje pagado de una deuda específica). Ideal para motivar al usuario y basarse en simuladores 
+como payment-simulator.tsx.
+
+Gráfico de dispersión o burbujas (Scatter/Bubble Chart): Para correlaciones avanzadas, como gastos vs. 
+ingresos por mes, o impacto de pagos extra en proyecciones de deudas. Más analítico, para usuarios que quieran 
+insights profundos.
+
+Gráfico combinado (Combo Chart): Un híbrido que combine barras y líneas, por ejemplo, para mostrar gastos reales 
+vs. presupuestados en el mismo gráfico, facilitando comparaciones directas.
+
+Estos gráficos podrían organizarse en pestañas o secciones dentro del componente de reportes, permitiendo filtros 
+por fecha, categoría o tipo de dato. Si necesitas más detalles sobre cómo estructurarlos o ejemplos de librerías 
+(como Recharts o Chart.js, que veo en chart.tsx), avísame. Por ahora, solo son sugerencias conceptuales.

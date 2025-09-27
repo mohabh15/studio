@@ -5,6 +5,7 @@ import type { Transaction, Budget, Category } from '@/lib/types';
 import { useFirestoreTransactions, useFirestoreBudgets, useFirestoreCategories, useFirestoreDebts } from '@/hooks/use-firestore';
 import SummaryCards from '@/components/dashboard/summary-cards';
 import SpendingChart from '@/components/dashboard/spending-chart';
+import SpendingTrendsChart from '@/components/dashboard/spending-trends-chart';
 import RecentTransactions from '@/components/dashboard/recent-transactions';
 import BudgetStatus from '@/components/dashboard/budget-status';
 import DebtStatus from '@/components/dashboard/debt-status';
@@ -98,6 +99,7 @@ export default function DashboardPage() {
                 selectedYear={selectedYear}
                 selectedMonth={selectedMonth}
               />
+              <SpendingTrendsChart transactions={allTransactions} />
               <RecentTransactions transactions={transactions} categories={categories} />
             </div>
             <div className="flex flex-col gap-4">

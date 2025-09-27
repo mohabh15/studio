@@ -56,6 +56,12 @@
       "description": "A breakdown of your expenses by category for this month.",
       "no_data": "No expense data to display."
     },
+    "spending_trends": {
+      "title": "Spending Trends",
+      "description": "Monthly evolution of total expenses to identify seasonal patterns.",
+      "no_data": "No trend data to display.",
+      "total": "Total"
+    },
     "recent_transactions": {
       "title": "Recent Transactions",
       "description": "Your 5 most recent transactions.",
