@@ -90,6 +90,8 @@ export default function DashboardPage() {
             expense={summary.expense}
             selectedYear={selectedYear}
             selectedMonth={selectedMonth}
+            allTransactions={allTransactions}
+            categories={categories}
           />
           <div className="grid grid-cols-1 gap-4 md:gap-8 lg:grid-cols-3">
             <div className="flex flex-col gap-4 lg:col-span-2">
