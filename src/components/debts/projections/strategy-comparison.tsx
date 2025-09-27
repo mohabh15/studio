@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ProjectionResult, getStrategyName, getStrategyDescription } from '@/lib/debt-projections';
 import { CheckCircle, Clock, DollarSign, TrendingUp } from 'lucide-react';
+import { useI18n } from '@/hooks/use-i18n';
 
 interface StrategyComparisonProps {
   projections: ProjectionResult[];
@@ -31,11 +32,12 @@ const formatMonths = (months: number) => {
 };
 
 export default function StrategyComparison({ projections, recommendedStrategy }: StrategyComparisonProps) {
+  const { t } = useI18n();
   if (projections.length === 0) {
     return (
       <Card>
         <CardContent className="flex items-center justify-center py-8">
-          <p className="text-muted-foreground">No hay proyecciones disponibles</p>
+          <p className="text-muted-foreground">{t('strategy_comparison.no_projections')}</p>
         </CardContent>
       </Card>
     );
@@ -50,10 +52,10 @@ export default function StrategyComparison({ projections, recommendedStrategy }:
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <TrendingUp className="h-5 w-5" />
-          Comparación de Estrategias
+          {t('strategy_comparison.title')}
         </CardTitle>
         <p className="text-sm text-muted-foreground">
-          Compara diferentes enfoques para saldar tus deudas
+          {t('strategy_comparison.description')}
         </p>
       </CardHeader>
       <CardContent>
@@ -77,19 +79,19 @@ export default function StrategyComparison({ projections, recommendedStrategy }:
                       {isRecommended && (
                         <Badge variant="default" className="text-xs">
                           <CheckCircle className="h-3 w-3 mr-1" />
-                          Recomendado
+                          {t('strategy_comparison.recommended')}
                         </Badge>
                       )}
                       {isBestTime && !isRecommended && (
                         <Badge variant="secondary" className="text-xs">
                           <Clock className="h-3 w-3 mr-1" />
-                          Más Rápido
+                          {t('strategy_comparison.fastest')}
                         </Badge>
                       )}
                       {isBestSavings && !isRecommended && (
                         <Badge variant="outline" className="text-xs">
                           <DollarSign className="h-3 w-3 mr-1" />
-                          Menos Intereses
+                          {t('strategy_comparison.least_interest')}
                         </Badge>
                       )}
                     </div>
@@ -104,28 +106,28 @@ export default function StrategyComparison({ projections, recommendedStrategy }:
                     <div className="text-2xl font-bold text-primary">
                       {formatMonths(projection.monthsToPayOff)}
                     </div>
-                    <div className="text-xs text-muted-foreground">Tiempo Total</div>
+                    <div className="text-xs text-muted-foreground">{t('strategy_comparison.total_time')}</div>
                   </div>
 
                   <div className="text-center">
                     <div className="text-2xl font-bold text-green-600">
                       {formatCurrency(projection.totalPaid)}
                     </div>
-                    <div className="text-xs text-muted-foreground">Total Pagado</div>
+                    <div className="text-xs text-muted-foreground">{t('strategy_comparison.total_paid')}</div>
                   </div>
 
                   <div className="text-center">
                     <div className="text-2xl font-bold text-red-600">
                       {formatCurrency(projection.totalInterest)}
                     </div>
-                    <div className="text-xs text-muted-foreground">Intereses</div>
+                    <div className="text-xs text-muted-foreground">{t('strategy_comparison.interest')}</div>
                   </div>
 
                   <div className="text-center">
                     <div className="text-2xl font-bold">
                       {formatCurrency(projection.monthlyPayment)}
                     </div>
-                    <div className="text-xs text-muted-foreground">Pago Mensual</div>
+                    <div className="text-xs text-muted-foreground">{t('strategy_comparison.monthly_payment')}</div>
                   </div>
                 </div>
 
@@ -144,11 +146,11 @@ export default function StrategyComparison({ projections, recommendedStrategy }:
         </div>
 
         <div className="mt-6 p-4 bg-muted rounded-lg">
-          <h5 className="font-semibold mb-2">💡 Recomendaciones</h5>
+          <h5 className="font-semibold mb-2">{t('strategy_comparison.recommendations_title')}</h5>
           <ul className="text-sm space-y-1 text-muted-foreground">
-            <li>• La estrategia <strong>Avalancha</strong> minimiza los intereses totales pagados</li>
-            <li>• La estrategia <strong>Bola de Nieve</strong> proporciona motivación psicológica</li>
-            <li>• Considera tu situación financiera personal para elegir la mejor opción</li>
+            <li>• {t('strategy_comparison.avalanche_benefit')}</li>
+            <li>• {t('strategy_comparison.snowball_benefit')}</li>
+            <li>• {t('strategy_comparison.personal_situation')}</li>
           </ul>
         </div>
       </CardContent>

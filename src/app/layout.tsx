@@ -4,6 +4,7 @@ import './globals.css';
 import { I18nProvider } from '@/context/i18n';
 import { ThemeProvider } from 'next-themes';
 import { UiPreferencesProvider } from '@/contexts/ui-preferences-context';
+import { AuthProvider } from '@/contexts/auth-context';
 
 export const metadata: Metadata = {
   title: 'Budget3M',
@@ -34,8 +35,10 @@ export default function RootLayout({
         <I18nProvider>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <UiPreferencesProvider>
-              {children}
-              <Toaster />
+              <AuthProvider>
+                {children}
+                <Toaster />
+              </AuthProvider>
             </UiPreferencesProvider>
           </ThemeProvider>
         </I18nProvider>

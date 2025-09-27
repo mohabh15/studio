@@ -32,16 +32,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Debt, DebtPayment } from '@/lib/types';
 import { useI18n } from '@/hooks/use-i18n';
-
-const debtPaymentSchema = z.object({
-  debt_id: z.string().min(1, 'Debes seleccionar una deuda'),
-  amount: z.number().min(0.01, 'El monto debe ser mayor a 0'),
-  date: z.string().min(1, 'La fecha es requerida'),
-  tipo: z.enum(['regular', 'extra']),
-  description: z.string().optional(),
-});
-
-type DebtPaymentFormValues = z.infer<typeof debtPaymentSchema>;
+import { useAuth } from '@/hooks/use-auth';
 
 type DebtPaymentDialogProps = {
   isOpen: boolean;
@@ -51,11 +42,22 @@ type DebtPaymentDialogProps = {
 };
 
 export default function DebtPaymentDialog({ isOpen, onOpenChange, onSave, debts }: DebtPaymentDialogProps) {
-  const { t } = useI18n();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+    const { t } = useI18n();
+    const { user } = useAuth();
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const form = useForm<DebtPaymentFormValues>({
-    resolver: zodResolver(debtPaymentSchema),
+   const debtPaymentSchema = z.object({
+     debt_id: z.string().min(1, t('debt_payment_dialog.validation.debt_required')),
+     amount: z.number().min(0.01, t('debt_payment_dialog.validation.amount_required')),
+     date: z.string().min(1, t('debt_payment_dialog.validation.date_required')),
+     tipo: z.enum(['regular', 'extra']),
+     description: z.string().optional(),
+   });
+
+   type DebtPaymentFormValues = z.infer<typeof debtPaymentSchema>;
+
+   const form = useForm<DebtPaymentFormValues>({
+     resolver: zodResolver(debtPaymentSchema),
     defaultValues: {
       debt_id: '',
       amount: 0,
@@ -84,9 +86,10 @@ export default function DebtPaymentDialog({ isOpen, onOpenChange, onSave, debts 
     setIsSubmitting(true);
     try {
       const paymentData: Omit<DebtPayment, 'id'> = {
-        ...values,
-        transaction_id: undefined, // Se asignará cuando se cree la transacción
-      };
+         ...values,
+         userId: user?.uid || '',
+         transaction_id: undefined, // Se asignará cuando se cree la transacción
+       };
       await onSave(paymentData);
       onOpenChange(false);
     } catch (error) {
@@ -107,9 +110,9 @@ export default function DebtPaymentDialog({ isOpen, onOpenChange, onSave, debts 
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Registrar Pago de Deuda</DialogTitle>
+          <DialogTitle>{t('debt_payment_dialog.title')}</DialogTitle>
           <DialogDescription>
-            Registra un pago realizado hacia una de tus deudas. Esto creará automáticamente una transacción de gasto.
+            {t('debt_payment_dialog.description')}
           </DialogDescription>
         </DialogHeader>
 
@@ -120,11 +123,11 @@ export default function DebtPaymentDialog({ isOpen, onOpenChange, onSave, debts 
               name="debt_id"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Deuda</FormLabel>
+                  <FormLabel>{t('debt_payment_dialog.debt_label')}</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Selecciona una deuda" />
+                        <SelectValue placeholder={t('debt_payment_dialog.select_debt')} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -142,12 +145,12 @@ export default function DebtPaymentDialog({ isOpen, onOpenChange, onSave, debts 
 
             {selectedDebt && (
               <div className="p-3 bg-muted rounded-lg">
-                <p className="text-sm font-medium">Deuda seleccionada:</p>
+                <p className="text-sm font-medium">{t('debt_payment_dialog.debt_info')}</p>
                 <p className="text-sm text-muted-foreground">
-                  Monto actual: {formatCurrency(selectedDebt.monto_actual)}
+                  {`Monto actual: ${formatCurrency(selectedDebt.monto_actual)}`}
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  Pago mínimo: {formatCurrency(selectedDebt.pagos_minimos)}
+                  {`Pago mínimo: ${formatCurrency(selectedDebt.pagos_minimos)}`}
                 </p>
               </div>
             )}
@@ -158,7 +161,7 @@ export default function DebtPaymentDialog({ isOpen, onOpenChange, onSave, debts 
                 name="amount"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Monto del Pago</FormLabel>
+                    <FormLabel>{t('debt_payment_dialog.payment_amount')}</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
@@ -178,7 +181,7 @@ export default function DebtPaymentDialog({ isOpen, onOpenChange, onSave, debts 
                 name="tipo"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Tipo de Pago</FormLabel>
+                    <FormLabel>{t('debt_payment_dialog.payment_type')}</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
@@ -186,8 +189,8 @@ export default function DebtPaymentDialog({ isOpen, onOpenChange, onSave, debts 
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="regular">Pago Regular</SelectItem>
-                        <SelectItem value="extra">Pago Extra</SelectItem>
+                        <SelectItem value="regular">{t('debt_payment_dialog.regular_payment')}</SelectItem>
+                        <SelectItem value="extra">{t('debt_payment_dialog.extra_payment')}</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -201,7 +204,7 @@ export default function DebtPaymentDialog({ isOpen, onOpenChange, onSave, debts 
               name="date"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Fecha del Pago</FormLabel>
+                  <FormLabel>{t('debt_payment_dialog.payment_date')}</FormLabel>
                   <FormControl>
                     <Input
                       type="date"
@@ -218,10 +221,10 @@ export default function DebtPaymentDialog({ isOpen, onOpenChange, onSave, debts 
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Descripción (Opcional)</FormLabel>
+                  <FormLabel>{t('debt_payment_dialog.description_optional')}</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Añade una descripción para este pago..."
+                      placeholder={t('debt_payment_dialog.description_placeholder')}
                       {...field}
                     />
                   </FormControl>
@@ -237,10 +240,10 @@ export default function DebtPaymentDialog({ isOpen, onOpenChange, onSave, debts 
                 onClick={() => onOpenChange(false)}
                 disabled={isSubmitting}
               >
-                Cancelar
+                {t('common.cancel')}
               </Button>
               <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? 'Registrando...' : 'Registrar Pago'}
+                {isSubmitting ? t('debt_payment_dialog.registering') : t('debt_payment_dialog.register_payment')}
               </Button>
             </DialogFooter>
           </form>

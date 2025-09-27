@@ -11,6 +11,25 @@ export function getIcon(iconName: keyof typeof LucideIcons): React.ElementType {
   return Icon || LucideIcons.Package;
 }
 
+/**
+ * Formatea el nombre del mes y año según el locale especificado
+ * @param year - Año
+ * @param month - Mes (0-11)
+ * @param locale - Locale ('en' | 'es')
+ * @returns Nombre del mes formateado
+ */
+export function formatMonthName(year: number, month: number, locale: 'en' | 'es'): string {
+  const date = new Date(year, month, 1);
+
+  // Para español usar 'es-ES', para inglés usar 'en-US'
+  const localeString = locale === 'es' ? 'es-ES' : 'en-US';
+
+  return date.toLocaleDateString(localeString, {
+    month: 'long',
+    year: 'numeric'
+  });
+}
+
 // Lista de iconos comunes que queremos mostrar en el selector
 export const commonIconNames = [
   'ShoppingCart',

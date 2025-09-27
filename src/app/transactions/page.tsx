@@ -3,10 +3,12 @@
 import { useState, useEffect } from 'react';
 import { Transaction, Category } from '@/lib/types';
 import { useFirestoreTransactions, useFirestoreCategories } from '@/hooks/use-firestore';
+import { useAuth } from '@/hooks/use-auth';
 import AppLayout from '@/components/layout/app-layout';
 import DashboardSkeleton from '@/components/dashboard/dashboard-skeleton';
 import { useI18n } from '@/hooks/use-i18n';
 import { useSelectedYear } from '@/hooks/use-selected-year';
+import { useToast } from '@/hooks/use-toast';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 import { getIcon } from '@/lib/utils';
@@ -64,11 +66,14 @@ const formatCurrency = (amount: number) => {
 
 
 export default function TransactionsPage() {
-  const { t } = useI18n();
-  const { selectedYear } = useSelectedYear();
-  const [isClient, setIsClient] = useState(false);
-  const { transactions: allTransactions, loading: transactionsLoading, updateTransaction, deleteTransaction } = useFirestoreTransactions();
-  const { categories, loading: categoriesLoading } = useFirestoreCategories();
+   const { t } = useI18n();
+   const { user, loading: authLoading } = useAuth();
+   const { selectedYear } = useSelectedYear();
+   const [isClient, setIsClient] = useState(false);
+   const userId = user?.uid;
+   const { toast } = useToast();
+   const { transactions: allTransactions, loading: transactionsLoading, updateTransaction, deleteTransaction, error: transactionsError } = useFirestoreTransactions(userId || '');
+   const { categories, loading: categoriesLoading, error: categoriesError } = useFirestoreCategories(userId || '');
   const [filters, setFilters] = useState({
     category: '',
     type: '',
@@ -85,6 +90,18 @@ export default function TransactionsPage() {
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  const hasError = transactionsError || categoriesError;
+
+  useEffect(() => {
+    if (hasError) {
+      toast({
+        title: "Error al cargar datos",
+        description: "Algunos datos no pudieron cargarse. La aplicación sigue siendo funcional.",
+        variant: "destructive",
+      });
+    }
+  }, [hasError, toast]);
 
   const transactions = allTransactions.filter(tx => new Date(tx.date).getFullYear() === selectedYear);
   const filteredTransactions = transactions.filter(tx => {
@@ -173,7 +190,11 @@ export default function TransactionsPage() {
     }
   };
 
-  if (!isClient || transactionsLoading || categoriesLoading) {
+  if (authLoading || !isClient) {
+    return <DashboardSkeleton />;
+  }
+
+  if (transactionsLoading || categoriesLoading) {
     return <DashboardSkeleton />;
   }
 

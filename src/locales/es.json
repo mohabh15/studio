@@ -44,12 +44,34 @@
     "change_language": "Cambiar Idioma"
   },
   "dashboard": {
+    "debt_status": {
+      "title": "Estado de Deudas",
+      "no_debts": "Sin deudas",
+      "no_debts_description": "No tienes deudas registradas",
+      "manage_debts": "Gestionar Deudas",
+      "progress_reduction": "Progreso de reducción",
+      "total_paid": "Total pagado",
+      "minimum_monthly_payments": "Pagos mínimos mensuales",
+      "upcoming_due_dates": "Vencimientos próximos",
+      "view_projections": "📊 Ver Proyecciones",
+      "view_details": "Ver Detalles",
+      "debts_count": "{{count}} deuda",
+      "debts_count_plural": "{{count}} deudas",
+      "average_rate": "Tasa promedio: {{rate}}%"
+    },
     "summary": {
       "total_income": "Ingresos Totales",
       "total_expenses": "Gastos Totales",
-      "balance": "Balance",
+      "balance": "Saldo",
       "this_month": "Este mes",
-      "remaining_funds": "Fondos restantes"
+      "remaining_funds": "Fondos restantes",
+      "daily_insight": "Insight Diario",
+      "expenses_increased": "Tus gastos totales aumentaron un {{percentage}}% respecto al mes pasado.",
+      "expenses_decreased": "Tus gastos totales bajaron un {{percentage}}% respecto al mes pasado.",
+      "income_increased": "Tus ingresos aumentaron un {{percentage}}% respecto al mes pasado.",
+      "income_decreased": "Tus ingresos bajaron un {{percentage}}% respecto al mes pasado.",
+      "category_expenses_increased": "Tus gastos en {{category}} aumentaron un {{percentage}}% respecto al mes pasado.",
+      "category_expenses_decreased": "Tus gastos en {{category}} bajaron un {{percentage}}% respecto al mes pasado."
     },
     "spending_overview": {
       "title": "Resumen de Gastos",
@@ -75,7 +97,8 @@
       "description": "Cómo vas con tus presupuestos este mes.",
       "left": "restante",
       "over": "excedido",
-      "no_budgets": "No hay presupuestos establecidos."
+      "no_budgets": "No hay presupuestos establecidos.",
+      "budget_label": "Presupuesto"
     }
   },
   "transactions_page": {
@@ -103,7 +126,8 @@
     "scan_failed_title": "Escaneo Fallido",
     "scan_successful_title": "Escaneo Exitoso",
     "scan_successful_desc": "Los datos del recibo han sido rellenados.",
-    "read_file_error": "Error al leer el archivo."
+    "read_file_error": "Error al leer el archivo.",
+    "type": "Tipo"
   },
   "edit_transaction_title": "Editar Transacción",
   "edit_transaction_description": "Actualiza los detalles de la transacción.",
@@ -180,5 +204,176 @@
     "select_category": "Selecciona una categoría",
     "category_type_income": "Ingreso",
     "category_type_expense": "Gasto"
+  },
+  "auth": {
+    "logout": "Cerrar sesión",
+    "logout_error": "Error al cerrar sesión",
+    "logout_success": "Sesión cerrada exitosamente",
+    "required_message": "Debes iniciar sesión para acceder a esta página."
+  },
+  "debts_page": {
+    "title": "Gestión de Deudas",
+    "description": "Controla y administra todas tus deudas financieras",
+    "add_debt": "Añadir Deuda",
+    "register_payment": "Registrar Pago",
+    "total_debt": "Deuda Total",
+    "minimum_payments": "Pagos Mínimos",
+    "average_rate": "Tasa Promedio",
+    "upcoming_due_dates": "Próximos Vencimientos",
+    "monthly": "mensuales",
+    "annual_interest": "interés anual",
+    "in_30_days": "en 30 días",
+    "all_debts": "Todas las Deudas",
+    "all_debts_description": "Lista completa de tus deudas activas",
+    "view_projections": "Ver Proyecciones",
+    "no_description": "Sin descripción",
+    "debt_info_format": "Tipo: {{type}} • Tasa: {{rate}}% • Vence: {{date}}",
+    "minimum_label": "Mínimo: {{amount}}",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "delete_debt_title": "¿Eliminar deuda?",
+    "delete_debt_description": "Esta acción no se puede deshacer. Se eliminará permanentemente la deuda \"{{description}}\" del sistema.",
+    "error_loading_data": "Error al cargar datos",
+    "error_loading_description": "Algunos datos no pudieron cargarse. La aplicación sigue siendo funcional."
+  },
+  "debt_dialog": {
+    "edit_title": "Editar Deuda",
+    "add_title": "Añadir Nueva Deuda",
+    "edit_description": "Modifica los detalles de tu deuda existente.",
+    "add_description": "Añade una nueva deuda para hacer seguimiento de tus pagos.",
+    "debt_type": "Tipo de Deuda",
+    "select_debt_type": "Selecciona el tipo de deuda",
+    "original_amount": "Monto Original",
+    "current_amount": "Monto Actual",
+    "interest_rate": "Tasa de Interés (%)",
+    "minimum_payments": "Pagos Mínimos",
+    "due_date": "Fecha de Vencimiento",
+    "description_optional": "Descripción (Opcional)",
+    "description_placeholder": "Añade una descripción para esta deuda...",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "update": "Actualizar",
+    "saving": "Guardando...",
+    "validation": {
+      "amount_required": "El monto debe ser mayor a 0",
+      "current_amount_negative": "El monto actual no puede ser negativo",
+      "interest_rate_min": "La tasa de interés debe ser mayor o igual a 0",
+      "minimum_payment_required": "Los pagos mínimos deben ser mayores a 0",
+      "due_date_required": "La fecha de vencimiento es requerida"
+    }
+  },
+  "debt_payment_dialog": {
+    "title": "Registrar Pago de Deuda",
+    "description": "Registra un pago realizado hacia una de tus deudas. Esto creará automáticamente una transacción de gasto.",
+    "debt_label": "Deuda",
+    "select_debt": "Selecciona una deuda",
+    "debt_info": "Deuda seleccionada:",
+    "current_balance": "Monto actual: {{amount}}",
+    "minimum_payment": "Pago mínimo: {{amount}}",
+    "payment_amount": "Monto del Pago",
+    "payment_type": "Tipo de Pago",
+    "payment_date": "Fecha del Pago",
+    "description_optional": "Descripción (Opcional)",
+    "description_placeholder": "Añade una descripción para este pago...",
+    "cancel": "Cancelar",
+    "register_payment": "Registrar Pago",
+    "registering": "Registrando...",
+    "regular_payment": "Pago Regular",
+    "extra_payment": "Pago Extra",
+    "validation": {
+      "debt_required": "Debes seleccionar una deuda",
+      "amount_required": "El monto debe ser mayor a 0",
+      "date_required": "La fecha es requerida"
+    }
+  },
+  "debt_charts": {
+    "distribution_by_type": "Distribución por Tipo",
+    "distribution_description": "Deudas agrupadas por categoría",
+    "minimum_payments_chart": "Pagos Mínimos",
+    "minimum_payments_description": "Pagos mensuales requeridos",
+    "interest_evolution": "Evolución de Intereses",
+    "interest_evolution_description": "Proyección de intereses acumulados",
+    "no_data": "No hay datos para mostrar",
+    "debt_type_labels": {
+      "credit_card": "Tarjeta de Crédito",
+      "personal_loan": "Préstamo Personal",
+      "mortgage": "Hipoteca",
+      "student_loan": "Préstamo Estudiantil",
+      "car_loan": "Préstamo de Auto",
+      "other": "Otro"
+    }
+  },
+  "debt_projections": {
+    "title": "Proyecciones de Deudas",
+    "back": "Volver",
+    "no_debts": "No hay deudas registradas",
+    "no_debts_description": "Agrega tus deudas para ver proyecciones y estrategias de pago.",
+    "manage_debts": "Gestionar Deudas",
+    "total_debt": "Deuda Total",
+    "total_paid": "Total Pagado",
+    "monthly_payment": "Pago Mensual",
+    "estimated_time": "Tiempo Estimado",
+    "minimum_payments_total": "Pagos mínimos totales",
+    "with_minimum_payments": "Con pagos mínimos",
+    "debt_reduction": "{{percentage}}% reducido",
+    "from_original": "De {{amount}}",
+    "months": "{{count}} meses",
+    "year": "{{count}} año",
+    "years": "{{count}} años",
+    "and": "y",
+    "month": "mes",
+    "months_label": "meses",
+    "freedom_date": "Fecha estimada de libertad financiera:",
+    "loading": "Cargando...",
+    "loading_projections": "Cargando proyecciones...",
+    "strategies": {
+      "avalanche": "Avalancha",
+      "snowball": "Bola de Nieve",
+      "combined": "Combinada"
+    },
+    "strategy_descriptions": {
+      "avalanche": "Mayor interés primero",
+      "snowball": "Menor monto primero",
+      "combined": "Balance optimizado"
+    }
+  },
+  "payment_simulator": {
+    "title": "Simulador de Pagos",
+    "description": "Ajusta tus pagos y estrategia para ver el impacto en tus proyecciones",
+    "extra_monthly_payment": "Pago Extra Mensual: {{amount}}",
+    "payment_strategy": "Estrategia de Pago",
+    "simulation_results": "Resultados de la Simulación",
+    "total_time": "Tiempo Total",
+    "total_paid": "Total Pagado",
+    "interest": "Intereses",
+    "monthly_payment": "Pago Mensual",
+    "savings_vs_minimum": "Ahorro Comparado con Pagos Mínimos",
+    "time_saved": "Tiempo ahorrado",
+    "interest_saved": "Intereses ahorrados",
+    "total_saved": "Total ahorrado",
+    "no_debts_to_simulate": "No hay deudas para simular",
+    "tips_title": "💡 Consejos para Mejorar tus Resultados",
+    "tips": {
+      "increase_payments": "Aumenta gradualmente tus pagos extra mensuales",
+      "additional_income": "Considera ingresos adicionales para acelerar el proceso",
+      "review_expenses": "Revisa tus gastos para identificar ahorros potenciales",
+      "consistency": "La consistencia es más importante que pagos grandes esporádicos"
+    }
+  },
+  "strategy_comparison": {
+    "title": "Comparación de Estrategias",
+    "description": "Compara diferentes enfoques para saldar tus deudas",
+    "recommended": "Recomendado",
+    "fastest": "Más Rápido",
+    "least_interest": "Menos Intereses",
+    "total_time": "Tiempo Total",
+    "total_paid": "Total Pagado",
+    "interest": "Intereses",
+    "monthly_payment": "Pago Mensual",
+    "no_projections": "No hay proyecciones disponibles",
+    "recommendations_title": "💡 Recomendaciones",
+    "avalanche_benefit": "La estrategia Avalancha minimiza los intereses totales pagados",
+    "snowball_benefit": "La estrategia Bola de Nieve proporciona motivación psicológica",
+    "personal_situation": "Considera tu situación financiera personal para elegir la mejor opción"
   }
 }

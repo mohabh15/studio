@@ -12,6 +12,7 @@ import { useFirestoreDebtPayments } from '@/hooks/use-firestore';
 
 type DebtStatusProps = {
   debts: Debt[];
+  userId: string;
 };
 
 const formatCurrency = (amount: number) => {
@@ -21,9 +22,9 @@ const formatCurrency = (amount: number) => {
   }).format(amount)} €`;
 };
 
-export default function DebtStatus({ debts }: DebtStatusProps) {
+export default function DebtStatus({ debts, userId }: DebtStatusProps) {
   const { t } = useI18n();
-  const { debtPayments } = useFirestoreDebtPayments();
+  const { debtPayments } = useFirestoreDebtPayments(userId);
 
   const debtSummary = useMemo(() => {
     const totalCurrentDebt = debts.reduce((sum, debt) => sum + debt.monto_actual, 0);
@@ -63,17 +64,17 @@ export default function DebtStatus({ debts }: DebtStatusProps) {
     return (
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle>Estado de Deudas</CardTitle>
+          <CardTitle>{t('dashboard.debt_status.title')}</CardTitle>
           <CreditCard className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold mb-2">Sin deudas</div>
+          <div className="text-2xl font-bold mb-2">{t('dashboard.debt_status.no_debts')}</div>
           <p className="text-xs text-muted-foreground mb-4">
-            No tienes deudas registradas
+            {t('dashboard.debt_status.no_debts_description')}
           </p>
           <Link href="/debts">
             <Button size="sm" className="w-full">
-              Gestionar Deudas
+              {t('dashboard.debt_status.manage_debts')}
             </Button>
           </Link>
         </CardContent>
@@ -84,20 +85,23 @@ export default function DebtStatus({ debts }: DebtStatusProps) {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium">Estado de Deudas</CardTitle>
+        <CardTitle className="text-sm font-medium">{t('dashboard.debt_status.title')}</CardTitle>
         <CreditCard className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent className="space-y-3 sm:space-y-4">
         <div className="text-2xl font-bold">{formatCurrency(debtSummary.totalCurrentDebt)}</div>
         <p className="text-xs text-muted-foreground">
-          {debtSummary.totalDebts} deuda{debtSummary.totalDebts !== 1 ? 's' : ''} •
-          Tasa promedio: {debtSummary.averageInterestRate.toFixed(1)}%
+          {debtSummary.totalDebts === 1
+            ? debtSummary.totalDebts + ' ' + t('dashboard.debt_status.debts_count').replace('{{count}} ', '')
+            : debtSummary.totalDebts + ' ' + t('dashboard.debt_status.debts_count_plural').replace('{{count}} ', '')
+          } •
+          {t('dashboard.debt_status.average_rate').replace('{{rate}}', debtSummary.averageInterestRate.toFixed(1))}
         </p>
 
         {/* Barra de progreso */}
         <div>
           <div className="flex items-center justify-between text-sm mb-1.5">
-            <span>Progreso de reducción</span>
+            <span>{t('dashboard.debt_status.progress_reduction')}</span>
             <span className="font-medium">{debtSummary.progress.toFixed(1)}%</span>
           </div>
           <Progress value={debtSummary.progress} className="h-2" />
@@ -107,7 +111,7 @@ export default function DebtStatus({ debts }: DebtStatusProps) {
           <div className="flex items-center justify-between text-sm">
             <span className="flex items-center gap-1">
               <DollarSign className="h-3 w-3" />
-              Total pagado
+              {t('dashboard.debt_status.total_paid')}
             </span>
             <span className="font-medium">{formatCurrency(debtSummary.totalPaid)}</span>
           </div>
@@ -115,7 +119,7 @@ export default function DebtStatus({ debts }: DebtStatusProps) {
           <div className="flex items-center justify-between text-sm">
             <span className="flex items-center gap-1">
               <TrendingUp className="h-3 w-3" />
-              Pagos mínimos mensuales
+              {t('dashboard.debt_status.minimum_monthly_payments')}
             </span>
             <span className="font-medium">{formatCurrency(debtSummary.totalMinimumPayments)}</span>
           </div>
@@ -124,7 +128,7 @@ export default function DebtStatus({ debts }: DebtStatusProps) {
             <div className="flex items-center justify-between text-sm">
               <span className="flex items-center gap-1 text-amber-600">
                 <AlertTriangle className="h-3 w-3" />
-                Vencimientos próximos
+                {t('dashboard.debt_status.upcoming_due_dates')}
               </span>
               <span className="font-medium text-amber-600">{debtSummary.upcomingPayments}</span>
             </div>
@@ -134,12 +138,12 @@ export default function DebtStatus({ debts }: DebtStatusProps) {
         <div className="space-y-2 pt-1">
           <Link href="/debts/projections" className="block">
             <Button size="sm" className="w-full text-xs sm:text-sm">
-              📊 Ver Proyecciones
+              {t('dashboard.debt_status.view_projections')}
             </Button>
           </Link>
           <Link href="/debts" className="block">
             <Button size="sm" variant="outline" className="w-full text-xs sm:text-sm">
-              Ver Detalles
+              {t('dashboard.debt_status.view_details')}
             </Button>
           </Link>
         </div>

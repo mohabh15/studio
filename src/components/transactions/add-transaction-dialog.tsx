@@ -56,6 +56,7 @@ type AddTransactionDialogProps = {
   onOpenChange: (isOpen: boolean) => void;
   onTransactionAdded: (transaction: Omit<Transaction, 'id'>) => void;
   categories: Category[];
+  userId: string;
 };
 
 export default function AddTransactionDialog({
@@ -63,6 +64,7 @@ export default function AddTransactionDialog({
   onOpenChange,
   onTransactionAdded,
   categories,
+  userId,
 }: AddTransactionDialogProps) {
   const { toast } = useToast();
   const { t } = useI18n();
@@ -144,6 +146,7 @@ export default function AddTransactionDialog({
     onTransactionAdded({
       ...values,
       date: values.date.toISOString(),
+      userId,
     });
   };
 

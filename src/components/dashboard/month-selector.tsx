@@ -3,6 +3,7 @@
 import { useI18n } from '@/hooks/use-i18n';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { formatMonthName } from '@/lib/utils';
 
 type MonthSelectorProps = {
   selectedYear: number;
@@ -11,11 +12,10 @@ type MonthSelectorProps = {
 };
 
 export default function MonthSelector({ selectedYear, selectedMonth, updateSelectedMonth }: MonthSelectorProps) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
 
   const getMonthName = (year: number, month: number) => {
-    const date = new Date(year, month, 1);
-    return date.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
+    return formatMonthName(year, month, locale);
   };
 
   const handlePreviousMonth = () => {
@@ -36,7 +36,7 @@ export default function MonthSelector({ selectedYear, selectedMonth, updateSelec
   };
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-0.5">
       <Button
         variant="outline"
         size="sm"

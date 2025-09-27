@@ -3,9 +3,11 @@
 import { useState, useEffect } from 'react';
 import { Debt, DebtPayment } from '@/lib/types';
 import { useFirestoreDebts, useFirestoreDebtPayments, useFirestoreTransactions } from '@/hooks/use-firestore';
+import { useAuth } from '@/hooks/use-auth';
 import AppLayout from '@/components/layout/app-layout';
 import DashboardSkeleton from '@/components/dashboard/dashboard-skeleton';
 import { useI18n } from '@/hooks/use-i18n';
+import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
@@ -38,11 +40,14 @@ const formatCurrency = (amount: number) => {
 };
 
 export default function DebtsPage() {
-  const { t } = useI18n();
-  const [isClient, setIsClient] = useState(false);
-  const { debts, loading: debtsLoading, addDebt, updateDebt, deleteDebt } = useFirestoreDebts();
-  const { addDebtPayment } = useFirestoreDebtPayments();
-  const { addTransaction } = useFirestoreTransactions();
+   const { t } = useI18n();
+   const { user, loading: authLoading } = useAuth();
+   const [isClient, setIsClient] = useState(false);
+   const userId = user?.uid;
+   const { toast } = useToast();
+   const { debts, loading: debtsLoading, addDebt, updateDebt, deleteDebt, error: debtsError } = useFirestoreDebts(userId || '');
+  const { addDebtPayment } = useFirestoreDebtPayments(userId || '');
+  const { addTransaction } = useFirestoreTransactions(userId || '');
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [isPaymentDialogOpen, setPaymentDialogOpen] = useState(false);
   const [editingDebt, setEditingDebt] = useState<Debt | null>(null);
@@ -52,11 +57,23 @@ export default function DebtsPage() {
     setIsClient(true);
   }, []);
 
+  useEffect(() => {
+    if (debtsError) {
+      toast({
+        title: "Error al cargar datos",
+        description: "Algunos datos no pudieron cargarse. La aplicación sigue siendo funcional.",
+        variant: "destructive",
+      });
+    }
+  }, [debtsError, toast]);
+
   const handleSaveDebt = async (debtData: Omit<Debt, 'id'>) => {
+    if (!userId) return;
+    const debtWithUserId = { ...debtData, userId };
     if (editingDebt) {
-      await updateDebt(editingDebt.id, debtData);
+      await updateDebt(editingDebt.id, debtWithUserId);
     } else {
-      await addDebt(debtData);
+      await addDebt(debtWithUserId);
     }
     setDialogOpen(false);
     setEditingDebt(null);
@@ -79,9 +96,11 @@ export default function DebtsPage() {
   };
 
   const handleSaveDebtPayment = async (paymentData: Omit<DebtPayment, 'id'>) => {
+    if (!userId) return;
     try {
       // Crear el registro de pago
-      const paymentDoc = await addDebtPayment(paymentData);
+      const paymentWithUserId = { ...paymentData, userId };
+      const paymentDoc = await addDebtPayment(paymentWithUserId);
 
       // Crear la transacción correspondiente (gasto)
       const selectedDebt = debts.find(d => d.id === paymentData.debt_id);
@@ -93,6 +112,7 @@ export default function DebtsPage() {
           category: 'debt', // Categoría especial para pagos de deudas
           notes: `Pago de deuda [${selectedDebt.id}]: ${selectedDebt.descripcion || selectedDebt.tipo.replace('_', ' ').toUpperCase()}${paymentData.description ? ` - ${paymentData.description}` : ''}`,
           merchant: selectedDebt.descripcion || selectedDebt.tipo.replace('_', ' ').toUpperCase(),
+          userId,
         };
 
         const transactionDoc = await addTransaction(transactionData);
@@ -126,7 +146,11 @@ export default function DebtsPage() {
     return dueDate >= today && dueDate <= thirtyDaysFromNow;
   });
 
-  if (!isClient || debtsLoading) {
+  if (authLoading || !isClient) {
+    return <DashboardSkeleton />;
+  }
+
+  if (debtsLoading) {
     return <DashboardSkeleton />;
   }
 
@@ -135,8 +159,8 @@ export default function DebtsPage() {
       <main className="flex-1 p-4 md:p-6 lg:p-8">
         <div className="mb-6 flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Gestión de Deudas</h1>
-            <p className="text-muted-foreground">Controla y administra todas tus deudas financieras</p>
+            <h1 className="text-3xl font-bold tracking-tight">{t('debts_page.title')}</h1>
+            <p className="text-muted-foreground">{t('debts_page.description')}</p>
           </div>
           <div className="flex flex-col gap-2 md:flex-row">
             <Button onClick={() => {
@@ -144,11 +168,11 @@ export default function DebtsPage() {
               setDialogOpen(true);
             }} className="h-8 px-3 text-sm md:h-9 md:px-3 md:text-sm md:order-2">
               <PlusCircle className="mr-1 h-4 w-4" />
-              Añadir Deuda
+              {t('debts_page.add_debt')}
             </Button>
             <Button variant="outline" onClick={() => setPaymentDialogOpen(true)} className="h-8 px-3 text-sm md:h-9 md:px-3 md:text-sm md:order-1">
               <CreditCard className="mr-1 h-4 w-4" />
-              Registrar Pago
+              {t('debts_page.register_payment')}
             </Button>
           </div>
         </div>
@@ -157,47 +181,47 @@ export default function DebtsPage() {
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-6">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Deuda Total</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('debts_page.total_debt')}</CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{formatCurrency(totalDebt)}</div>
               <p className="text-xs text-muted-foreground">
-                {debts.length} deuda{debts.length !== 1 ? 's' : ''}
+                {debts.length === 1 ? debts.length + ' ' + t('dashboard.debt_status.debts_count').replace('{{count}} ', '') : debts.length + ' ' + t('dashboard.debt_status.debts_count_plural').replace('{{count}} ', '')}
               </p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Pagos Mínimos</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('debts_page.minimum_payments')}</CardTitle>
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{formatCurrency(totalMinimumPayments)}</div>
-              <p className="text-xs text-muted-foreground">mensuales</p>
+              <p className="text-xs text-muted-foreground">{t('debts_page.monthly')}</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Tasa Promedio</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('debts_page.average_rate')}</CardTitle>
               <AlertTriangle className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{averageInterestRate.toFixed(1)}%</div>
-              <p className="text-xs text-muted-foreground">interés anual</p>
+              <p className="text-xs text-muted-foreground">{t('debts_page.annual_interest')}</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Próximos Vencimientos</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('debts_page.upcoming_due_dates')}</CardTitle>
               <Calendar className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{upcomingPayments.length}</div>
-              <p className="text-xs text-muted-foreground">en 30 días</p>
+              <p className="text-xs text-muted-foreground">{t('debts_page.in_30_days')}</p>
             </CardContent>
           </Card>
         </div>
@@ -212,13 +236,13 @@ export default function DebtsPage() {
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle>Todas las Deudas</CardTitle>
-                <CardDescription>Lista completa de tus deudas activas</CardDescription>
+                <CardTitle>{t('debts_page.all_debts')}</CardTitle>
+                <CardDescription>{t('debts_page.all_debts_description')}</CardDescription>
               </div>
               <Link href="/debts/projections">
                 <Button variant="outline" size="sm">
                   <BarChart3 className="mr-2 h-4 w-4" />
-                  Ver Proyecciones
+                  {t('debts_page.view_projections')}
                 </Button>
               </Link>
             </div>
@@ -229,17 +253,15 @@ export default function DebtsPage() {
                 {debts.map((debt) => (
                   <div key={debt.id} className="flex items-center justify-between p-4 border rounded-lg">
                     <div className="space-y-1 flex-1">
-                      <p className="font-medium">{debt.descripcion || 'Sin descripción'}</p>
+                      <p className="font-medium">{debt.descripcion || t('debts_page.no_description')}</p>
                       <p className="text-sm text-muted-foreground">
-                        Tipo: {debt.tipo.replace('_', ' ').toUpperCase()} •
-                        Tasa: {debt.tasa_interes}% •
-                        Vence: {new Date(debt.fecha_vencimiento).toLocaleDateString()}
+                        {`Tipo: ${debt.tipo.replace('_', ' ').toUpperCase()} • Tasa: ${debt.tasa_interes}% • Vence: ${new Date(debt.fecha_vencimiento).toLocaleDateString()}`}
                       </p>
                     </div>
                     <div className="text-right space-y-1 mr-4">
                       <p className="font-bold">{formatCurrency(debt.monto_actual)}</p>
                       <p className="text-sm text-muted-foreground">
-                        Mínimo: {formatCurrency(debt.pagos_minimos)}
+                        {`Mínimo: ${formatCurrency(debt.pagos_minimos)}`}
                       </p>
                     </div>
                     <div className="flex-shrink-0">
@@ -252,11 +274,11 @@ export default function DebtsPage() {
                         <DropdownMenuContent>
                           <DropdownMenuItem onClick={() => handleEditDebt(debt)}>
                             <Edit className="mr-2 h-4 w-4" />
-                            <span>Editar</span>
+                            <span>{t('common.edit')}</span>
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => handleDeleteDebt(debt)} className="text-destructive">
                             <Trash2 className="mr-2 h-4 w-4" />
-                            <span>Eliminar</span>
+                            <span>{t('common.delete')}</span>
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -266,7 +288,7 @@ export default function DebtsPage() {
               </div>
             ) : (
               <div className="flex h-[200px] w-full items-center justify-center rounded-md border-2 border-dashed">
-                <p className="text-muted-foreground">No tienes deudas registradas</p>
+                <p className="text-muted-foreground">{t('dashboard.debt_status.no_debts_description')}</p>
               </div>
             )}
           </CardContent>
@@ -290,16 +312,15 @@ export default function DebtsPage() {
       <AlertDialog open={!!deletingDebt} onOpenChange={() => setDeletingDebt(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>¿Eliminar deuda?</AlertDialogTitle>
+            <AlertDialogTitle>{t('debts_page.delete_debt_title')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta acción no se puede deshacer. Se eliminará permanentemente la deuda
-              "{deletingDebt?.descripcion || 'Sin descripción'}" del sistema.
+              {`Esta acción no se puede deshacer. Se eliminará permanentemente la deuda "${deletingDebt?.descripcion || t('debts_page.no_description')}" del sistema.`}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setDeletingDebt(null)}>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel onClick={() => setDeletingDebt(null)}>{t('common.cancel')}</AlertDialogCancel>
             <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-              Eliminar
+              {t('common.delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

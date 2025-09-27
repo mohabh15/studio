@@ -2,6 +2,7 @@ export type TransactionType = 'income' | 'expense';
 
 export type Transaction = {
   id: string;
+  userId: string;
   type: TransactionType;
   amount: number;
   date: string; // ISO string
@@ -12,6 +13,7 @@ export type Transaction = {
 
 export type Category = {
   id: string;
+  userId: string;
   name: string;
   icon: string;
   type: TransactionType;
@@ -19,6 +21,7 @@ export type Category = {
 
 export type Budget = {
   id: string;
+  userId: string;
   category: string; // category id
   amount: number;
 };
@@ -27,6 +30,7 @@ export type DebtType = 'credit_card' | 'personal_loan' | 'mortgage' | 'student_l
 
 export type Debt = {
   id: string;
+  userId: string;
   tipo: DebtType;
   monto: number; // monto original
   monto_actual: number; // monto pendiente
@@ -39,6 +43,7 @@ export type Debt = {
 
 export type DebtPayment = {
   id: string;
+  userId: string;
   debt_id: string;
   amount: number;
   date: string; // ISO string
@@ -49,6 +54,7 @@ export type DebtPayment = {
 
 export type DebtGoal = {
   id: string;
+  userId: string;
   debt_id: string;
   target_amount: number; // monto objetivo a reducir
   target_date: string; // fecha objetivo (ISO string)

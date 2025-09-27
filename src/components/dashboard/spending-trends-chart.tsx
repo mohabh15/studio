@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { ChartContainer } from '@/components/ui/chart';
 import { type Transaction } from '@/lib/types';
 import { useI18n } from '@/hooks/use-i18n';
+import { formatMonthName } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 
 type SpendingTrendsChartProps = {
@@ -13,7 +14,7 @@ type SpendingTrendsChartProps = {
 };
 
 export default function SpendingTrendsChart({ transactions }: SpendingTrendsChartProps) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -36,7 +37,7 @@ export default function SpendingTrendsChart({ transactions }: SpendingTrendsChar
       months.push({
         year: date.getFullYear(),
         month: date.getMonth(),
-        label: date.toLocaleDateString('es-ES', { month: 'short', year: 'numeric' }),
+        label: formatMonthName(date.getFullYear(), date.getMonth(), locale),
       });
     }
 

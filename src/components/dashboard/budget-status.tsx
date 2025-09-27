@@ -74,7 +74,7 @@ export default function BudgetStatus({ transactions, budgets, categories, select
                 </div>
                 <Progress value={budget.progress} aria-label={`${budget.categoryName} budget progress`} />
                 <p className="text-xs text-muted-foreground text-right">
-                  <span className="font-semibold">{formatCurrency(budget.amount)}</span> Budget
+                  <span className="font-semibold">{formatCurrency(budget.amount)}</span> {t('dashboard.budget_status.budget_label')}
                 </p>
               </div>
             ))}

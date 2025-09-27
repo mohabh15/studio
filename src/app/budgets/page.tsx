@@ -3,10 +3,11 @@
 import { useState, useEffect } from 'react';
 import type { Category, Budget } from '@/lib/types';
 import { useFirestoreBudgets, useFirestoreCategories } from '@/hooks/use-firestore';
+import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { PlusCircle, Trash2, Edit, MoreHorizontal } from 'lucide-react';
+import { PlusCircle, Trash2, Edit, MoreHorizontal, AlertCircle } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,6 +29,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+import { useToast } from '@/hooks/use-toast';
 import AppLayout from '@/components/layout/app-layout';
 
 const formatCurrency = (amount: number) => {
@@ -38,11 +40,14 @@ const formatCurrency = (amount: number) => {
 };
 
 export default function BudgetsPage() {
-  const { t } = useI18n();
-  const { selectedYear } = useSelectedYear();
-  const [isClient, setIsClient] = useState(false);
-  const { budgets: allBudgets, loading: budgetsLoading, addBudget, updateBudget, deleteBudget } = useFirestoreBudgets();
-  const { categories, loading: categoriesLoading } = useFirestoreCategories();
+   const { t } = useI18n();
+   const { user, loading: authLoading } = useAuth();
+   const { selectedYear } = useSelectedYear();
+   const [isClient, setIsClient] = useState(false);
+   const userId = user?.uid;
+   const { toast } = useToast();
+   const { budgets: allBudgets, loading: budgetsLoading, addBudget, updateBudget, deleteBudget, error: budgetsError } = useFirestoreBudgets(userId || '');
+   const { categories, loading: categoriesLoading, error: categoriesError } = useFirestoreCategories(userId || '');
   const budgets = allBudgets; // TODO: filter by year if budgets have year
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [editingBudget, setEditingBudget] = useState<Budget | null>(null);
@@ -51,6 +56,18 @@ export default function BudgetsPage() {
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  const hasError = budgetsError || categoriesError;
+
+  useEffect(() => {
+    if (hasError) {
+      toast({
+        title: "Error al cargar datos",
+        description: "Algunos datos no pudieron cargarse. La aplicación sigue siendo funcional.",
+        variant: "destructive",
+      });
+    }
+  }, [hasError, toast]);
 
   const handleAddBudget = () => {
     setEditingBudget(null);
@@ -74,12 +91,14 @@ export default function BudgetsPage() {
   }
 
   const handleSaveBudget = async (budgetData: Omit<Budget, 'id'>) => {
+    if (!userId) return;
+    const budgetWithUserId = { ...budgetData, userId };
     if (editingBudget) {
       // Edit
-      await updateBudget(editingBudget.id, budgetData);
+      await updateBudget(editingBudget.id, budgetWithUserId);
     } else {
       // Add
-      await addBudget(budgetData);
+      await addBudget(budgetWithUserId);
     }
     setDialogOpen(false);
   };
@@ -88,7 +107,11 @@ export default function BudgetsPage() {
     return categories.find(c => c.id === id);
   };
 
-  if (!isClient || budgetsLoading || categoriesLoading) {
+  if (authLoading || !isClient) {
+    return <DashboardSkeleton />;
+  }
+
+  if (budgetsLoading || categoriesLoading) {
     return <DashboardSkeleton />;
   }
 
@@ -177,6 +200,7 @@ export default function BudgetsPage() {
         budget={editingBudget}
         categories={categories}
         existingBudgets={budgets}
+        userId={userId || ''}
       />
       
       <AlertDialog open={!!deletingBudget} onOpenChange={() => setDeletingBudget(null)}>

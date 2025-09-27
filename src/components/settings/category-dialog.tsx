@@ -48,6 +48,7 @@ type CategoryDialogProps = {
   onOpenChange: (isOpen: boolean) => void;
   onSave: (category: Omit<Category, 'id'>) => void;
   category: Category | null;
+  userId: string;
 };
 
 export default function CategoryDialog({
@@ -55,6 +56,7 @@ export default function CategoryDialog({
   onOpenChange,
   onSave,
   category,
+  userId,
 }: CategoryDialogProps) {
   const { t } = useI18n();
 
@@ -91,13 +93,14 @@ export default function CategoryDialog({
   const onSubmit = (values: CategoryFormValues) => {
     // Crear un ID para la categoría basado en el nombre (solo para nuevas categorías)
     const categoryId = values.name.toLowerCase().replace(/\s+/g, '_');
-    
+
     // Asegurarse de que el nombre use el formato de traducción
     const processedValues = {
       ...values,
-      name: `categories.${categoryId}`
+      name: `categories.${categoryId}`,
+      userId
     };
-    
+
     onSave(processedValues);
   };
 

@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Debt } from '@/lib/types';
 import { calculateDebtProjections, PaymentStrategy, ProjectionResult } from '@/lib/debt-projections';
 import { Calculator, TrendingUp, Clock, DollarSign } from 'lucide-react';
+import { useI18n } from '@/hooks/use-i18n';
 
 interface PaymentSimulatorProps {
   debts: Debt[];
@@ -35,6 +36,7 @@ const formatMonths = (months: number) => {
 };
 
 export default function PaymentSimulator({ debts }: PaymentSimulatorProps) {
+  const { t } = useI18n();
   const [extraPayment, setExtraPayment] = useState<number>(0);
   const [selectedStrategy, setSelectedStrategy] = useState<PaymentStrategy>('avalanche');
 
@@ -83,7 +85,7 @@ export default function PaymentSimulator({ debts }: PaymentSimulatorProps) {
     return (
       <Card>
         <CardContent className="flex items-center justify-center py-8">
-          <p className="text-muted-foreground">No hay deudas para simular</p>
+          <p className="text-muted-foreground">{t('payment_simulator.no_debts_to_simulate')}</p>
         </CardContent>
       </Card>
     );
@@ -97,10 +99,10 @@ export default function PaymentSimulator({ debts }: PaymentSimulatorProps) {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Calculator className="h-5 w-5" />
-          Simulador de Pagos
+          {t('payment_simulator.title')}
         </CardTitle>
         <p className="text-sm text-muted-foreground">
-          Ajusta tus pagos y estrategia para ver el impacto en tus proyecciones
+          {t('payment_simulator.description')}
         </p>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -108,7 +110,7 @@ export default function PaymentSimulator({ debts }: PaymentSimulatorProps) {
         <div className="space-y-4">
           <div>
             <Label className="text-sm font-medium">
-              Pago Extra Mensual: {formatCurrency(extraPayment)}
+              {`Pago Extra Mensual: ${formatCurrency(extraPayment)}`}
             </Label>
             <Slider
               value={[extraPayment]}
@@ -124,7 +126,7 @@ export default function PaymentSimulator({ debts }: PaymentSimulatorProps) {
           </div>
 
           <div>
-            <Label className="text-sm font-medium mb-3 block">Estrategia de Pago</Label>
+            <Label className="text-sm font-medium mb-3 block">{t('payment_simulator.payment_strategy')}</Label>
             <div className="grid grid-cols-3 gap-2">
               {strategies.map((strategy) => (
                 <Button
@@ -147,7 +149,7 @@ export default function PaymentSimulator({ debts }: PaymentSimulatorProps) {
           <div className="border-t pt-6">
             <h4 className="font-semibold mb-4 flex items-center gap-2">
               <TrendingUp className="h-4 w-4" />
-              Resultados de la Simulación
+              {t('payment_simulator.simulation_results')}
             </h4>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
@@ -155,28 +157,28 @@ export default function PaymentSimulator({ debts }: PaymentSimulatorProps) {
                 <div className="text-lg font-bold text-primary">
                   {formatMonths(currentProjection.monthsToPayOff)}
                 </div>
-                <div className="text-xs text-muted-foreground">Tiempo Total</div>
+                <div className="text-xs text-muted-foreground">{t('payment_simulator.total_time')}</div>
               </div>
 
               <div className="text-center p-3 bg-muted rounded-lg">
                 <div className="text-lg font-bold text-green-600">
                   {formatCurrency(currentProjection.totalPaid)}
                 </div>
-                <div className="text-xs text-muted-foreground">Total Pagado</div>
+                <div className="text-xs text-muted-foreground">{t('payment_simulator.total_paid')}</div>
               </div>
 
               <div className="text-center p-3 bg-muted rounded-lg">
                 <div className="text-lg font-bold text-red-600">
                   {formatCurrency(currentProjection.totalInterest)}
                 </div>
-                <div className="text-xs text-muted-foreground">Intereses</div>
+                <div className="text-xs text-muted-foreground">{t('payment_simulator.interest')}</div>
               </div>
 
               <div className="text-center p-3 bg-muted rounded-lg">
                 <div className="text-lg font-bold">
                   {formatCurrency(currentProjection.monthlyPayment)}
                 </div>
-                <div className="text-xs text-muted-foreground">Pago Mensual</div>
+                <div className="text-xs text-muted-foreground">{t('payment_simulator.monthly_payment')}</div>
               </div>
             </div>
 
@@ -185,26 +187,26 @@ export default function PaymentSimulator({ debts }: PaymentSimulatorProps) {
               <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                 <h5 className="font-medium text-green-800 mb-2 flex items-center gap-2">
                   <DollarSign className="h-4 w-4" />
-                  Ahorro Comparado con Pagos Mínimos
+                  {t('payment_simulator.savings_vs_minimum')}
                 </h5>
                 <div className="grid grid-cols-3 gap-4 text-sm">
                   <div>
                     <div className="font-semibold text-green-700">
                       {savings.timeSaved} meses
                     </div>
-                    <div className="text-green-600">Tiempo ahorrado</div>
+                    <div className="text-green-600">{t('payment_simulator.time_saved')}</div>
                   </div>
                   <div>
                     <div className="font-semibold text-green-700">
                       {formatCurrency(savings.interestSaved)}
                     </div>
-                    <div className="text-green-600">Intereses ahorrados</div>
+                    <div className="text-green-600">{t('payment_simulator.interest_saved')}</div>
                   </div>
                   <div>
                     <div className="font-semibold text-green-700">
                       {formatCurrency(savings.totalSaved)}
                     </div>
-                    <div className="text-green-600">Total ahorrado</div>
+                    <div className="text-green-600">{t('payment_simulator.total_saved')}</div>
                   </div>
                 </div>
               </div>
@@ -215,7 +217,7 @@ export default function PaymentSimulator({ debts }: PaymentSimulatorProps) {
               <div className="flex items-start gap-2">
                 <Clock className="h-4 w-4 text-blue-600 mt-0.5" />
                 <div className="text-sm">
-                  <div className="font-medium text-blue-800">Fecha estimada de libertad financiera</div>
+                  <div className="font-medium text-blue-800">{t('payment_simulator.freedom_date')}</div>
                   <div className="text-blue-700">
                     {currentProjection.payoffDate.toLocaleDateString('es-ES', {
                       year: 'numeric',
@@ -230,15 +232,15 @@ export default function PaymentSimulator({ debts }: PaymentSimulatorProps) {
         )}
 
         {/* Consejos */}
-        <div className="border-t pt-4">
-          <h5 className="font-medium mb-2">💡 Consejos para Mejorar tus Resultados</h5>
-          <ul className="text-sm space-y-1 text-muted-foreground">
-            <li>• Aumenta gradualmente tus pagos extra mensuales</li>
-            <li>• Considera ingresos adicionales para acelerar el proceso</li>
-            <li>• Revisa tus gastos para identificar ahorros potenciales</li>
-            <li>• La consistencia es más importante que pagos grandes esporádicos</li>
-          </ul>
-        </div>
+         <div className="border-t pt-4">
+           <h5 className="font-medium mb-2">{t('payment_simulator.tips_title')}</h5>
+           <ul className="text-sm space-y-1 text-muted-foreground">
+             <li>• {t('payment_simulator.tips.increase_payments')}</li>
+             <li>• {t('payment_simulator.tips.additional_income')}</li>
+             <li>• {t('payment_simulator.tips.review_expenses')}</li>
+             <li>• {t('payment_simulator.tips.consistency')}</li>
+           </ul>
+         </div>
       </CardContent>
     </Card>
   );

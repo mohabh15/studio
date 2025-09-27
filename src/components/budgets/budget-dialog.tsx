@@ -48,6 +48,7 @@ type BudgetDialogProps = {
   budget: Budget | null;
   categories: Category[];
   existingBudgets: Budget[];
+  userId: string;
 };
 
 export default function BudgetDialog({
@@ -57,6 +58,7 @@ export default function BudgetDialog({
   budget,
   categories,
   existingBudgets,
+  userId,
 }: BudgetDialogProps) {
   const { t } = useI18n();
 
@@ -80,7 +82,7 @@ export default function BudgetDialog({
   }, [budget, form, isOpen]);
 
   const onSubmit = (values: BudgetFormValues) => {
-    onSave(values);
+    onSave({ ...values, userId });
   };
 
   const availableCategories = categories.filter(c =>

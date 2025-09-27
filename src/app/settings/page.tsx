@@ -3,10 +3,11 @@
 import { useState, useEffect } from 'react';
 import type { Category, TransactionType } from '@/lib/types';
 import { useFirestoreCategories } from '@/hooks/use-firestore';
+import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { PlusCircle, Trash2, Edit, MoreHorizontal, Languages, RotateCcw, Eye, EyeOff } from 'lucide-react';
+import { PlusCircle, Trash2, Edit, MoreHorizontal, Languages, RotateCcw, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -44,10 +45,12 @@ import { toast } from '@/hooks/use-toast';
 
 export default function SettingsPage() {
   const { t, setLocale, locale } = useI18n();
+  const { user, loading: authLoading } = useAuth();
   const { selectedYear, updateSelectedYear } = useSelectedYear();
   const { showDebts, toggleShowDebts } = useShowDebts();
   const [isClient, setIsClient] = useState(false);
-  const { categories, loading: categoriesLoading, addCategory, updateCategory, deleteCategory } = useFirestoreCategories();
+  const userId = user?.uid;
+  const { categories, loading: categoriesLoading, addCategory, updateCategory, deleteCategory, error: categoriesError } = useFirestoreCategories(userId || '');
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [deletingCategory, setDeletingCategory] = useState<Category | null>(null);
@@ -55,6 +58,16 @@ export default function SettingsPage() {
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  useEffect(() => {
+    if (categoriesError) {
+      toast({
+        title: "Error al cargar datos",
+        description: "Algunos datos no pudieron cargarse. La aplicación sigue siendo funcional.",
+        variant: "destructive",
+      });
+    }
+  }, [categoriesError, toast]);
 
   const handleAddCategory = () => {
     setEditingCategory(null);
@@ -121,18 +134,21 @@ export default function SettingsPage() {
   }
 
   const handleSaveCategory = async (categoryData: Omit<Category, 'id'>) => {
+    if (!userId) return;
     // Si el nombre ya es una clave de traducción, lo usamos tal cual
     const nameKey = categoryData.name.startsWith('categories.')
       ? categoryData.name
       : `categories.${categoryData.name.toLowerCase().replace(/\s+/g, '_')}`;
 
+    const categoryWithUserId = { ...categoryData, name: nameKey, userId };
+
     if (editingCategory) {
       // Edit - mantener el ID existente
-      await updateCategory(editingCategory.id, { ...categoryData, name: nameKey });
+      await updateCategory(editingCategory.id, categoryWithUserId);
     } else {
       // Add - usar el nombre sin el prefijo como ID
       const id = nameKey.replace('categories.', '');
-      await addCategory({ ...categoryData, name: nameKey, id });
+      await addCategory({ ...categoryWithUserId, id });
     }
     setDialogOpen(false);
   };
@@ -180,7 +196,11 @@ export default function SettingsPage() {
       });
   };
 
-  if (!isClient || categoriesLoading) {
+  if (authLoading || !isClient) {
+    return <DashboardSkeleton />;
+  }
+
+  if (categoriesLoading) {
     return <DashboardSkeleton />;
   }
 
@@ -320,6 +340,7 @@ export default function SettingsPage() {
         onOpenChange={setDialogOpen}
         onSave={handleSaveCategory}
         category={editingCategory}
+        userId={userId || ''}
       />
       
       <AlertDialog open={!!deletingCategory} onOpenChange={() => setDeletingCategory(null)}>

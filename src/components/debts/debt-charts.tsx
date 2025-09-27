@@ -5,6 +5,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, BarChart, Ba
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { ChartContainer } from '@/components/ui/chart';
 import { Debt } from '@/lib/types';
+import { useI18n } from '@/hooks/use-i18n';
 
 type DebtChartsProps = {
   debts: Debt[];
@@ -45,6 +46,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 export default function DebtCharts({ debts }: DebtChartsProps) {
+  const { t } = useI18n();
   // Datos para gráfico de distribución por tipo
   const debtTypeData = useMemo(() => {
     const typeMap = debts.reduce((acc, debt) => {
@@ -96,8 +98,8 @@ export default function DebtCharts({ debts }: DebtChartsProps) {
       {/* Gráfico de distribución por tipo */}
       <Card className="md:col-span-2 lg:col-span-1">
         <CardHeader>
-          <CardTitle>Distribución por Tipo</CardTitle>
-          <CardDescription>Deudas agrupadas por categoría</CardDescription>
+          <CardTitle>{t('debt_charts.distribution_by_type')}</CardTitle>
+          <CardDescription>{t('debt_charts.distribution_description')}</CardDescription>
         </CardHeader>
         <CardContent>
           {debtTypeData.length > 0 ? (
@@ -124,7 +126,7 @@ export default function DebtCharts({ debts }: DebtChartsProps) {
             </ChartContainer>
           ) : (
             <div className="flex h-[250px] w-full items-center justify-center rounded-md border-2 border-dashed">
-              <p className="text-muted-foreground">No hay datos para mostrar</p>
+              <p className="text-muted-foreground">{t('debt_charts.no_data')}</p>
             </div>
           )}
         </CardContent>
@@ -133,8 +135,8 @@ export default function DebtCharts({ debts }: DebtChartsProps) {
       {/* Gráfico de pagos mínimos */}
       <Card>
         <CardHeader>
-          <CardTitle>Pagos Mínimos</CardTitle>
-          <CardDescription>Pagos mensuales requeridos</CardDescription>
+          <CardTitle>{t('debt_charts.minimum_payments_chart')}</CardTitle>
+          <CardDescription>{t('debt_charts.minimum_payments_description')}</CardDescription>
         </CardHeader>
         <CardContent>
           {minimumPaymentsData.length > 0 ? (
@@ -166,7 +168,7 @@ export default function DebtCharts({ debts }: DebtChartsProps) {
             </ChartContainer>
           ) : (
             <div className="flex h-[300px] w-full items-center justify-center rounded-md border-2 border-dashed">
-              <p className="text-muted-foreground">No hay datos para mostrar</p>
+              <p className="text-muted-foreground">{t('debt_charts.no_data')}</p>
             </div>
           )}
         </CardContent>
@@ -175,8 +177,8 @@ export default function DebtCharts({ debts }: DebtChartsProps) {
       {/* Gráfico de evolución de intereses */}
       <Card>
         <CardHeader>
-          <CardTitle>Evolución de Intereses</CardTitle>
-          <CardDescription>Proyección de intereses acumulados</CardDescription>
+          <CardTitle>{t('debt_charts.interest_evolution')}</CardTitle>
+          <CardDescription>{t('debt_charts.interest_evolution_description')}</CardDescription>
         </CardHeader>
         <CardContent>
           {interestEvolutionData.length > 0 ? (
@@ -210,7 +212,7 @@ export default function DebtCharts({ debts }: DebtChartsProps) {
             </ChartContainer>
           ) : (
             <div className="flex h-[300px] w-full items-center justify-center rounded-md border-2 border-dashed">
-              <p className="text-muted-foreground">No hay datos para mostrar</p>
+              <p className="text-muted-foreground">{t('debt_charts.no_data')}</p>
             </div>
           )}
         </CardContent>

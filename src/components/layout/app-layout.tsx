@@ -3,11 +3,12 @@
 import { useState } from 'react';
 import type { Category, Transaction } from '@/lib/types';
 import { useFirestoreTransactions, useFirestoreCategories } from '@/hooks/use-firestore';
+import { useAuth } from '@/hooks/use-auth';
 import AddTransactionDialog from '../transactions/add-transaction-dialog';
 import BottomNav from './bottom-nav';
 import { ThemeToggle } from '../theme/theme-toggle';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Plus, Wallet } from 'lucide-react';
 import { useI18n } from '@/hooks/use-i18n';
 
 type AppLayoutProps = {
@@ -16,18 +17,34 @@ type AppLayoutProps = {
 
 export default function AppLayout({ children }: AppLayoutProps) {
   const { t } = useI18n();
+  const { user } = useAuth();
   const [isAddTransactionOpen, setAddTransactionOpen] = useState(false);
-  const { addTransaction } = useFirestoreTransactions();
-  const { categories } = useFirestoreCategories();
+  const userId = user?.uid;
+  const { addTransaction } = useFirestoreTransactions(userId || '');
+  const { categories } = useFirestoreCategories(userId || '');
 
   const handleTransactionAdded = async (newTx: Omit<Transaction, 'id'>) => {
-    await addTransaction(newTx);
+    if (!userId) return;
+    const transactionWithUserId = { ...newTx, userId };
+    await addTransaction(transactionWithUserId);
     setAddTransactionOpen(false);
   };
   
   return (
     <>
       <div className="flex min-h-screen w-full flex-col">
+        {/* Header with title */}
+        {user && (
+          <header className="flex items-center justify-start border-b bg-background px-4 py-3 sm:px-6">
+            <div className="flex items-center gap-2">
+              <Wallet className="h-7 w-7 text-primary" />
+              <h1 className="text-xl font-bold tracking-tight text-foreground">
+                {t('app.title')}
+              </h1>
+            </div>
+          </header>
+        )}
+
         <div className="pb-20 sm:pb-24">{children}</div>
 
         {/* Botón flotante para añadir transacción - justo encima de la navbar */}
@@ -36,6 +53,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
             onClick={() => setAddTransactionOpen(true)}
             size="icon"
             className="h-16 w-16 sm:h-18 sm:w-18 rounded-full bg-primary shadow-lg hover:bg-primary/90"
+            disabled={!user}
           >
             <Plus className="h-8 w-8 sm:h-9 sm:w-9" />
             <span className="sr-only">{t('header.add_transaction')}</span>
@@ -49,6 +67,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
         onOpenChange={setAddTransactionOpen}
         onTransactionAdded={handleTransactionAdded}
         categories={categories}
+        userId={userId || ''}
       />
     </>
   );

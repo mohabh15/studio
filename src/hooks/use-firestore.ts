@@ -16,7 +16,7 @@ import { db } from '@/lib/firebase';
 import { Transaction, Category, Budget, Debt, DebtPayment, DebtGoal } from '@/lib/types';
 
 // Hook for transactions
-export function useFirestoreTransactions() {
+export function useFirestoreTransactions(userId: string) {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -24,12 +24,11 @@ export function useFirestoreTransactions() {
   const fetchTransactions = async () => {
     try {
       setLoading(true);
-      const q = query(collection(db, 'transactions'), orderBy('date', 'desc'));
-      const querySnapshot = await getDocs(q);
-      const data = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Transaction[];
+      const q = query(collection(db, 'transactions'), where('userId', '==', userId));
+      const snapshot = await getDocs(q);
+      const data = snapshot.docs
+        .map(doc => ({ id: doc.id, ...doc.data() } as Transaction))
+        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
       setTransactions(data);
       setError(null);
     } catch (err) {
@@ -39,9 +38,9 @@ export function useFirestoreTransactions() {
     }
   };
 
-  const addTransaction = async (transaction: Omit<Transaction, 'id'>) => {
+  const addTransaction = async (transaction: Omit<Transaction, 'id' | 'userId'>) => {
     try {
-      await addDoc(collection(db, 'transactions'), transaction);
+      await addDoc(collection(db, 'transactions'), { ...transaction, userId });
       await fetchTransactions(); // Refresh data
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error adding transaction');
@@ -50,21 +49,16 @@ export function useFirestoreTransactions() {
 
   const updateTransaction = async (id: string, updates: Partial<Transaction>) => {
     try {
-      console.log('Updating transaction in Firestore:', id, updates);
       const docRef = doc(db, 'transactions', id);
       await updateDoc(docRef, updates);
-      console.log('Transaction updated successfully, fetching updated list...');
       await fetchTransactions();
-      console.log('Transactions updated');
     } catch (err) {
-      console.error('Error updating transaction:', err);
       setError(err instanceof Error ? err.message : 'Error updating transaction');
     }
   };
 
   const deleteTransaction = async (id: string) => {
     try {
-      console.log('Deleting transaction from Firestore:', id);
       const docRef = doc(db, 'transactions', id);
       const docSnap = await getDoc(docRef);
 
@@ -77,7 +71,6 @@ export function useFirestoreTransactions() {
           const debtIdMatch = transactionData.notes.match(/Pago de deuda \[([^\]]+)\]/);
           if (debtIdMatch) {
             const debtId = debtIdMatch[1];
-            console.log('Restoring payment to debt:', debtId);
 
             const debtDoc = await getDoc(doc(db, 'debts', debtId));
             if (debtDoc.exists()) {
@@ -88,30 +81,24 @@ export function useFirestoreTransactions() {
               await updateDoc(doc(db, 'debts', debtId), {
                 monto_actual: restoredAmount
               });
-              console.log('Debt amount restored:', debtId, 'new amount:', restoredAmount);
             }
           }
         }
 
-        console.log('Transaction exists, deleting...');
         await deleteDoc(docRef);
-        console.log('Transaction deleted from Firestore, fetching updated list...');
       } else {
-        console.error('Transaction does not exist:', id);
         throw new Error(`Transaction with id ${id} does not exist`);
       }
 
       await fetchTransactions();
-      console.log('Transactions updated');
     } catch (err) {
-      console.error('Error deleting transaction:', err);
       setError(err instanceof Error ? err.message : 'Error deleting transaction');
     }
   };
 
   useEffect(() => {
     fetchTransactions();
-  }, []);
+  }, [userId]);
 
   return {
     transactions,
@@ -125,7 +112,7 @@ export function useFirestoreTransactions() {
 }
 
 // Hook for categories
-export function useFirestoreCategories() {
+export function useFirestoreCategories(userId: string) {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -133,11 +120,10 @@ export function useFirestoreCategories() {
   const fetchCategories = async () => {
     try {
       setLoading(true);
-      const querySnapshot = await getDocs(collection(db, 'categories'));
-      const data = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Category[];
+      const q = query(collection(db, 'categories'), where('userId', '==', userId));
+      const snapshot = await getDocs(q);
+      const data = snapshot.docs
+        .map(doc => ({ id: doc.id, ...doc.data() } as Category));
       setCategories(data);
       setError(null);
     } catch (err) {
@@ -169,41 +155,32 @@ export function useFirestoreCategories() {
 
   const deleteCategory = async (id: string) => {
     try {
-      console.log('Deleting category from Firestore by id:', id);
-
       // First try to delete by id
       const docRef = doc(db, 'categories', id);
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
-        console.log('Document exists by id, deleting...');
         await deleteDoc(docRef);
       } else {
-        console.log('Document not found by id, trying to find by name...');
         // If not found by id, find by name (for categories that might have different ids)
         const q = query(collection(db, 'categories'), where('name', '==', `categories.${id}`));
         const querySnapshot = await getDocs(q);
         if (!querySnapshot.empty) {
           const docToDelete = querySnapshot.docs[0];
-          console.log('Found document by name, deleting:', docToDelete.id);
           await deleteDoc(docToDelete.ref);
         } else {
-          console.error('Category not found by id or name:', id);
           throw new Error(`Category with id ${id} does not exist`);
         }
       }
 
-      console.log('Category deleted from Firestore, fetching updated list...');
       await fetchCategories();
-      console.log('Categories updated');
     } catch (err) {
-      console.error('Error deleting category:', err);
       setError(err instanceof Error ? err.message : 'Error deleting category');
     }
   };
 
   useEffect(() => {
     fetchCategories();
-  }, []);
+  }, [userId]);
 
   return {
     categories,
@@ -217,7 +194,7 @@ export function useFirestoreCategories() {
 }
 
 // Hook for budgets
-export function useFirestoreBudgets() {
+export function useFirestoreBudgets(userId: string) {
   const [budgets, setBudgets] = useState<Budget[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -225,11 +202,10 @@ export function useFirestoreBudgets() {
   const fetchBudgets = async () => {
     try {
       setLoading(true);
-      const querySnapshot = await getDocs(collection(db, 'budgets'));
-      const data = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Budget[];
+      const q = query(collection(db, 'budgets'), where('userId', '==', userId));
+      const snapshot = await getDocs(q);
+      const data = snapshot.docs
+        .map(doc => ({ id: doc.id, ...doc.data() } as Budget));
       setBudgets(data);
       setError(null);
     } catch (err) {
@@ -239,9 +215,9 @@ export function useFirestoreBudgets() {
     }
   };
 
-  const addBudget = async (budget: Omit<Budget, 'id'>) => {
+  const addBudget = async (budget: Omit<Budget, 'id' | 'userId'>) => {
     try {
-      await addDoc(collection(db, 'budgets'), budget);
+      await addDoc(collection(db, 'budgets'), { ...budget, userId });
       await fetchBudgets();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error adding budget');
@@ -269,7 +245,7 @@ export function useFirestoreBudgets() {
 
   useEffect(() => {
     fetchBudgets();
-  }, []);
+  }, [userId]);
 
   return {
     budgets,
@@ -283,7 +259,7 @@ export function useFirestoreBudgets() {
 }
 
 // Hook for debts
-export function useFirestoreDebts() {
+export function useFirestoreDebts(userId: string) {
   const [debts, setDebts] = useState<Debt[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -291,11 +267,10 @@ export function useFirestoreDebts() {
   const fetchDebts = async () => {
     try {
       setLoading(true);
-      const querySnapshot = await getDocs(collection(db, 'debts'));
-      const data = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Debt[];
+      const q = query(collection(db, 'debts'), where('userId', '==', userId));
+      const snapshot = await getDocs(q);
+      const data = snapshot.docs
+        .map(doc => ({ id: doc.id, ...doc.data() } as Debt));
       setDebts(data);
       setError(null);
     } catch (err) {
@@ -305,9 +280,9 @@ export function useFirestoreDebts() {
     }
   };
 
-  const addDebt = async (debt: Omit<Debt, 'id'>) => {
+  const addDebt = async (debt: Omit<Debt, 'id' | 'userId'>) => {
     try {
-      await addDoc(collection(db, 'debts'), debt);
+      await addDoc(collection(db, 'debts'), { ...debt, userId });
       await fetchDebts();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error adding debt');
@@ -335,7 +310,7 @@ export function useFirestoreDebts() {
 
   useEffect(() => {
     fetchDebts();
-  }, []);
+  }, [userId]);
 
   return {
     debts,
@@ -349,7 +324,7 @@ export function useFirestoreDebts() {
 }
 
 // Hook for debt payments
-export function useFirestoreDebtPayments() {
+export function useFirestoreDebtPayments(userId: string) {
   const [debtPayments, setDebtPayments] = useState<DebtPayment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -357,11 +332,10 @@ export function useFirestoreDebtPayments() {
   const fetchDebtPayments = async () => {
     try {
       setLoading(true);
-      const querySnapshot = await getDocs(collection(db, 'debt_payments'));
-      const data = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as DebtPayment[];
+      const q = query(collection(db, 'debt_payments'), where('userId', '==', userId));
+      const snapshot = await getDocs(q);
+      const data = snapshot.docs
+        .map(doc => ({ id: doc.id, ...doc.data() } as DebtPayment));
       setDebtPayments(data);
       setError(null);
     } catch (err) {
@@ -371,9 +345,9 @@ export function useFirestoreDebtPayments() {
     }
   };
 
-  const addDebtPayment = async (payment: Omit<DebtPayment, 'id'>) => {
+  const addDebtPayment = async (payment: Omit<DebtPayment, 'id' | 'userId'>) => {
     try {
-      await addDoc(collection(db, 'debt_payments'), payment);
+      await addDoc(collection(db, 'debt_payments'), { ...payment, userId });
       await fetchDebtPayments();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error adding debt payment');
@@ -401,7 +375,7 @@ export function useFirestoreDebtPayments() {
 
   useEffect(() => {
     fetchDebtPayments();
-  }, []);
+  }, [userId]);
 
   return {
     debtPayments,
@@ -415,7 +389,7 @@ export function useFirestoreDebtPayments() {
 }
 
 // Hook for debt goals
-export function useFirestoreDebtGoals() {
+export function useFirestoreDebtGoals(userId: string) {
   const [debtGoals, setDebtGoals] = useState<DebtGoal[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -423,11 +397,10 @@ export function useFirestoreDebtGoals() {
   const fetchDebtGoals = async () => {
     try {
       setLoading(true);
-      const querySnapshot = await getDocs(collection(db, 'debt_goals'));
-      const data = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as DebtGoal[];
+      const q = query(collection(db, 'debt_goals'), where('userId', '==', userId));
+      const snapshot = await getDocs(q);
+      const data = snapshot.docs
+        .map(doc => ({ id: doc.id, ...doc.data() } as DebtGoal));
       setDebtGoals(data);
       setError(null);
     } catch (err) {
@@ -437,9 +410,9 @@ export function useFirestoreDebtGoals() {
     }
   };
 
-  const addDebtGoal = async (goal: Omit<DebtGoal, 'id'>) => {
+  const addDebtGoal = async (goal: Omit<DebtGoal, 'id' | 'userId'>) => {
     try {
-      await addDoc(collection(db, 'debt_goals'), goal);
+      await addDoc(collection(db, 'debt_goals'), { ...goal, userId });
       await fetchDebtGoals();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error adding debt goal');
@@ -467,7 +440,7 @@ export function useFirestoreDebtGoals() {
 
   useEffect(() => {
     fetchDebtGoals();
-  }, []);
+  }, [userId]);
 
   return {
     debtGoals,

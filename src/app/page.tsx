@@ -3,6 +3,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import type { Transaction, Budget, Category } from '@/lib/types';
 import { useFirestoreTransactions, useFirestoreBudgets, useFirestoreCategories, useFirestoreDebts } from '@/hooks/use-firestore';
+import { useAuth } from '@/hooks/use-auth';
 import SummaryCards from '@/components/dashboard/summary-cards';
 import SpendingChart from '@/components/dashboard/spending-chart';
 import SpendingTrendsChart from '@/components/dashboard/spending-trends-chart';
@@ -12,22 +13,65 @@ import DebtStatus from '@/components/dashboard/debt-status';
 import DashboardSkeleton from '@/components/dashboard/dashboard-skeleton';
 import MonthSelector from '@/components/dashboard/month-selector';
 import AppLayout from '@/components/layout/app-layout';
-import { Wallet } from 'lucide-react';
+import { Wallet, AlertCircle, LogOut } from 'lucide-react';
 import { useI18n } from '@/hooks/use-i18n';
 import { useSelectedMonth } from '@/hooks/use-selected-month';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { useToast } from '@/hooks/use-toast';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
+import { useRouter } from 'next/navigation';
 
 export default function DashboardPage() {
-  const { t } = useI18n();
-  const { selectedYear, selectedMonth, updateSelectedMonth } = useSelectedMonth();
-  const [isClient, setIsClient] = useState(false);
-  const { transactions: allTransactions, loading: transactionsLoading } = useFirestoreTransactions();
-  const { budgets: allBudgets, loading: budgetsLoading } = useFirestoreBudgets();
-  const { categories, loading: categoriesLoading } = useFirestoreCategories();
-  const { debts, loading: debtsLoading } = useFirestoreDebts();
+    const { t } = useI18n();
+    const { user, loading: authLoading, logout } = useAuth();
+    const { selectedYear, selectedMonth, updateSelectedMonth } = useSelectedMonth();
+    const [isClient, setIsClient] = useState(false);
+    const userId = user?.uid;
+    const { toast } = useToast();
+    const router = useRouter();
+
+   const { transactions: allTransactions, loading: transactionsLoading, error: transactionsError } = useFirestoreTransactions(userId || '');
+   const { budgets: allBudgets, loading: budgetsLoading, error: budgetsError } = useFirestoreBudgets(userId || '');
+   const { categories, loading: categoriesLoading, error: categoriesError } = useFirestoreCategories(userId || '');
+   const { debts, loading: debtsLoading, error: debtsError } = useFirestoreDebts(userId || '');
 
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  const hasError = transactionsError || budgetsError || categoriesError || debtsError;
+
+  useEffect(() => {
+    if (hasError) {
+      toast({
+        title: "Error al cargar datos",
+        description: "Algunos datos no pudieron cargarse. La aplicación sigue siendo funcional.",
+        variant: "destructive",
+      });
+    }
+  }, [hasError, toast]);
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      router.push('/login');
+      toast({
+        title: t('auth.logout_success') || 'Sesión cerrada exitosamente',
+      });
+    } catch (error) {
+      toast({
+        variant: 'destructive',
+        title: t('auth.logout_error') || 'Error al cerrar sesión',
+      });
+    }
+  };
 
   const transactions = useMemo(() => {
     return allTransactions.filter(tx => {
@@ -64,27 +108,54 @@ export default function DashboardPage() {
     );
   }, [transactions]);
 
-  if (!isClient || transactionsLoading || budgetsLoading || categoriesLoading || debtsLoading) {
+  if (authLoading || !isClient) {
+    return <DashboardSkeleton />;
+  }
+
+  if (!user) {
+    console.log('Dashboard: Usuario no autenticado, mostrando mensaje de login requerido');
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <Alert className="max-w-md">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            {t('auth.required_message') || 'Debes iniciar sesión para acceder al dashboard.'}
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
+
+  if (transactionsLoading || budgetsLoading || categoriesLoading || debtsLoading) {
     return <DashboardSkeleton />;
   }
 
   return (
     <>
       <AppLayout>
-        <header className="flex items-center justify-between p-4 sm:px-6 sm:py-4 border-b">
-          <div className="flex items-center gap-2">
-            <Wallet className="h-7 w-7 text-primary" />
-            <h1 className="text-xl font-bold tracking-tight text-foreground">
-              {t('app.title')}
-            </h1>
-          </div>
-          <MonthSelector
-            selectedYear={selectedYear}
-            selectedMonth={selectedMonth}
-            updateSelectedMonth={updateSelectedMonth}
-          />
-        </header>
         <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-6 lg:p-8">
+          <div className="flex items-center justify-between">
+            <MonthSelector
+              selectedYear={selectedYear}
+              selectedMonth={selectedMonth}
+              updateSelectedMonth={updateSelectedMonth}
+            />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                  <Avatar className="h-8 w-8">
+                    <AvatarFallback>{user?.email?.charAt(0).toUpperCase()}</AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56" align="end" forceMount>
+                <DropdownMenuItem onClick={handleLogout}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>{t('logout') || 'Cerrar sesión'}</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
           <SummaryCards
             income={summary.income}
             expense={summary.expense}
@@ -112,7 +183,7 @@ export default function DashboardPage() {
                 selectedYear={selectedYear}
                 selectedMonth={selectedMonth}
               />
-              <DebtStatus debts={debts} />
+              <DebtStatus debts={debts} userId={userId || ''} />
             </div>
           </div>
         </main>

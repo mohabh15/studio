@@ -44,12 +44,34 @@
     "change_language": "Change Language"
   },
   "dashboard": {
+    "debt_status": {
+      "title": "Debt Status",
+      "no_debts": "No debts",
+      "no_debts_description": "You don't have any registered debts",
+      "manage_debts": "Manage Debts",
+      "progress_reduction": "Reduction Progress",
+      "total_paid": "Total Paid",
+      "minimum_monthly_payments": "Minimum Monthly Payments",
+      "upcoming_due_dates": "Upcoming Due Dates",
+      "view_projections": "📊 View Projections",
+      "view_details": "View Details",
+      "debts_count": "{{count}} debt",
+      "debts_count_plural": "{{count}} debts",
+      "average_rate": "Average rate: {{rate}}%"
+    },
     "summary": {
       "total_income": "Total Income",
       "total_expenses": "Total Expenses",
       "balance": "Balance",
       "this_month": "This month",
-      "remaining_funds": "Remaining funds"
+      "remaining_funds": "Remaining funds",
+      "daily_insight": "Daily Insight",
+      "expenses_increased": "Your total expenses increased by {{percentage}}% compared to last month.",
+      "expenses_decreased": "Your total expenses decreased by {{percentage}}% compared to last month.",
+      "income_increased": "Your income increased by {{percentage}}% compared to last month.",
+      "income_decreased": "Your income decreased by {{percentage}}% compared to last month.",
+      "category_expenses_increased": "Your {{category}} expenses increased by {{percentage}}% compared to last month.",
+      "category_expenses_decreased": "Your {{category}} expenses decreased by {{percentage}}% compared to last month."
     },
     "spending_overview": {
       "title": "Spending Overview",
@@ -75,7 +97,8 @@
       "description": "How you're tracking against your budgets this month.",
       "left": "left",
       "over": "over",
-      "no_budgets": "No budgets set."
+      "no_budgets": "No budgets set.",
+      "budget_label": "Budget"
     }
   },
   "transactions_page": {
@@ -103,7 +126,8 @@
     "scan_failed_title": "Scan Failed",
     "scan_successful_title": "Scan Successful",
     "scan_successful_desc": "Receipt data has been filled in.",
-    "read_file_error": "Failed to read file."
+    "read_file_error": "Failed to read file.",
+    "type": "Type"
   },
   "edit_transaction_title": "Edit Transaction",
   "edit_transaction_description": "Update the transaction details.",
@@ -120,6 +144,10 @@
     "preferences_description": "Configure your application preferences.",
     "language_title": "Language",
     "language_description": "Choose your preferred language.",
+    "appearance": "Appearance",
+    "manage_appearance": "Customize the application appearance.",
+    "theme": "Theme",
+    "theme_description": "Switch between light and dark theme.",
     "expense_categories": "Expense Categories",
     "manage_expense_categories": "Add, edit, or remove your expense categories.",
     "add_category": "Add Category",
@@ -176,5 +204,176 @@
     "select_category": "Select a category",
     "category_type_income": "Income",
     "category_type_expense": "Expense"
+  },
+  "auth": {
+    "logout": "Logout",
+    "logout_error": "Logout Error",
+    "logout_success": "Logged out successfully",
+    "required_message": "You must be logged in to access this page."
+  },
+  "debts_page": {
+    "title": "Debt Management",
+    "description": "Control and manage all your financial debts",
+    "add_debt": "Add Debt",
+    "register_payment": "Register Payment",
+    "total_debt": "Total Debt",
+    "minimum_payments": "Minimum Payments",
+    "average_rate": "Average Rate",
+    "upcoming_due_dates": "Upcoming Due Dates",
+    "monthly": "monthly",
+    "annual_interest": "annual interest",
+    "in_30_days": "in 30 days",
+    "all_debts": "All Debts",
+    "all_debts_description": "Complete list of your active debts",
+    "view_projections": "View Projections",
+    "no_description": "No description",
+    "debt_info_format": "Type: {{type}} • Rate: {{rate}}% • Due: {{date}}",
+    "minimum_label": "Minimum: {{amount}}",
+    "edit": "Edit",
+    "delete": "Delete",
+    "delete_debt_title": "Delete debt?",
+    "delete_debt_description": "This action cannot be undone. The debt \"{{description}}\" will be permanently deleted from the system.",
+    "error_loading_data": "Error loading data",
+    "error_loading_description": "Some data could not be loaded. The application is still functional."
+  },
+  "debt_dialog": {
+    "edit_title": "Edit Debt",
+    "add_title": "Add New Debt",
+    "edit_description": "Modify the details of your existing debt.",
+    "add_description": "Add a new debt to track your payments.",
+    "debt_type": "Debt Type",
+    "select_debt_type": "Select debt type",
+    "original_amount": "Original Amount",
+    "current_amount": "Current Amount",
+    "interest_rate": "Interest Rate (%)",
+    "minimum_payments": "Minimum Payments",
+    "due_date": "Due Date",
+    "description_optional": "Description (Optional)",
+    "description_placeholder": "Add a description for this debt...",
+    "cancel": "Cancel",
+    "save": "Save",
+    "update": "Update",
+    "saving": "Saving...",
+    "validation": {
+      "amount_required": "Amount must be greater than 0",
+      "current_amount_negative": "Current amount cannot be negative",
+      "interest_rate_min": "Interest rate must be greater than or equal to 0",
+      "minimum_payment_required": "Minimum payments must be greater than 0",
+      "due_date_required": "Due date is required"
+    }
+  },
+  "debt_payment_dialog": {
+    "title": "Register Debt Payment",
+    "description": "Register a payment made towards one of your debts. This will automatically create an expense transaction.",
+    "debt_label": "Debt",
+    "select_debt": "Select a debt",
+    "debt_info": "Selected debt:",
+    "current_balance": "Current balance: {{amount}}",
+    "minimum_payment": "Minimum payment: {{amount}}",
+    "payment_amount": "Payment Amount",
+    "payment_type": "Payment Type",
+    "payment_date": "Payment Date",
+    "description_optional": "Description (Optional)",
+    "description_placeholder": "Add a description for this payment...",
+    "cancel": "Cancel",
+    "register_payment": "Register Payment",
+    "registering": "Registering...",
+    "regular_payment": "Regular Payment",
+    "extra_payment": "Extra Payment",
+    "validation": {
+      "debt_required": "You must select a debt",
+      "amount_required": "Amount must be greater than 0",
+      "date_required": "Date is required"
+    }
+  },
+  "debt_charts": {
+    "distribution_by_type": "Distribution by Type",
+    "distribution_description": "Debts grouped by category",
+    "minimum_payments_chart": "Minimum Payments",
+    "minimum_payments_description": "Required monthly payments",
+    "interest_evolution": "Interest Evolution",
+    "interest_evolution_description": "Projection of accumulated interest",
+    "no_data": "No data to display",
+    "debt_type_labels": {
+      "credit_card": "Credit Card",
+      "personal_loan": "Personal Loan",
+      "mortgage": "Mortgage",
+      "student_loan": "Student Loan",
+      "car_loan": "Car Loan",
+      "other": "Other"
+    }
+  },
+  "debt_projections": {
+    "title": "Debt Projections",
+    "back": "Back",
+    "no_debts": "No debts registered",
+    "no_debts_description": "Add your debts to see projections and payment strategies.",
+    "manage_debts": "Manage Debts",
+    "total_debt": "Total Debt",
+    "total_paid": "Total Paid",
+    "monthly_payment": "Monthly Payment",
+    "estimated_time": "Estimated Time",
+    "minimum_payments_total": "Total minimum payments",
+    "with_minimum_payments": "With minimum payments",
+    "debt_reduction": "{{percentage}}% reduced",
+    "from_original": "From {{amount}}",
+    "months": "{{count}} months",
+    "year": "{{count}} year",
+    "years": "{{count}} years",
+    "and": "and",
+    "month": "month",
+    "months_label": "months",
+    "freedom_date": "Estimated financial freedom date:",
+    "loading": "Loading...",
+    "loading_projections": "Loading projections...",
+    "strategies": {
+      "avalanche": "Avalanche",
+      "snowball": "Snowball",
+      "combined": "Combined"
+    },
+    "strategy_descriptions": {
+      "avalanche": "Highest interest first",
+      "snowball": "Smallest amount first",
+      "combined": "Optimized balance"
+    }
+  },
+  "payment_simulator": {
+    "title": "Payment Simulator",
+    "description": "Adjust your payments and strategy to see the impact on your projections",
+    "extra_monthly_payment": "Extra Monthly Payment: {{amount}}",
+    "payment_strategy": "Payment Strategy",
+    "simulation_results": "Simulation Results",
+    "total_time": "Total Time",
+    "total_paid": "Total Paid",
+    "interest": "Interest",
+    "monthly_payment": "Monthly Payment",
+    "savings_vs_minimum": "Savings Compared to Minimum Payments",
+    "time_saved": "Time saved",
+    "interest_saved": "Interest saved",
+    "total_saved": "Total saved",
+    "no_debts_to_simulate": "No debts to simulate",
+    "tips_title": "💡 Tips to Improve Your Results",
+    "tips": {
+      "increase_payments": "Gradually increase your extra monthly payments",
+      "additional_income": "Consider additional income to accelerate the process",
+      "review_expenses": "Review your expenses to identify potential savings",
+      "consistency": "Consistency is more important than sporadic large payments"
+    }
+  },
+  "strategy_comparison": {
+    "title": "Strategy Comparison",
+    "description": "Compare different approaches to pay off your debts",
+    "recommended": "Recommended",
+    "fastest": "Fastest",
+    "least_interest": "Least Interest",
+    "total_time": "Total Time",
+    "total_paid": "Total Paid",
+    "interest": "Interest",
+    "monthly_payment": "Monthly Payment",
+    "no_projections": "No projections available",
+    "recommendations_title": "💡 Recommendations",
+    "avalanche_benefit": "The Avalanche strategy minimizes total interest paid",
+    "snowball_benefit": "The Snowball strategy provides psychological motivation",
+    "personal_situation": "Consider your personal financial situation to choose the best option"
   }
 }

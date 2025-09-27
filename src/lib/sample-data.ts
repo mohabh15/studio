@@ -12,6 +12,7 @@ export const sampleTransactions: Transaction[] = [
     category: 'salary',
     merchant: 'Employer Inc.',
     notes: 'Monthly salary',
+    userId: 'sample-user',
   },
   {
     id: '2',
@@ -21,6 +22,7 @@ export const sampleTransactions: Transaction[] = [
     category: 'rent',
     merchant: 'Landlord',
     notes: 'Monthly rent and utilities',
+    userId: 'sample-user',
   },
   {
     id: '3',
@@ -30,6 +32,7 @@ export const sampleTransactions: Transaction[] = [
     category: 'groceries',
     merchant: 'SuperMart',
     notes: 'Weekly groceries',
+    userId: 'sample-user',
   },
   {
     id: '4',
@@ -39,6 +42,7 @@ export const sampleTransactions: Transaction[] = [
     category: 'transport',
     merchant: 'City Transit',
     notes: 'Monthly pass',
+    userId: 'sample-user',
   },
   {
     id: '5',
@@ -48,11 +52,12 @@ export const sampleTransactions: Transaction[] = [
     category: 'shopping',
     merchant: 'Gadget Store',
     notes: 'New headphones',
+    userId: 'sample-user',
   },
 ];
 
 export const sampleBudgets: Budget[] = [
-  { id: '1', category: 'groceries', amount: 400 },
-  { id: '2', category: 'shopping', amount: 250 },
-  { id: '3', category: 'entertainment', amount: 150 },
+  { id: '1', category: 'groceries', amount: 400, userId: 'sample-user' },
+  { id: '2', category: 'shopping', amount: 250, userId: 'sample-user' },
+  { id: '3', category: 'entertainment', amount: 150, userId: 'sample-user' },
 ];

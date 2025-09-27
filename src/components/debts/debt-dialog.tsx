@@ -32,18 +32,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Debt, DebtType } from '@/lib/types';
 import { useI18n } from '@/hooks/use-i18n';
+import { useAuth } from '@/hooks/use-auth';
 
-const debtSchema = z.object({
-  tipo: z.enum(['credit_card', 'personal_loan', 'mortgage', 'student_loan', 'car_loan', 'other']),
-  monto: z.number().min(0.01, 'El monto debe ser mayor a 0'),
-  monto_actual: z.number().min(0, 'El monto actual no puede ser negativo'),
-  tasa_interes: z.number().min(0, 'La tasa de interés debe ser mayor o igual a 0'),
-  pagos_minimos: z.number().min(0.01, 'Los pagos mínimos deben ser mayores a 0'),
-  fecha_vencimiento: z.string().min(1, 'La fecha de vencimiento es requerida'),
-  descripcion: z.string().optional(),
-});
-
-type DebtFormValues = z.infer<typeof debtSchema>;
 
 type DebtDialogProps = {
   isOpen: boolean;
@@ -62,8 +52,21 @@ const debtTypeLabels: Record<DebtType, string> = {
 };
 
 export default function DebtDialog({ isOpen, onOpenChange, onSave, debt }: DebtDialogProps) {
-  const { t } = useI18n();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+   const { t } = useI18n();
+   const { user } = useAuth();
+   const [isSubmitting, setIsSubmitting] = useState(false);
+
+   const debtSchema = z.object({
+     tipo: z.enum(['credit_card', 'personal_loan', 'mortgage', 'student_loan', 'car_loan', 'other']),
+     monto: z.number().min(0.01, t('debt_dialog.validation.amount_required')),
+     monto_actual: z.number().min(0, t('debt_dialog.validation.current_amount_negative')),
+     tasa_interes: z.number().min(0, t('debt_dialog.validation.interest_rate_min')),
+     pagos_minimos: z.number().min(0.01, t('debt_dialog.validation.minimum_payment_required')),
+     fecha_vencimiento: z.string().min(1, t('debt_dialog.validation.due_date_required')),
+     descripcion: z.string().optional(),
+   });
+
+   type DebtFormValues = z.infer<typeof debtSchema>;
 
   const form = useForm<DebtFormValues>({
     resolver: zodResolver(debtSchema),
@@ -106,9 +109,10 @@ export default function DebtDialog({ isOpen, onOpenChange, onSave, debt }: DebtD
     setIsSubmitting(true);
     try {
       const debtData: Omit<Debt, 'id'> = {
-        ...values,
-        fecha_creacion: debt?.fecha_creacion || new Date().toISOString(),
-      };
+         ...values,
+         userId: user?.uid || '',
+         fecha_creacion: debt?.fecha_creacion || new Date().toISOString(),
+       };
       await onSave(debtData);
       onOpenChange(false);
     } catch (error) {
@@ -123,12 +127,12 @@ export default function DebtDialog({ isOpen, onOpenChange, onSave, debt }: DebtD
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>
-            {debt ? 'Editar Deuda' : 'Añadir Nueva Deuda'}
+            {debt ? t('debt_dialog.edit_title') : t('debt_dialog.add_title')}
           </DialogTitle>
           <DialogDescription>
             {debt
-              ? 'Modifica los detalles de tu deuda existente.'
-              : 'Añade una nueva deuda para hacer seguimiento de tus pagos.'
+              ? t('debt_dialog.edit_description')
+              : t('debt_dialog.add_description')
             }
           </DialogDescription>
         </DialogHeader>
@@ -140,11 +144,11 @@ export default function DebtDialog({ isOpen, onOpenChange, onSave, debt }: DebtD
               name="tipo"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Tipo de Deuda</FormLabel>
+                  <FormLabel>{t('debt_dialog.debt_type')}</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Selecciona el tipo de deuda" />
+                        <SelectValue placeholder={t('debt_dialog.select_debt_type')} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -166,7 +170,7 @@ export default function DebtDialog({ isOpen, onOpenChange, onSave, debt }: DebtD
                 name="monto"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Monto Original</FormLabel>
+                    <FormLabel>{t('debt_dialog.original_amount')}</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
@@ -186,7 +190,7 @@ export default function DebtDialog({ isOpen, onOpenChange, onSave, debt }: DebtD
                 name="monto_actual"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Monto Actual</FormLabel>
+                    <FormLabel>{t('debt_dialog.current_amount')}</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
@@ -208,7 +212,7 @@ export default function DebtDialog({ isOpen, onOpenChange, onSave, debt }: DebtD
                 name="tasa_interes"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Tasa de Interés (%)</FormLabel>
+                    <FormLabel>{t('debt_dialog.interest_rate')}</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
@@ -228,7 +232,7 @@ export default function DebtDialog({ isOpen, onOpenChange, onSave, debt }: DebtD
                 name="pagos_minimos"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Pagos Mínimos</FormLabel>
+                    <FormLabel>{t('debt_dialog.minimum_payments')}</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
@@ -249,7 +253,7 @@ export default function DebtDialog({ isOpen, onOpenChange, onSave, debt }: DebtD
               name="fecha_vencimiento"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Fecha de Vencimiento</FormLabel>
+                  <FormLabel>{t('debt_dialog.due_date')}</FormLabel>
                   <FormControl>
                     <Input
                       type="date"
@@ -266,10 +270,10 @@ export default function DebtDialog({ isOpen, onOpenChange, onSave, debt }: DebtD
               name="descripcion"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Descripción (Opcional)</FormLabel>
+                  <FormLabel>{t('debt_dialog.description_optional')}</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Añade una descripción para esta deuda..."
+                      placeholder={t('debt_dialog.description_placeholder')}
                       {...field}
                     />
                   </FormControl>
@@ -285,10 +289,10 @@ export default function DebtDialog({ isOpen, onOpenChange, onSave, debt }: DebtD
                 onClick={() => onOpenChange(false)}
                 disabled={isSubmitting}
               >
-                Cancelar
+                {t('common.cancel')}
               </Button>
               <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? 'Guardando...' : (debt ? 'Actualizar' : 'Guardar')}
+                {isSubmitting ? t('debt_dialog.saving') : (debt ? t('debt_dialog.update') : t('common.save'))}
               </Button>
             </DialogFooter>
           </form>

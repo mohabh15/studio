@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowDown, ArrowUp, DollarSign, TrendingUp, TrendingDown } from 'lucide-react';
 import { useI18n } from '@/hooks/use-i18n';
 import type { Transaction, Category } from '@/lib/types';
+import { formatMonthName } from '@/lib/utils';
 import { useMemo } from 'react';
 
 type SummaryCardsProps = {
@@ -23,12 +24,11 @@ const formatCurrency = (amount: number) => {
 };
 
 export default function SummaryCards({ income, expense, selectedYear, selectedMonth, allTransactions, categories }: SummaryCardsProps) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const balance = income - expense;
 
   const getMonthName = (month: number) => {
-    const date = new Date(selectedYear, month, 1);
-    return date.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
+    return formatMonthName(selectedYear, month, locale);
   };
 
   const dailyInsight = useMemo(() => {
@@ -82,7 +82,9 @@ export default function SummaryCards({ income, expense, selectedYear, selectedMo
       const isIncrease = percentage >= 0;
       const absPercentage = Math.abs(percentage).toFixed(0);
       insights.push({
-        message: `Tus gastos totales ${isIncrease ? 'aumentaron' : 'bajaron'} un ${absPercentage}% respecto al mes pasado.`,
+        message: isIncrease
+          ? t('dashboard.summary.expenses_increased').replace('{{percentage}}', absPercentage)
+          : t('dashboard.summary.expenses_decreased').replace('{{percentage}}', absPercentage),
         isIncrease
       });
     }
@@ -93,7 +95,9 @@ export default function SummaryCards({ income, expense, selectedYear, selectedMo
       const isIncrease = percentage >= 0;
       const absPercentage = Math.abs(percentage).toFixed(0);
       insights.push({
-        message: `Tus ingresos ${isIncrease ? 'aumentaron' : 'bajaron'} un ${absPercentage}% respecto al mes pasado.`,
+        message: isIncrease
+          ? t('dashboard.summary.income_increased').replace('{{percentage}}', absPercentage)
+          : t('dashboard.summary.income_decreased').replace('{{percentage}}', absPercentage),
         isIncrease
       });
     }
@@ -107,7 +111,9 @@ export default function SummaryCards({ income, expense, selectedYear, selectedMo
         const isIncrease = percentage >= 0;
         const absPercentage = Math.abs(percentage).toFixed(0);
         insights.push({
-          message: `Tus gastos en ${t(cat.name)} ${isIncrease ? 'aumentaron' : 'bajaron'} un ${absPercentage}% respecto al mes pasado.`,
+          message: isIncrease
+            ? t('dashboard.summary.category_expenses_increased').replace('{{category}}', t(cat.name)).replace('{{percentage}}', absPercentage)
+            : t('dashboard.summary.category_expenses_decreased').replace('{{category}}', t(cat.name)).replace('{{percentage}}', absPercentage),
           isIncrease
         });
       }
@@ -156,7 +162,7 @@ export default function SummaryCards({ income, expense, selectedYear, selectedMo
       {dailyInsight && (
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Insight Diario</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('dashboard.summary.daily_insight')}</CardTitle>
             {dailyInsight.isIncrease ? (
               <TrendingUp className="h-5 w-5 text-destructive" />
             ) : (
