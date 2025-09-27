@@ -107,7 +107,7 @@ export default function SpendingChart({ transactions, categories, selectedYear, 
   const responsiveConfig = useMemo(() => {
     if (isMobile) {
       return {
-        height: 280,
+        height: 250,
         outerRadius: 80,
         innerRadius: 40,
         legendHeight: 80,
@@ -117,8 +117,8 @@ export default function SpendingChart({ transactions, categories, selectedYear, 
     } else {
       return {
         height: 350,
-        outerRadius: 120,
-        innerRadius: 60,
+        outerRadius: 150,
+        innerRadius: 80,
         legendHeight: 60,
         fontSize: 14,
         showLegend: true,
@@ -138,13 +138,13 @@ export default function SpendingChart({ transactions, categories, selectedYear, 
       </CardHeader>
       <CardContent>
         {chartData.length > 0 ? (
-          <ChartContainer config={chartDataConfig} className={`w-full ${isMobile ? 'min-h-[280px]' : 'min-h-[350px]'}`}>
+          <ChartContainer config={chartDataConfig} className={`w-full ${isMobile ? 'min-h-[200px]' : 'min-h-[350px]'}`}>
             <ResponsiveContainer width="100%" height={responsiveConfig.height}>
               <PieChart>
                 <Pie
                   data={chartData}
                   cx="50%"
-                  cy={isMobile ? "45%" : "48%"}
+                  cy={isMobile ? "75%" : "48%"}
                   outerRadius={responsiveConfig.outerRadius}
                   innerRadius={responsiveConfig.innerRadius}
                   fill="#8884d8"
@@ -164,7 +164,7 @@ export default function SpendingChart({ transactions, categories, selectedYear, 
                     verticalAlign="bottom"
                     height={responsiveConfig.legendHeight}
                     wrapperStyle={{
-                      paddingTop: '8px',
+                      paddingTop: isMobile ? '70px' : '8px',
                       fontSize: responsiveConfig.fontSize
                     }}
                     formatter={(value, entry) => (

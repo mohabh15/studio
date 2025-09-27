@@ -28,16 +28,16 @@ export default function AppLayout({ children }: AppLayoutProps) {
   return (
     <>
       <div className="flex min-h-screen w-full flex-col">
-        <div className="pb-28 sm:pb-32">{children}</div>
+        <div className="pb-30 sm:pb-34">{children}</div>
 
         {/* Botón flotante para añadir transacción - justo encima de la navbar */}
         <div className="fixed bottom-24 right-4 z-50 sm:bottom-28 sm:right-6">
           <Button
             onClick={() => setAddTransactionOpen(true)}
             size="icon"
-            className="h-12 w-12 sm:h-14 sm:w-14 rounded-full bg-primary shadow-lg hover:bg-primary/90"
+            className="h-16 w-16 sm:h-18 sm:w-18 rounded-full bg-primary shadow-lg hover:bg-primary/90"
           >
-            <Plus className="h-6 w-6 sm:h-7 sm:w-7" />
+            <Plus className="h-8 w-8 sm:h-9 sm:w-9" />
             <span className="sr-only">{t('header.add_transaction')}</span>
           </Button>
         </div>

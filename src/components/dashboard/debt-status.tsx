@@ -87,23 +87,23 @@ export default function DebtStatus({ debts }: DebtStatusProps) {
         <CardTitle className="text-sm font-medium">Estado de Deudas</CardTitle>
         <CreditCard className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
-      <CardContent>
-        <div className="text-2xl font-bold mb-2">{formatCurrency(debtSummary.totalCurrentDebt)}</div>
-        <p className="text-xs text-muted-foreground mb-4">
+      <CardContent className="space-y-3 sm:space-y-4">
+        <div className="text-2xl font-bold">{formatCurrency(debtSummary.totalCurrentDebt)}</div>
+        <p className="text-xs text-muted-foreground">
           {debtSummary.totalDebts} deuda{debtSummary.totalDebts !== 1 ? 's' : ''} •
           Tasa promedio: {debtSummary.averageInterestRate.toFixed(1)}%
         </p>
 
         {/* Barra de progreso */}
-        <div className="mb-4">
-          <div className="flex items-center justify-between text-sm mb-2">
+        <div>
+          <div className="flex items-center justify-between text-sm mb-1.5">
             <span>Progreso de reducción</span>
             <span className="font-medium">{debtSummary.progress.toFixed(1)}%</span>
           </div>
           <Progress value={debtSummary.progress} className="h-2" />
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-1.5 sm:space-y-2">
           <div className="flex items-center justify-between text-sm">
             <span className="flex items-center gap-1">
               <DollarSign className="h-3 w-3" />
@@ -131,14 +131,14 @@ export default function DebtStatus({ debts }: DebtStatusProps) {
           )}
         </div>
 
-        <div className="mt-4 space-y-2">
+        <div className="space-y-2 pt-1">
           <Link href="/debts/projections" className="block">
-            <Button size="sm" className="w-full">
+            <Button size="sm" className="w-full text-xs sm:text-sm">
               📊 Ver Proyecciones
             </Button>
           </Link>
           <Link href="/debts" className="block">
-            <Button size="sm" variant="outline" className="w-full">
+            <Button size="sm" variant="outline" className="w-full text-xs sm:text-sm">
               Ver Detalles
             </Button>
           </Link>
