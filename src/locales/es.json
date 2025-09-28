@@ -23,6 +23,7 @@
     "transport": "Transporte",
     "clothing": "Ropa",
     "entertainment": "Entretenimiento",
+    "ocio": "Ocio",
     "health": "Salud",
     "gifts": "Regalos",
     "debt_payment": "Pago de Deuda",
@@ -210,6 +211,19 @@
     "logout_error": "Error al cerrar sesión",
     "logout_success": "Sesión cerrada exitosamente",
     "required_message": "Debes iniciar sesión para acceder a esta página."
+  },
+  "forgot_password": {
+    "title": "Recuperar Contraseña",
+    "description": "Ingresa tu email para recibir instrucciones de recuperación",
+    "email_label": "Email",
+    "email_placeholder": "tu@email.com",
+    "submit_button": "Enviar instrucciones",
+    "submit_button_loading": "Enviando...",
+    "back_to_login": "Volver al inicio de sesión",
+    "success_message": "¡Email enviado!",
+    "success_description": "Revisa tu bandeja de entrada y carpeta de spam para las instrucciones de recuperación.",
+    "email_required": "El email es requerido",
+    "email_invalid": "Email inválido"
   },
   "debts_page": {
     "title": "Gestión de Deudas",

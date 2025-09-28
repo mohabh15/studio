@@ -301,20 +301,23 @@ export async function middleware(request: NextRequest) {
     logger.debug('Ruta pública, permitiendo acceso', { pathname });
 
     // Si el usuario ya está autenticado y trata de acceder a login/signup,
-    // redirigir al dashboard
-    try {
-      const sessionResult = await verifySession(request);
-      if (sessionResult.isValid && sessionResult.sessionData) {
-        logger.info('Usuario autenticado intentando acceder a ruta pública, redirigiendo', {
-          from: pathname,
-          uid: sessionResult.sessionData.uid,
-        });
+    // redirigir al dashboard. PERO permitir acceso a forgot-password y reset-password
+    // incluso para usuarios autenticados
+    if (pathname === '/login' || pathname === '/signup') {
+      try {
+        const sessionResult = await verifySession(request);
+        if (sessionResult.isValid && sessionResult.sessionData) {
+          logger.info('Usuario autenticado intentando acceder a login/signup, redirigiendo', {
+            from: pathname,
+            uid: sessionResult.sessionData.uid,
+          });
 
-        const dashboardUrl = new URL('/dashboard', request.url);
-        return NextResponse.redirect(dashboardUrl);
+          const dashboardUrl = new URL('/dashboard', request.url);
+          return NextResponse.redirect(dashboardUrl);
+        }
+      } catch (error) {
+        logger.warn('Error verificando sesión para redirección', error);
       }
-    } catch (error) {
-      logger.warn('Error verificando sesión para redirección', error);
     }
 
     return response;

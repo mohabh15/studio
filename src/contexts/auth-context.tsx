@@ -239,7 +239,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // ============================================================================
 
   useEffect(() => {
-    if (!loading && !user && !['/login', '/signup'].includes(pathname)) {
+    if (!loading && !user && !['/login', '/signup', '/forgot-password'].includes(pathname)) {
       console.log('[AuthProvider] Usuario no autenticado, redirigiendo a login');
       router.push('/login');
     }

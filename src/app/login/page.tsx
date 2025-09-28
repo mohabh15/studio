@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Progress } from '@/components/ui/progress';
-import { Badge } from '@/components/ui/badge';
+import { ThemeToggle } from '@/components/theme/theme-toggle';
 import Link from 'next/link';
 import type { LoginFormData, AuthError } from '@/lib/types/auth';
 
@@ -179,16 +179,14 @@ export default function LoginPage() {
   const currentError = getErrorMessage(authError);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <div className="flex items-center justify-between">
             <CardTitle className="text-2xl font-bold">Iniciar Sesión</CardTitle>
-            {sessionStatus && (
-              <Badge variant={sessionStatus === 'authenticated' ? 'default' : 'secondary'}>
-                {sessionStatus === 'authenticated' ? 'Activa' : 'Inactiva'}
-              </Badge>
-            )}
+            <div className="flex items-center space-x-2">
+              <ThemeToggle />
+            </div>
           </div>
           <CardDescription>
             Ingresa tus credenciales para acceder a tu cuenta
