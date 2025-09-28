@@ -208,6 +208,12 @@ class ActivityTimerManager {
     onExpire: (sessionId: string) => void,
     onWarning?: SessionWarningCallback
   ): void {
+    // Si no hay timeout configurado, no iniciar timers
+    if (this.config.inactivityTimeoutMinutes <= 0) {
+      this.logger.debug('No se inicia timer - sesiones sin expiración configuradas', { sessionId });
+      return;
+    }
+
     this.stopActivityTimer(sessionId);
 
     const now = Date.now();
@@ -224,7 +230,7 @@ class ActivityTimerManager {
     this.timers.set(sessionId, expireTimer);
 
     // Timer de warning si está configurado
-    if (onWarning && warningThreshold < inactivityTimeout) {
+    if (onWarning && warningThreshold < inactivityTimeout && this.config.warningThresholdMinutes > 0) {
       const warningTimeMs = expireTime - warningThreshold;
       const warningTimer = setTimeout(() => {
         const minutesLeft = Math.floor((expireTime - Date.now()) / (60 * 1000));
@@ -412,12 +418,12 @@ export class SessionManager {
 
   constructor(config: Partial<SessionManagerConfig> = {}) {
     this.config = {
-      inactivityTimeoutMinutes: 30,
-      absoluteTimeoutDays: 7,
+      inactivityTimeoutMinutes: 0, // Sin expiración por defecto
+      absoluteTimeoutDays: 0, // Sin expiración absoluta por defecto
       checkIntervalMinutes: 1,
       maxConcurrentSessions: 5,
-      autoExtendSession: true,
-      warningThresholdMinutes: 5,
+      autoExtendSession: false, // No extender automáticamente por defecto
+      warningThresholdMinutes: 0, // Sin warnings por defecto
       persistence: 'local',
       ...config,
     };
@@ -950,6 +956,11 @@ export class SessionManager {
    * Maneja el warning de expiración
    */
   private handleSessionWarning(minutesLeft: number, sessionData: SessionData): void {
+    // Si no hay timeout configurado, no mostrar warnings
+    if (this.config.inactivityTimeoutMinutes <= 0) {
+      return;
+    }
+
     this.logger.warn('Sesión próxima a expirar', {
       minutesLeft,
       uid: sessionData.uid,
@@ -991,6 +1002,12 @@ export class SessionManager {
    * Inicia la verificación periódica de sesiones
    */
   private startPeriodicCheck(): void {
+    // Si no hay timeout configurado, no iniciar verificación periódica
+    if (this.config.inactivityTimeoutMinutes <= 0) {
+      this.logger.debug('No se inicia verificación periódica - sesiones sin expiración configuradas');
+      return;
+    }
+
     this.checkInterval = setInterval(async () => {
       try {
         await this.cleanupExpiredSessions();

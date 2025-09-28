@@ -21,13 +21,13 @@ export const SessionNotifications: React.FC<SessionNotificationProps> = ({
   className,
   showToasts = true,
   warningThreshold = 5,
-  autoHideDelay = 5000,
+  autoHideDelay = 2000,
 }) => {
   const { sessionStatus, loading } = useAuthEnhanced();
   const { timeUntilExpiration, isExpiringSoon, minutesUntilExpiration } = useSessionExpiration(warningThreshold);
   const [notifications, setNotifications] = useState<Array<{
     id: string;
-    type: 'warning' | 'expired' | 'extended';
+    type: 'warning' | 'extended';
     message: string;
     timestamp: Date;
     visible: boolean;
@@ -76,35 +76,6 @@ export const SessionNotifications: React.FC<SessionNotificationProps> = ({
       });
     }
 
-    // Notificación de sesión expirada (cuando no hay usuario autenticado)
-    if (sessionStatus === 'unauthenticated' && !loading) {
-      const notificationId = 'session-expired';
-      const message = 'Tu sesión ha expirado. Por favor, inicia sesión nuevamente.';
-
-      setNotifications(prev => {
-        const existing = prev.find(n => n.id === notificationId);
-        if (existing) return prev;
-
-        const newNotification = {
-          id: notificationId,
-          type: 'expired' as const,
-          message,
-          timestamp: new Date(),
-          visible: true,
-        };
-
-        if (showToasts) {
-          toast({
-            title: "Sesión expirada",
-            description: message,
-            variant: "destructive",
-            duration: autoHideDelay * 2, // Más tiempo para errores
-          });
-        }
-
-        return [...prev, newNotification];
-      });
-    }
   }, [sessionStatus, isExpiringSoon, minutesUntilExpiration, loading, showToasts, warningThreshold, autoHideDelay]);
 
   const removeNotification = (id: string) => {
@@ -144,7 +115,6 @@ export const SessionNotifications: React.FC<SessionNotificationProps> = ({
           className={cn(
             'w-80 shadow-lg border-l-4',
             notification.type === 'warning' && 'border-l-warning',
-            notification.type === 'expired' && 'border-l-destructive',
             notification.type === 'extended' && 'border-l-green-500'
           )}
         >
@@ -155,9 +125,6 @@ export const SessionNotifications: React.FC<SessionNotificationProps> = ({
                   {notification.type === 'warning' && (
                     <AlertTriangle className="h-4 w-4 text-warning" />
                   )}
-                  {notification.type === 'expired' && (
-                    <X className="h-4 w-4 text-destructive" />
-                  )}
                   {notification.type === 'extended' && (
                     <CheckCircle className="h-4 w-4 text-green-500" />
                   )}
@@ -165,7 +132,6 @@ export const SessionNotifications: React.FC<SessionNotificationProps> = ({
                 <div className="flex-1">
                   <p className="text-sm font-medium">
                     {notification.type === 'warning' && 'Sesión próxima a expirar'}
-                    {notification.type === 'expired' && 'Sesión expirada'}
                     {notification.type === 'extended' && 'Sesión extendida'}
                   </p>
                   <p className="text-xs text-muted-foreground mt-1">

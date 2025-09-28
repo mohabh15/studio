@@ -104,8 +104,8 @@ export interface AuthState {
 export interface AuthConfig {
   /** Tipo de persistencia por defecto */
   defaultPersistence: PersistenceType;
-  /** Tiempo de vida de la sesión en minutos */
-  sessionTimeoutMinutes: number;
+  /** Tiempo de vida de la sesión en minutos (opcional, si no se especifica las sesiones no expiran) */
+  sessionTimeoutMinutes?: number;
   /** Indica si se requiere verificación de email */
   requireEmailVerification: boolean;
   /** URLs de redirección después del login/logout */

@@ -101,7 +101,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         // Configurar AuthService con configuración avanzada
         authService.updateConfig({
           defaultPersistence: 'local',
-          sessionTimeoutMinutes: 30,
           requireEmailVerification: false,
           redirectUrls: {
             afterLogin: '/dashboard',
