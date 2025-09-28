@@ -7,6 +7,7 @@ import { UiPreferencesProvider } from '@/contexts/ui-preferences-context';
 import { AuthProvider } from '@/contexts/auth-context';
 import { SessionNotifications } from '@/components/auth/session-notifications';
 import { AuthErrorBoundaryClient } from '@/components/auth/auth-error-boundary-client';
+import { ThemeInitializer } from '@/components/theme/theme-initializer';
 
 export const metadata: Metadata = {
   title: 'Budget3M',
@@ -40,6 +41,7 @@ export default function RootLayout({
         <meta httpEquiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=()" />
       </head>
       <body className="font-body antialiased">
+        <ThemeInitializer />
         <AuthErrorBoundaryClient>
           <I18nProvider>
             <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
