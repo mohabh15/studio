@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -287,7 +288,16 @@ export default function LoginPage() {
                 <span>Conectando...</span>
               </div>
             ) : (
-              'Continuar con Google'
+              <div className="flex items-center justify-center space-x-2">
+                <Image
+                  src="https://developers.google.com/identity/images/g-logo.png"
+                  alt="Google logo"
+                  width={20}
+                  height={20}
+                  className="flex-shrink-0"
+                />
+                <span>Continuar con Google</span>
+              </div>
             )}
           </Button>
 
