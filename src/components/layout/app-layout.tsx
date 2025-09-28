@@ -6,7 +6,6 @@ import { useFirestoreTransactions, useFirestoreCategories } from '@/hooks/use-fi
 import { useAuth } from '@/hooks/use-auth';
 import AddTransactionDialog from '../transactions/add-transaction-dialog';
 import BottomNav from './bottom-nav';
-import { ThemeToggle } from '../theme/theme-toggle';
 import { Button } from '@/components/ui/button';
 import { Plus, Wallet } from 'lucide-react';
 import { useI18n } from '@/hooks/use-i18n';
@@ -35,17 +34,17 @@ export default function AppLayout({ children }: AppLayoutProps) {
       <div className="flex min-h-screen w-full flex-col">
         {/* Header with title */}
         {user && (
-          <header className="flex items-center justify-start border-b bg-background px-4 py-3 sm:px-6">
-            <div className="flex items-center gap-2">
-              <Wallet className="h-7 w-7 text-primary" />
-              <h1 className="text-xl font-bold tracking-tight text-foreground">
+          <header className="flex items-center justify-between border-b bg-background px-3 py-3 sm:px-6">
+            <div className="flex items-center gap-2 min-w-0 flex-1">
+              <Wallet className="h-6 w-6 text-primary flex-shrink-0 sm:h-7 sm:w-7" />
+              <h1 className="text-lg font-bold tracking-tight text-foreground truncate sm:text-xl">
                 {t('app.title')}
               </h1>
             </div>
           </header>
         )}
 
-        <div className="pb-20 sm:pb-24">{children}</div>
+        <div className="pb-20 sm:pb-24 md:pb-20">{children}</div>
 
         {/* Botón flotante para añadir transacción - justo encima de la navbar */}
         <div className="fixed bottom-24 right-4 z-50 sm:bottom-28 sm:right-6">
