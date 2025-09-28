@@ -65,12 +65,12 @@ export function useFirestoreTransactions(userId: string) {
       if (docSnap.exists()) {
         const transactionData = docSnap.data();
 
-        // If it's a debt payment transaction, restore the amount to the debt
-        if (transactionData.category === 'debt' && transactionData.notes) {
-          // Extract debt ID from notes format: "Pago de deuda [debt_id]: ..."
-          const debtIdMatch = transactionData.notes.match(/Pago de deuda \[([^\]]+)\]/);
+        // If it's a debt payment or collection transaction, restore the amount to the debt
+        if ((transactionData.category === 'debt' || transactionData.category === 'debt_collection') && transactionData.notes) {
+          // Extract debt ID from notes format: "Pago de deuda [debt_id]: ..." or "Cobro de deuda [debt_id]: ..."
+          const debtIdMatch = transactionData.notes.match(/(Pago|Cobro) de deuda \[([^\]]+)\]/);
           if (debtIdMatch) {
-            const debtId = debtIdMatch[1];
+            const debtId = debtIdMatch[2];
 
             const debtDoc = await getDoc(doc(db, 'debts', debtId));
             if (debtDoc.exists()) {
@@ -81,6 +81,27 @@ export function useFirestoreTransactions(userId: string) {
               await updateDoc(doc(db, 'debts', debtId), {
                 monto_actual: restoredAmount
               });
+            }
+
+            // Find and delete the corresponding debt payment record
+            const debtPaymentsQuery = query(
+              collection(db, 'debt_payments'),
+              where('userId', '==', userId),
+              where('debt_id', '==', debtId),
+              where('amount', '==', transactionData.amount),
+              where('date', '==', transactionData.date)
+            );
+            const debtPaymentsSnapshot = await getDocs(debtPaymentsQuery);
+            if (!debtPaymentsSnapshot.empty) {
+              let paymentToDelete;
+              if (debtPaymentsSnapshot.docs.length === 1) {
+                paymentToDelete = debtPaymentsSnapshot.docs[0];
+              } else {
+                // Multiple matches, choose the most recent
+                const sortedDocs = debtPaymentsSnapshot.docs.sort((a, b) => new Date(b.data().date).getTime() - new Date(a.data().date).getTime());
+                paymentToDelete = sortedDocs[0];
+              }
+              await deleteDoc(paymentToDelete.ref);
             }
           }
         }
@@ -120,10 +141,22 @@ export function useFirestoreCategories(userId: string) {
   const fetchCategories = async () => {
     try {
       setLoading(true);
-      const q = query(collection(db, 'categories'), where('userId', '==', userId));
+      // Get both system categories (userId: 'default') and user-specific categories
+      const q = query(collection(db, 'categories'), where('userId', 'in', ['default', userId]));
       const snapshot = await getDocs(q);
       const data = snapshot.docs
-        .map(doc => ({ id: doc.id, ...doc.data() } as Category));
+        .map(doc => ({ id: doc.id, ...doc.data() } as Category))
+        // Remove duplicates by prioritizing user-specific categories over system ones
+        .reduce((acc, category) => {
+          const existingIndex = acc.findIndex(cat => cat.id === category.id);
+          if (existingIndex >= 0) {
+            // Replace system category with user-specific one if it exists
+            acc[existingIndex] = category;
+          } else {
+            acc.push(category);
+          }
+          return acc;
+        }, [] as Category[]);
       setCategories(data);
       setError(null);
     } catch (err) {

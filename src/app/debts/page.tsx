@@ -10,6 +10,8 @@ import { useI18n } from '@/hooks/use-i18n';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,7 +28,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { PlusCircle, TrendingUp, DollarSign, Calendar, AlertTriangle, MoreHorizontal, Edit, Trash2, CreditCard, BarChart3 } from 'lucide-react';
+import { PlusCircle, TrendingUp, DollarSign, Calendar, AlertTriangle, MoreHorizontal, Edit, Trash2, CreditCard, BarChart3, ArrowUp, ArrowDown } from 'lucide-react';
 import Link from 'next/link';
 import DebtDialog from '@/components/debts/debt-dialog';
 import DebtPaymentDialog from '@/components/debts/debt-payment-dialog';
@@ -52,6 +54,7 @@ export default function DebtsPage() {
   const [isPaymentDialogOpen, setPaymentDialogOpen] = useState(false);
   const [editingDebt, setEditingDebt] = useState<Debt | null>(null);
   const [deletingDebt, setDeletingDebt] = useState<Debt | null>(null);
+  const [filter, setFilter] = useState<string>('all');
 
   useEffect(() => {
     setIsClient(true);
@@ -102,14 +105,15 @@ export default function DebtsPage() {
       const paymentWithUserId = { ...paymentData, userId };
       const paymentDoc = await addDebtPayment(paymentWithUserId);
 
-      // Crear la transacción correspondiente (gasto)
+      // Crear la transacción correspondiente
       const selectedDebt = debts.find(d => d.id === paymentData.debt_id);
       if (selectedDebt) {
+        const isCollection = paymentData.tipo === 'collection';
         const transactionData = {
-          type: 'expense' as const,
+          type: isCollection ? 'income' as const : 'expense' as const,
           amount: paymentData.amount,
           date: paymentData.date,
-          category: 'debt', // Categoría especial para pagos de deudas
+          category: isCollection ? 'debt_collection' : 'debt',
           notes: `Pago de deuda [${selectedDebt.id}]: ${selectedDebt.descripcion || selectedDebt.tipo.replace('_', ' ').toUpperCase()}${paymentData.description ? ` - ${paymentData.description}` : ''}`,
           merchant: selectedDebt.descripcion || selectedDebt.tipo.replace('_', ' ').toUpperCase(),
           userId,
@@ -146,6 +150,17 @@ export default function DebtsPage() {
     return dueDate >= today && dueDate <= thirtyDaysFromNow;
   });
 
+  // Función para determinar la dirección de la deuda
+  const getDebtDirection = (debt: Debt) => {
+    if (debt.direction) return debt.direction;
+    return (debt.tipo as string) === 'incoming' ? 'incoming' : 'outgoing';
+  };
+
+  // Calcular totales separados
+  const totalOutgoing = debts.filter(d => getDebtDirection(d) === 'outgoing').reduce((sum, debt) => sum + debt.monto_actual, 0);
+  const totalIncoming = debts.filter(d => getDebtDirection(d) === 'incoming').reduce((sum, debt) => sum + debt.monto_actual, 0);
+  const filteredDebts = debts.filter(debt => filter === 'all' || getDebtDirection(debt) === filter);
+
   if (authLoading || !isClient) {
     return <DashboardSkeleton />;
   }
@@ -178,58 +193,65 @@ export default function DebtsPage() {
         </div>
 
         {/* Métricas principales */}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-6">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{t('debts_page.total_debt')}</CardTitle>
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{formatCurrency(totalDebt)}</div>
-              <p className="text-xs text-muted-foreground">
-                {debts.length === 1 ? debts.length + ' ' + t('dashboard.debt_status.debts_count').replace('{{count}} ', '') : debts.length + ' ' + t('dashboard.debt_status.debts_count_plural').replace('{{count}} ', '')}
-              </p>
-            </CardContent>
-          </Card>
+        <div className="grid gap-4 grid-cols-2 md:grid-cols-2 lg:grid-cols-4 mb-6">
+           <Card>
+             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+               <CardTitle className="text-sm font-medium">Total Deudas</CardTitle>
+               <DollarSign className="h-4 w-4 text-red-500" />
+             </CardHeader>
+             <CardContent>
+               <div className="text-2xl font-bold">{formatCurrency(totalOutgoing)}</div>
+               <p className="text-xs text-muted-foreground">Deudas que debo</p>
+             </CardContent>
+           </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{t('debts_page.minimum_payments')}</CardTitle>
-              <TrendingUp className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{formatCurrency(totalMinimumPayments)}</div>
-              <p className="text-xs text-muted-foreground">{t('debts_page.monthly')}</p>
-            </CardContent>
-          </Card>
+           <Card>
+             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+               <CardTitle className="text-sm font-medium">Total Por Cobrar</CardTitle>
+               <DollarSign className="h-4 w-4 text-green-500" />
+             </CardHeader>
+             <CardContent>
+               <div className="text-2xl font-bold">{formatCurrency(totalIncoming)}</div>
+               <p className="text-xs text-muted-foreground">Dinero que me deben</p>
+             </CardContent>
+           </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{t('debts_page.average_rate')}</CardTitle>
-              <AlertTriangle className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{averageInterestRate.toFixed(1)}%</div>
-              <p className="text-xs text-muted-foreground">{t('debts_page.annual_interest')}</p>
-            </CardContent>
-          </Card>
+           <Card>
+             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+               <CardTitle className="text-sm font-medium">{t('debts_page.minimum_payments')}</CardTitle>
+               <TrendingUp className="h-4 w-4 text-muted-foreground" />
+             </CardHeader>
+             <CardContent>
+               <div className="text-2xl font-bold">{formatCurrency(totalMinimumPayments)}</div>
+               <p className="text-xs text-muted-foreground">{t('debts_page.monthly')}</p>
+             </CardContent>
+           </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{t('debts_page.upcoming_due_dates')}</CardTitle>
-              <Calendar className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{upcomingPayments.length}</div>
-              <p className="text-xs text-muted-foreground">{t('debts_page.in_30_days')}</p>
-            </CardContent>
-          </Card>
-        </div>
+           <Card>
+             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+               <CardTitle className="text-sm font-medium">{t('debts_page.upcoming_due_dates')}</CardTitle>
+               <Calendar className="h-4 w-4 text-muted-foreground" />
+             </CardHeader>
+             <CardContent>
+               <div className="text-2xl font-bold">{upcomingPayments.length}</div>
+               <p className="text-xs text-muted-foreground">{t('debts_page.in_30_days')}</p>
+             </CardContent>
+           </Card>
+         </div>
 
         {/* Gráficos de deudas */}
         <DebtCharts debts={debts} />
 
         <div className="my-8" />
+
+        {/* Filtro de deudas */}
+        <Tabs value={filter} onValueChange={setFilter} className="mb-4">
+          <TabsList>
+            <TabsTrigger value="all">Todas</TabsTrigger>
+            <TabsTrigger value="outgoing">Debo</TabsTrigger>
+            <TabsTrigger value="incoming">Me Deben</TabsTrigger>
+          </TabsList>
+        </Tabs>
 
         {/* Lista de deudas */}
         <Card>
@@ -248,12 +270,23 @@ export default function DebtsPage() {
             </div>
           </CardHeader>
           <CardContent>
-            {debts.length > 0 ? (
+            {filteredDebts.length > 0 ? (
               <div className="space-y-4">
-                {debts.map((debt) => (
+                {filteredDebts.map((debt) => (
                   <div key={debt.id} className="flex items-center justify-between p-4 border rounded-lg">
                     <div className="space-y-1 flex-1">
                       <p className="font-medium">{debt.descripcion || t('debts_page.no_description')}</p>
+                      <div className="flex items-center gap-2 mb-2">
+                        {getDebtDirection(debt) === 'incoming' ? (
+                          <Badge variant="secondary" className="bg-green-100 text-green-800">
+                            <ArrowUp className="w-3 h-3 mr-1" />Por Cobrar
+                          </Badge>
+                        ) : (
+                          <Badge variant="secondary" className="bg-red-100 text-red-800">
+                            <ArrowDown className="w-3 h-3 mr-1" />Debo
+                          </Badge>
+                        )}
+                      </div>
                       <p className="text-sm text-muted-foreground">
                         {`Tipo: ${debt.tipo.replace('_', ' ').toUpperCase()} • Tasa: ${debt.tasa_interes}% • Vence: ${new Date(debt.fecha_vencimiento).toLocaleDateString()}`}
                       </p>
@@ -288,7 +321,9 @@ export default function DebtsPage() {
               </div>
             ) : (
               <div className="flex h-[200px] w-full items-center justify-center rounded-md border-2 border-dashed">
-                <p className="text-muted-foreground">{t('dashboard.debt_status.no_debts_description')}</p>
+                <p className="text-muted-foreground">
+                  {filter === 'all' ? t('dashboard.debt_status.no_debts_description') : 'No hay deudas en esta categoría'}
+                </p>
               </div>
             )}
           </CardContent>

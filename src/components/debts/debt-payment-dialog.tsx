@@ -50,7 +50,7 @@ export default function DebtPaymentDialog({ isOpen, onOpenChange, onSave, debts 
      debt_id: z.string().min(1, t('debt_payment_dialog.validation.debt_required')),
      amount: z.number().min(0.01, t('debt_payment_dialog.validation.amount_required')),
      date: z.string().min(1, t('debt_payment_dialog.validation.date_required')),
-     tipo: z.enum(['regular', 'extra']),
+     tipo: z.enum(['regular', 'extra', 'collection']),
      description: z.string().optional(),
    });
 
@@ -69,6 +69,7 @@ export default function DebtPaymentDialog({ isOpen, onOpenChange, onSave, debts 
 
   const selectedDebtId = form.watch('debt_id');
   const selectedDebt = debts.find(debt => debt.id === selectedDebtId);
+  const selectedTipo = form.watch('tipo');
 
   useEffect(() => {
     if (!isOpen) {
@@ -82,14 +83,21 @@ export default function DebtPaymentDialog({ isOpen, onOpenChange, onSave, debts 
     }
   }, [isOpen, form]);
 
+  useEffect(() => {
+    if (selectedDebt) {
+      const isIncoming = selectedDebt.direction === 'incoming';
+      form.setValue('tipo', isIncoming ? 'collection' : 'regular');
+    }
+  }, [selectedDebt, form]);
+
   const onSubmit = async (values: DebtPaymentFormValues) => {
     setIsSubmitting(true);
     try {
       const paymentData: Omit<DebtPayment, 'id'> = {
          ...values,
          userId: user?.uid || '',
-         transaction_id: undefined, // Se asignará cuando se cree la transacción
        };
+
       await onSave(paymentData);
       onOpenChange(false);
     } catch (error) {
@@ -189,8 +197,14 @@ export default function DebtPaymentDialog({ isOpen, onOpenChange, onSave, debts 
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="regular">{t('debt_payment_dialog.regular_payment')}</SelectItem>
-                        <SelectItem value="extra">{t('debt_payment_dialog.extra_payment')}</SelectItem>
+                        {selectedDebt?.direction === 'incoming' ? (
+                          <SelectItem value="collection">Cobro</SelectItem>
+                        ) : (
+                          <>
+                            <SelectItem value="regular">{t('debt_payment_dialog.regular_payment')}</SelectItem>
+                            <SelectItem value="extra">{t('debt_payment_dialog.extra_payment')}</SelectItem>
+                          </>
+                        )}
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -243,7 +257,7 @@ export default function DebtPaymentDialog({ isOpen, onOpenChange, onSave, debts 
                 {t('common.cancel')}
               </Button>
               <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? t('debt_payment_dialog.registering') : t('debt_payment_dialog.register_payment')}
+                {isSubmitting ? t('debt_payment_dialog.registering') : (selectedTipo === 'collection' ? 'Registrar cobro' : t('debt_payment_dialog.register_payment'))}
               </Button>
             </DialogFooter>
           </form>

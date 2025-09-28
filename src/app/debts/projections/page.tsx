@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Filter } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -24,12 +26,13 @@ const formatCurrency = (amount: number) => {
 };
 
 export default function DebtProjectionsPage() {
-   const { t } = useI18n();
-   const { user, loading: authLoading } = useAuth();
-   const userId = user?.uid;
-   const { toast } = useToast();
-   const { debts, loading: debtsLoading, error: debtsError } = useFirestoreDebts(userId || '');
-   const { debtPayments } = useFirestoreDebtPayments(userId || '');
+    const { t } = useI18n();
+    const { user, loading: authLoading } = useAuth();
+    const userId = user?.uid;
+    const { toast } = useToast();
+    const { debts, loading: debtsLoading, error: debtsError } = useFirestoreDebts(userId || '');
+    const { debtPayments } = useFirestoreDebtPayments(userId || '');
+    const [selectedType, setSelectedType] = useState<string>('all');
 
   const debtSummary = useMemo(() => {
     if (debts.length === 0) return null;
@@ -52,10 +55,20 @@ export default function DebtProjectionsPage() {
     };
   }, [debts, debtPayments]);
 
+  const filteredDebts = useMemo(() => {
+    if (selectedType === 'all') return debts;
+    return debts.filter(debt => debt.tipo === selectedType);
+  }, [debts, selectedType]);
+
   const projections = useMemo(() => {
-    if (debts.length === 0) return [];
-    return calculateDebtProjections({ debts });
-  }, [debts]);
+    if (filteredDebts.length === 0) return [];
+    return calculateDebtProjections({ debts: filteredDebts });
+  }, [filteredDebts]);
+
+  const incomingProjections = useMemo(() => {
+    if (filteredDebts.length === 0) return [];
+    return calculateDebtProjections({ debts: filteredDebts, isIncoming: true });
+  }, [filteredDebts]);
 
   if (authLoading) {
     return (
@@ -209,18 +222,41 @@ export default function DebtProjectionsPage() {
           </Card>
         </div>
 
+        {/* Filtro por Tipo */}
+        <div className="flex items-center gap-4 mb-6">
+          <Filter className="h-4 w-4 text-muted-foreground" />
+          <Select value={selectedType} onValueChange={setSelectedType}>
+            <SelectTrigger className="w-48">
+              <SelectValue placeholder="Filtrar por tipo" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos los tipos</SelectItem>
+              <SelectItem value="credit_card">Tarjeta de Crédito</SelectItem>
+              <SelectItem value="personal_loan">Préstamo Personal</SelectItem>
+              <SelectItem value="mortgage">Hipoteca</SelectItem>
+              <SelectItem value="student_loan">Préstamo Estudiantil</SelectItem>
+              <SelectItem value="car_loan">Préstamo de Auto</SelectItem>
+              <SelectItem value="other">Otro</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
         {/* Contenido Principal */}
         <Tabs defaultValue="comparison" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="comparison" className="flex items-center gap-2">
-              <BarChart3 className="h-4 w-4" />
-              {t('strategy_comparison.title')}
-            </TabsTrigger>
-            <TabsTrigger value="simulator" className="flex items-center gap-2">
-              <Calculator className="h-4 w-4" />
-              {t('payment_simulator.title')}
-            </TabsTrigger>
-          </TabsList>
+           <TabsList className="grid w-full grid-cols-3">
+             <TabsTrigger value="comparison" className="flex items-center gap-2">
+               <BarChart3 className="h-4 w-4" />
+               {t('strategy_comparison.title')}
+             </TabsTrigger>
+             <TabsTrigger value="simulator" className="flex items-center gap-2">
+               <Calculator className="h-4 w-4" />
+               {t('payment_simulator.title')}
+             </TabsTrigger>
+             <TabsTrigger value="incoming" className="flex items-center gap-2">
+               <TrendingUp className="h-4 w-4" />
+               Cobros Entrantes
+             </TabsTrigger>
+           </TabsList>
 
           <TabsContent value="comparison" className="space-y-6">
             <StrategyComparison
@@ -230,7 +266,14 @@ export default function DebtProjectionsPage() {
           </TabsContent>
 
           <TabsContent value="simulator" className="space-y-6">
-            <PaymentSimulator debts={debts} />
+            <PaymentSimulator debts={filteredDebts} />
+          </TabsContent>
+
+          <TabsContent value="incoming" className="space-y-6">
+            <StrategyComparison
+              projections={incomingProjections}
+              isIncoming={true}
+            />
           </TabsContent>
         </Tabs>
       </div>

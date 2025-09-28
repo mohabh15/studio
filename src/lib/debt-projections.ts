@@ -1,9 +1,11 @@
 import { Debt } from './types';
 
 export type PaymentStrategy = 'avalanche' | 'snowball' | 'combined';
+export type CollectionStrategy = 'aggressive' | 'conservative';
 
 export interface ProjectionResult {
-  strategy: PaymentStrategy;
+  strategy?: PaymentStrategy;
+  collectionStrategy?: CollectionStrategy;
   monthsToPayOff: number;
   totalPaid: number;
   totalInterest: number;
@@ -16,12 +18,17 @@ export interface ProjectionResult {
     interestPayment: number;
     remainingBalance: number;
   }>;
+  expectedCollection?: number; // Para incoming debts
+  probability?: number; // Probabilidad de cobro
 }
 
 export interface DebtProjectionInput {
   debts: Debt[];
   extraPayment?: number; // Pago extra mensual adicional
   strategy?: PaymentStrategy;
+  isIncoming?: boolean; // true para proyecciones de cobro (incoming debts)
+  collectionStrategy?: CollectionStrategy;
+  probability?: number; // Probabilidad base de cobro (0-1)
 }
 
 /**
@@ -156,7 +163,11 @@ function calculateProjection(debts: Debt[], extraPayment: number, strategy: Paym
  * Calcula proyecciones para todas las estrategias disponibles
  */
 export function calculateDebtProjections(input: DebtProjectionInput): ProjectionResult[] {
-  const { debts, extraPayment = 0, strategy } = input;
+  const { debts, extraPayment = 0, strategy, isIncoming = false, collectionStrategy, probability } = input;
+
+  if (isIncoming) {
+    return calculateCollectionProjections({ debts, collectionStrategy, probability });
+  }
 
   if (strategy) {
     switch (strategy) {
@@ -206,6 +217,175 @@ export function getStrategyDescription(strategy: PaymentStrategy): string {
       return 'Enfocado en momentum psicológico. Recomendado para mantener motivación.';
     case 'combined':
       return 'Equilibra intereses y momentum psicológico para un enfoque balanceado.';
+    default:
+      return '';
+  }
+}
+
+/**
+ * Calcula la probabilidad de cobro basada en el tipo de deuda
+ */
+function getCollectionProbability(debtType: string): number {
+  switch (debtType) {
+    case 'credit_card':
+      return 0.75; // Más difícil de cobrar
+    case 'personal_loan':
+      return 0.85;
+    case 'mortgage':
+      return 0.95; // Más fácil, garantizado
+    case 'student_loan':
+      return 0.80;
+    case 'car_loan':
+      return 0.90;
+    default:
+      return 0.80;
+  }
+}
+
+/**
+ * Calcula proyecciones de cobro usando estrategia agresiva
+ * (cobra más rápido, más recursos dedicados)
+ */
+function calculateAggressiveCollectionProjection(debts: Debt[], probability: number = 0.8): ProjectionResult {
+  return calculateCollectionProjection(debts, probability, 'aggressive');
+}
+
+/**
+ * Calcula proyecciones de cobro usando estrategia conservadora
+ * (cobra más lentamente, menos recursos)
+ */
+function calculateConservativeCollectionProjection(debts: Debt[], probability: number = 0.8): ProjectionResult {
+  return calculateCollectionProjection(debts, probability, 'conservative');
+}
+
+/**
+ * Función principal para calcular proyecciones de cobro
+ */
+function calculateCollectionProjection(debts: Debt[], probability: number, strategy: CollectionStrategy): ProjectionResult {
+  if (debts.length === 0) {
+    return {
+      collectionStrategy: strategy,
+      monthsToPayOff: 0,
+      totalPaid: 0,
+      totalInterest: 0, // Sin interés para incoming
+      monthlyPayment: 0,
+      payoffDate: new Date(),
+      monthlyBreakdown: [],
+      expectedCollection: 0,
+      probability,
+    };
+  }
+
+  const monthlyBreakdown: ProjectionResult['monthlyBreakdown'] = [];
+  let totalCollected = 0;
+  let month = 0;
+  let remainingDebts = debts.map(debt => ({
+    ...debt,
+    remaining: debt.monto_actual,
+    prob: getCollectionProbability(debt.tipo) * probability // Probabilidad ajustada
+  }));
+
+  // Estrategia agresiva: cobra 1.5x pagos mínimos, conservador: 0.75x
+  const collectionMultiplier = strategy === 'aggressive' ? 1.5 : 0.75;
+
+  while (remainingDebts.some(debt => debt.remaining > 0) && month < 600) {
+    month++;
+    let monthlyTotalCollection = 0;
+    let monthlyPrincipal = 0;
+    let monthlyInterest = 0; // Siempre 0 para incoming
+
+    const activeDebts = remainingDebts.filter(debt => debt.remaining > 0);
+
+    for (const debt of activeDebts) {
+      // Simular cobro probabilístico
+      const collectionAmount = debt.pagos_minimos * collectionMultiplier;
+      const actualCollection = collectionAmount * debt.prob; // Monto esperado basado en probabilidad
+      const principalCollection = Math.min(actualCollection, debt.remaining);
+      debt.remaining -= principalCollection;
+      monthlyPrincipal += principalCollection;
+      monthlyTotalCollection += principalCollection;
+    }
+
+    totalCollected += monthlyTotalCollection;
+
+    monthlyBreakdown.push({
+      month,
+      totalPayment: monthlyTotalCollection,
+      principalPayment: monthlyPrincipal,
+      interestPayment: monthlyInterest,
+      remainingBalance: remainingDebts.reduce((sum, debt) => sum + Math.max(0, debt.remaining), 0),
+    });
+
+    if (remainingDebts.every(debt => debt.remaining <= 0)) {
+      break;
+    }
+  }
+
+  const payoffDate = new Date();
+  payoffDate.setMonth(payoffDate.getMonth() + month);
+
+  const totalExpected = debts.reduce((sum, debt) => sum + debt.monto_actual * getCollectionProbability(debt.tipo) * probability, 0);
+
+  return {
+    collectionStrategy: strategy,
+    monthsToPayOff: month,
+    totalPaid: totalCollected, // Para incoming, totalCollected
+    totalInterest: 0,
+    monthlyPayment: debts.reduce((sum, debt) => sum + debt.pagos_minimos * collectionMultiplier, 0),
+    payoffDate,
+    monthlyBreakdown,
+    expectedCollection: totalExpected,
+    probability,
+  };
+}
+
+/**
+ * Calcula proyecciones de cobro para todas las estrategias disponibles
+ */
+export function calculateCollectionProjections(input: DebtProjectionInput): ProjectionResult[] {
+  const { debts, collectionStrategy, probability = 0.8 } = input;
+
+  if (collectionStrategy) {
+    switch (collectionStrategy) {
+      case 'aggressive':
+        return [calculateAggressiveCollectionProjection(debts, probability)];
+      case 'conservative':
+        return [calculateConservativeCollectionProjection(debts, probability)];
+      default:
+        return [calculateAggressiveCollectionProjection(debts, probability)];
+    }
+  }
+
+  // Calcular ambas estrategias
+  return [
+    calculateAggressiveCollectionProjection(debts, probability),
+    calculateConservativeCollectionProjection(debts, probability),
+  ];
+}
+
+/**
+ * Obtiene el nombre legible de una estrategia de cobro
+ */
+export function getCollectionStrategyName(strategy: CollectionStrategy): string {
+  switch (strategy) {
+    case 'aggressive':
+      return 'Agresiva (Cobro Rápido)';
+    case 'conservative':
+      return 'Conservadora (Cobro Lento)';
+    default:
+      return 'Desconocida';
+  }
+}
+
+/**
+ * Obtiene la descripción de una estrategia de cobro
+ */
+export function getCollectionStrategyDescription(strategy: CollectionStrategy): string {
+  switch (strategy) {
+    case 'aggressive':
+      return 'Enfocado en cobrar lo más rápido posible dedicando más recursos. Mayor probabilidad de recuperación pero más costoso.';
+    case 'conservative':
+      return 'Enfocado en cobrar de manera sostenible con menos recursos. Menor costo pero más tiempo.';
     default:
       return '';
   }

@@ -39,6 +39,7 @@ export type Debt = {
   fecha_vencimiento: string; // fecha de vencimiento (ISO string)
   descripcion?: string;
   fecha_creacion: string; // fecha cuando se creó la deuda (ISO string)
+  direction?: string;
 };
 
 export type DebtPayment = {
@@ -48,7 +49,7 @@ export type DebtPayment = {
   amount: number;
   date: string; // ISO string
   description?: string;
-  tipo: 'regular' | 'extra'; // pago regular vs pago extra
+  tipo: 'regular' | 'extra' | 'collection'; // pago regular vs pago extra vs cobro
   transaction_id?: string; // referencia a la transacción creada
 };
 

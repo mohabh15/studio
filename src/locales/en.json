@@ -15,7 +15,14 @@
     "error": "Error",
     "amount": "Amount",
     "category": "Category",
-    "uncategorized": "Uncategorized"
+    "uncategorized": "Uncategorized",
+    "incoming_debt": "Incoming Debt",
+    "outgoing_debt": "Outgoing Debt",
+    "collection": "Collection",
+    "debt_collection": "Debt Collection",
+    "por_cobrar": "Receivable",
+    "me_deben": "They Owe Me",
+    "debo": "I Owe"
   },
   "categories": {
     "groceries": "Groceries",
@@ -30,6 +37,7 @@
     "other_expense": "Other Expense",
     "salary": "Salary",
     "savings": "Savings",
+    "debt_collection": "Debt Collection",
     "other_income": "Other Income"
   },
   "nav": {
@@ -255,6 +263,7 @@
     "save": "Save",
     "update": "Update",
     "saving": "Saving...",
+    "debt_direction": "Debt Direction",
     "validation": {
       "amount_required": "Amount must be greater than 0",
       "current_amount_negative": "Current amount cannot be negative",

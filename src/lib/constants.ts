@@ -10,10 +10,12 @@ export const defaultCategories: Category[] = [
   { id: 'health', name: 'categories.health', icon: 'HeartPulse', type: 'expense', userId: 'default' },
   { id: 'gifts', name: 'categories.gifts', icon: 'Gift', type: 'expense', userId: 'default' },
   { id: 'debt', name: 'categories.debt_payment', icon: 'CreditCard', type: 'expense', userId: 'default' },
+  { id: 'shopping', name: 'categories.shopping', icon: 'ShoppingBag', type: 'expense', userId: 'default' },
   { id: 'other_expense', name: 'categories.other_expense', icon: 'Briefcase', type: 'expense', userId: 'default' },
 
   // Income
   { id: 'salary', name: 'categories.salary', icon: 'Landmark', type: 'income', userId: 'default' },
   { id: 'savings', name: 'categories.savings', icon: 'PiggyBank', type: 'income', userId: 'default' },
+  { id: 'debt_collection', name: 'categories.debt_collection', icon: 'DollarSign', type: 'income', userId: 'default' },
   { id: 'other_income', name: 'categories.other_income', icon: 'Briefcase', type: 'income', userId: 'default' },
 ];

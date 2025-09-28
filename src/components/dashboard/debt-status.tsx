@@ -27,36 +27,55 @@ export default function DebtStatus({ debts, userId }: DebtStatusProps) {
   const { debtPayments } = useFirestoreDebtPayments(userId);
 
   const debtSummary = useMemo(() => {
-    const totalCurrentDebt = debts.reduce((sum, debt) => sum + debt.monto_actual, 0);
-    const totalOriginalDebt = debts.reduce((sum, debt) => sum + debt.monto, 0);
-    const totalMinimumPayments = debts.reduce((sum, debt) => sum + debt.pagos_minimos, 0);
-    const averageInterestRate = debts.length > 0
-      ? debts.reduce((sum, debt) => sum + debt.tasa_interes, 0) / debts.length
+    // Separar deudas outgoing e incoming
+    const outgoingDebts = debts.filter(debt => debt.direction !== 'incoming');
+    const incomingDebts = debts.filter(debt => debt.direction === 'incoming');
+
+    // Summary para outgoing
+    const totalCurrentDebtOutgoing = outgoingDebts.reduce((sum, debt) => sum + debt.monto_actual, 0);
+    const totalOriginalDebtOutgoing = outgoingDebts.reduce((sum, debt) => sum + debt.monto, 0);
+    const totalMinimumPaymentsOutgoing = outgoingDebts.reduce((sum, debt) => sum + debt.pagos_minimos, 0);
+    const averageInterestRateOutgoing = outgoingDebts.length > 0
+      ? outgoingDebts.reduce((sum, debt) => sum + debt.tasa_interes, 0) / outgoingDebts.length
       : 0;
-
-    // Calcular total pagado
-    const totalPaid = debtPayments.reduce((sum, payment) => sum + payment.amount, 0);
-
-    // Calcular progreso (cuánto se ha reducido la deuda original)
-    const progress = totalOriginalDebt > 0 ? ((totalOriginalDebt - totalCurrentDebt) / totalOriginalDebt) * 100 : 0;
-
-    // Próximos vencimientos (próximos 30 días)
-    const upcomingPayments = debts.filter(debt => {
+    const totalPaidOutgoing = debtPayments.filter(payment => payment.tipo !== 'collection' && outgoingDebts.some(debt => debt.id === payment.debt_id)).reduce((sum, payment) => sum + payment.amount, 0);
+    const progressOutgoing = totalOriginalDebtOutgoing > 0 ? ((totalOriginalDebtOutgoing - totalCurrentDebtOutgoing) / totalOriginalDebtOutgoing) * 100 : 0;
+    const upcomingPaymentsOutgoing = outgoingDebts.filter(debt => {
       const dueDate = new Date(debt.fecha_vencimiento);
       const today = new Date();
       const thirtyDaysFromNow = new Date(today.getTime() + (30 * 24 * 60 * 60 * 1000));
       return dueDate >= today && dueDate <= thirtyDaysFromNow;
-    });
+    }).length;
+
+    // Summary para incoming
+    const totalPorCobrar = incomingDebts.reduce((sum, debt) => sum + debt.monto_actual, 0);
+    const totalCobrado = debtPayments.filter(payment => payment.tipo === 'collection' && incomingDebts.some(debt => debt.id === payment.debt_id)).reduce((sum, payment) => sum + payment.amount, 0);
+    const progressIncoming = totalPorCobrar > 0 ? (totalCobrado / totalPorCobrar) * 100 : 0;
+    const upcomingCobros = incomingDebts.filter(debt => {
+      const dueDate = new Date(debt.fecha_vencimiento);
+      const today = new Date();
+      const thirtyDaysFromNow = new Date(today.getTime() + (30 * 24 * 60 * 60 * 1000));
+      return dueDate >= today && dueDate <= thirtyDaysFromNow;
+    }).length;
 
     return {
-      totalCurrentDebt,
-      totalOriginalDebt,
-      totalPaid,
-      progress,
-      totalMinimumPayments,
-      averageInterestRate,
-      upcomingPayments: upcomingPayments.length,
-      totalDebts: debts.length,
+      outgoing: {
+        totalCurrentDebt: totalCurrentDebtOutgoing,
+        totalOriginalDebt: totalOriginalDebtOutgoing,
+        totalPaid: totalPaidOutgoing,
+        progress: progressOutgoing,
+        totalMinimumPayments: totalMinimumPaymentsOutgoing,
+        averageInterestRate: averageInterestRateOutgoing,
+        upcomingPayments: upcomingPaymentsOutgoing,
+        totalDebts: outgoingDebts.length,
+      },
+      incoming: {
+        totalPorCobrar,
+        totalCobrado,
+        progress: progressIncoming,
+        upcomingCobros,
+        totalDebts: incomingDebts.length,
+      },
     };
   }, [debts, debtPayments]);
 
@@ -88,51 +107,98 @@ export default function DebtStatus({ debts, userId }: DebtStatusProps) {
         <CardTitle className="text-sm font-medium">{t('dashboard.debt_status.title')}</CardTitle>
         <CreditCard className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
-      <CardContent className="space-y-3 sm:space-y-4">
-        <div className="text-2xl font-bold">{formatCurrency(debtSummary.totalCurrentDebt)}</div>
-        <p className="text-xs text-muted-foreground">
-          {debtSummary.totalDebts === 1
-            ? debtSummary.totalDebts + ' ' + t('dashboard.debt_status.debts_count').replace('{{count}} ', '')
-            : debtSummary.totalDebts + ' ' + t('dashboard.debt_status.debts_count_plural').replace('{{count}} ', '')
-          } •
-          {t('dashboard.debt_status.average_rate').replace('{{rate}}', debtSummary.averageInterestRate.toFixed(1))}
-        </p>
+      <CardContent className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Outgoing Debts */}
+          <div className="space-y-3">
+            <div className="text-red-600 text-sm font-medium">Total Deudas</div>
+            <div className="text-2xl font-bold text-red-600">{formatCurrency(debtSummary.outgoing.totalCurrentDebt)}</div>
+            <p className="text-xs text-muted-foreground">
+              {debtSummary.outgoing.totalDebts === 1
+                ? debtSummary.outgoing.totalDebts + ' ' + t('dashboard.debt_status.debts_count').replace('{{count}} ', '')
+                : debtSummary.outgoing.totalDebts + ' ' + t('dashboard.debt_status.debts_count_plural').replace('{{count}} ', '')
+              } •
+              {t('dashboard.debt_status.average_rate').replace('{{rate}}', debtSummary.outgoing.averageInterestRate.toFixed(1))}
+            </p>
 
-        {/* Barra de progreso */}
-        <div>
-          <div className="flex items-center justify-between text-sm mb-1.5">
-            <span>{t('dashboard.debt_status.progress_reduction')}</span>
-            <span className="font-medium">{debtSummary.progress.toFixed(1)}%</span>
-          </div>
-          <Progress value={debtSummary.progress} className="h-2" />
-        </div>
-
-        <div className="space-y-1.5 sm:space-y-2">
-          <div className="flex items-center justify-between text-sm">
-            <span className="flex items-center gap-1">
-              <DollarSign className="h-3 w-3" />
-              {t('dashboard.debt_status.total_paid')}
-            </span>
-            <span className="font-medium">{formatCurrency(debtSummary.totalPaid)}</span>
-          </div>
-
-          <div className="flex items-center justify-between text-sm">
-            <span className="flex items-center gap-1">
-              <TrendingUp className="h-3 w-3" />
-              {t('dashboard.debt_status.minimum_monthly_payments')}
-            </span>
-            <span className="font-medium">{formatCurrency(debtSummary.totalMinimumPayments)}</span>
-          </div>
-
-          {debtSummary.upcomingPayments > 0 && (
-            <div className="flex items-center justify-between text-sm">
-              <span className="flex items-center gap-1 text-amber-600">
-                <AlertTriangle className="h-3 w-3" />
-                {t('dashboard.debt_status.upcoming_due_dates')}
-              </span>
-              <span className="font-medium text-amber-600">{debtSummary.upcomingPayments}</span>
+            {/* Barra de progreso reducción */}
+            <div>
+              <div className="flex items-center justify-between text-sm mb-1.5">
+                <span>{t('dashboard.debt_status.progress_reduction')}</span>
+                <span className="font-medium">{debtSummary.outgoing.progress.toFixed(1)}%</span>
+              </div>
+              <Progress value={debtSummary.outgoing.progress} className="h-2" />
             </div>
-          )}
+
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between text-sm">
+                <span className="flex items-center gap-1">
+                  <DollarSign className="h-3 w-3" />
+                  {t('dashboard.debt_status.total_paid')}
+                </span>
+                <span className="font-medium">{formatCurrency(debtSummary.outgoing.totalPaid)}</span>
+              </div>
+
+              <div className="flex items-center justify-between text-sm">
+                <span className="flex items-center gap-1">
+                  <TrendingUp className="h-3 w-3" />
+                  {t('dashboard.debt_status.minimum_monthly_payments')}
+                </span>
+                <span className="font-medium">{formatCurrency(debtSummary.outgoing.totalMinimumPayments)}</span>
+              </div>
+
+              {debtSummary.outgoing.upcomingPayments > 0 && (
+                <div className="flex items-center justify-between text-sm">
+                  <span className="flex items-center gap-1 text-amber-600">
+                    <AlertTriangle className="h-3 w-3" />
+                    Próximos Pagos
+                  </span>
+                  <span className="font-medium text-amber-600">{debtSummary.outgoing.upcomingPayments}</span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Incoming Debts */}
+          <div className="space-y-3">
+            <div className="text-green-600 text-sm font-medium">Total Por Cobrar</div>
+            <div className="text-2xl font-bold text-green-600">{formatCurrency(debtSummary.incoming.totalPorCobrar)}</div>
+            <p className="text-xs text-muted-foreground">
+              {debtSummary.incoming.totalDebts === 1
+                ? debtSummary.incoming.totalDebts + ' ' + t('dashboard.debt_status.debts_count').replace('{{count}} ', '')
+                : debtSummary.incoming.totalDebts + ' ' + t('dashboard.debt_status.debts_count_plural').replace('{{count}} ', '')
+              }
+            </p>
+
+            {/* Barra de progreso cobro */}
+            <div>
+              <div className="flex items-center justify-between text-sm mb-1.5">
+                <span>Porcentaje Cobrado</span>
+                <span className="font-medium">{debtSummary.incoming.progress.toFixed(1)}%</span>
+              </div>
+              <Progress value={debtSummary.incoming.progress} className="h-2" />
+            </div>
+
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between text-sm">
+                <span className="flex items-center gap-1">
+                  <DollarSign className="h-3 w-3" />
+                  Total Cobrado
+                </span>
+                <span className="font-medium">{formatCurrency(debtSummary.incoming.totalCobrado)}</span>
+              </div>
+
+              {debtSummary.incoming.upcomingCobros > 0 && (
+                <div className="flex items-center justify-between text-sm">
+                  <span className="flex items-center gap-1 text-amber-600">
+                    <AlertTriangle className="h-3 w-3" />
+                    Próximos Cobros
+                  </span>
+                  <span className="font-medium text-amber-600">{debtSummary.incoming.upcomingCobros}</span>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
 
         <div className="space-y-2 pt-1">

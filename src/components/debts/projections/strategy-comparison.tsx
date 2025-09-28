@@ -2,13 +2,14 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ProjectionResult, getStrategyName, getStrategyDescription } from '@/lib/debt-projections';
-import { CheckCircle, Clock, DollarSign, TrendingUp } from 'lucide-react';
+import { ProjectionResult, getStrategyName, getStrategyDescription, getCollectionStrategyName, getCollectionStrategyDescription } from '@/lib/debt-projections';
+import { CheckCircle, Clock, DollarSign, TrendingUp, Target } from 'lucide-react';
 import { useI18n } from '@/hooks/use-i18n';
 
 interface StrategyComparisonProps {
   projections: ProjectionResult[];
   recommendedStrategy?: string;
+  isIncoming?: boolean;
 }
 
 const formatCurrency = (amount: number) => {
@@ -31,8 +32,27 @@ const formatMonths = (months: number) => {
   }
 };
 
-export default function StrategyComparison({ projections, recommendedStrategy }: StrategyComparisonProps) {
+export default function StrategyComparison({ projections, recommendedStrategy, isIncoming = false }: StrategyComparisonProps) {
   const { t } = useI18n();
+
+  const getProjectionName = (projection: ProjectionResult) => {
+    if (isIncoming && projection.collectionStrategy) {
+      return getCollectionStrategyName(projection.collectionStrategy);
+    } else if (projection.strategy) {
+      return getStrategyName(projection.strategy);
+    }
+    return 'Desconocida';
+  };
+
+  const getProjectionDescription = (projection: ProjectionResult) => {
+    if (isIncoming && projection.collectionStrategy) {
+      return getCollectionStrategyDescription(projection.collectionStrategy);
+    } else if (projection.strategy) {
+      return getStrategyDescription(projection.strategy);
+    }
+    return '';
+  };
+
   if (projections.length === 0) {
     return (
       <Card>
@@ -75,7 +95,7 @@ export default function StrategyComparison({ projections, recommendedStrategy }:
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <h4 className="font-semibold">{getStrategyName(projection.strategy)}</h4>
+                      <h4 className="font-semibold">{getProjectionName(projection)}</h4>
                       {isRecommended && (
                         <Badge variant="default" className="text-xs">
                           <CheckCircle className="h-3 w-3 mr-1" />
@@ -96,12 +116,12 @@ export default function StrategyComparison({ projections, recommendedStrategy }:
                       )}
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      {getStrategyDescription(projection.strategy)}
+                      {getProjectionDescription(projection)}
                     </p>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className={`grid gap-4 ${isIncoming ? 'grid-cols-2 md:grid-cols-3' : 'grid-cols-2 md:grid-cols-4'}`}>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-primary">
                       {formatMonths(projection.monthsToPayOff)}
@@ -113,15 +133,19 @@ export default function StrategyComparison({ projections, recommendedStrategy }:
                     <div className="text-2xl font-bold text-green-600">
                       {formatCurrency(projection.totalPaid)}
                     </div>
-                    <div className="text-xs text-muted-foreground">{t('strategy_comparison.total_paid')}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {isIncoming ? t('strategy_comparison.total_collected') : t('strategy_comparison.total_paid')}
+                    </div>
                   </div>
 
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-red-600">
-                      {formatCurrency(projection.totalInterest)}
+                  {!isIncoming && (
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-red-600">
+                        {formatCurrency(projection.totalInterest)}
+                      </div>
+                      <div className="text-xs text-muted-foreground">{t('strategy_comparison.interest')}</div>
                     </div>
-                    <div className="text-xs text-muted-foreground">{t('strategy_comparison.interest')}</div>
-                  </div>
+                  )}
 
                   <div className="text-center">
                     <div className="text-2xl font-bold">
@@ -129,7 +153,24 @@ export default function StrategyComparison({ projections, recommendedStrategy }:
                     </div>
                     <div className="text-xs text-muted-foreground">{t('strategy_comparison.monthly_payment')}</div>
                   </div>
+
+                  {isIncoming && projection.expectedCollection !== undefined && (
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-blue-600">
+                        {formatCurrency(projection.expectedCollection)}
+                      </div>
+                      <div className="text-xs text-muted-foreground">{t('strategy_comparison.expected_collection')}</div>
+                    </div>
+                  )}
                 </div>
+
+                {isIncoming && projection.probability !== undefined && (
+                  <div className="mt-3 pt-3 border-t">
+                    <div className="text-sm text-muted-foreground">
+                      <strong>Probabilidad de cobro:</strong> {(projection.probability * 100).toFixed(1)}%
+                    </div>
+                  </div>
+                )}
 
                 <div className="mt-3 pt-3 border-t">
                   <div className="text-sm text-muted-foreground">

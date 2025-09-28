@@ -7,12 +7,13 @@ import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Debt } from '@/lib/types';
-import { calculateDebtProjections, PaymentStrategy, ProjectionResult } from '@/lib/debt-projections';
+import { calculateDebtProjections, PaymentStrategy, CollectionStrategy, ProjectionResult, getCollectionStrategyName } from '@/lib/debt-projections';
 import { Calculator, TrendingUp, Clock, DollarSign } from 'lucide-react';
 import { useI18n } from '@/hooks/use-i18n';
 
 interface PaymentSimulatorProps {
   debts: Debt[];
+  isIncoming?: boolean;
 }
 
 const formatCurrency = (amount: number) => {
@@ -35,23 +36,32 @@ const formatMonths = (months: number) => {
   }
 };
 
-export default function PaymentSimulator({ debts }: PaymentSimulatorProps) {
+export default function PaymentSimulator({ debts, isIncoming = false }: PaymentSimulatorProps) {
   const { t } = useI18n();
   const [extraPayment, setExtraPayment] = useState<number>(0);
-  const [selectedStrategy, setSelectedStrategy] = useState<PaymentStrategy>('avalanche');
+  const [selectedStrategy, setSelectedStrategy] = useState<PaymentStrategy | CollectionStrategy>(isIncoming ? 'aggressive' : 'avalanche');
+  const [probability, setProbability] = useState<number>(0.8);
 
   const projections = useMemo(() => {
     if (debts.length === 0) return [];
-    return calculateDebtProjections({ debts, extraPayment, strategy: selectedStrategy });
-  }, [debts, extraPayment, selectedStrategy]);
+    if (isIncoming) {
+      return calculateDebtProjections({ debts, extraPayment, isIncoming, collectionStrategy: selectedStrategy as CollectionStrategy, probability });
+    } else {
+      return calculateDebtProjections({ debts, extraPayment, strategy: selectedStrategy as PaymentStrategy });
+    }
+  }, [debts, extraPayment, selectedStrategy, isIncoming, probability]);
 
   const currentProjection = projections[0];
 
   // Calcular el ahorro comparado con pagos mínimos
   const baseProjection = useMemo(() => {
     if (debts.length === 0) return null;
-    return calculateDebtProjections({ debts, extraPayment: 0, strategy: selectedStrategy })[0];
-  }, [debts, selectedStrategy]);
+    if (isIncoming) {
+      return calculateDebtProjections({ debts, extraPayment: 0, isIncoming, collectionStrategy: selectedStrategy as CollectionStrategy, probability })[0];
+    } else {
+      return calculateDebtProjections({ debts, extraPayment: 0, strategy: selectedStrategy as PaymentStrategy })[0];
+    }
+  }, [debts, selectedStrategy, isIncoming, probability]);
 
   const savings = useMemo(() => {
     if (!currentProjection || !baseProjection) return null;
@@ -63,19 +73,30 @@ export default function PaymentSimulator({ debts }: PaymentSimulatorProps) {
     };
   }, [currentProjection, baseProjection]);
 
-  const strategies: { value: PaymentStrategy; label: string; description: string }[] = [
+  const strategies: { value: PaymentStrategy | CollectionStrategy; label: string; description: string }[] = isIncoming ? [
     {
-      value: 'avalanche',
+      value: 'aggressive' as CollectionStrategy,
+      label: 'Agresiva',
+      description: 'Cobro rápido'
+    },
+    {
+      value: 'conservative' as CollectionStrategy,
+      label: 'Conservadora',
+      description: 'Cobro lento'
+    },
+  ] : [
+    {
+      value: 'avalanche' as PaymentStrategy,
       label: 'Avalancha',
       description: 'Mayor interés primero'
     },
     {
-      value: 'snowball',
+      value: 'snowball' as PaymentStrategy,
       label: 'Bola de Nieve',
       description: 'Menor monto primero'
     },
     {
-      value: 'combined',
+      value: 'combined' as PaymentStrategy,
       label: 'Combinada',
       description: 'Balance optimizado'
     },
@@ -110,7 +131,7 @@ export default function PaymentSimulator({ debts }: PaymentSimulatorProps) {
         <div className="space-y-4">
           <div>
             <Label className="text-sm font-medium">
-              {`Pago Extra Mensual: ${formatCurrency(extraPayment)}`}
+              {isIncoming ? `Recursos Adicionales para Cobro: ${formatCurrency(extraPayment)}` : `Pago Extra Mensual: ${formatCurrency(extraPayment)}`}
             </Label>
             <Slider
               value={[extraPayment]}
@@ -124,6 +145,26 @@ export default function PaymentSimulator({ debts }: PaymentSimulatorProps) {
               <span>{formatCurrency(maxExtraPayment)}</span>
             </div>
           </div>
+
+          {isIncoming && (
+            <div>
+              <Label className="text-sm font-medium">
+                {`Probabilidad de Cobro: ${(probability * 100).toFixed(0)}%`}
+              </Label>
+              <Slider
+                value={[probability]}
+                onValueChange={(value) => setProbability(value[0])}
+                max={1}
+                min={0.1}
+                step={0.05}
+                className="mt-2"
+              />
+              <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                <span>10%</span>
+                <span>100%</span>
+              </div>
+            </div>
+          )}
 
           <div>
             <Label className="text-sm font-medium mb-3 block">{t('payment_simulator.payment_strategy')}</Label>
@@ -152,7 +193,7 @@ export default function PaymentSimulator({ debts }: PaymentSimulatorProps) {
               {t('payment_simulator.simulation_results')}
             </h4>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+            <div className={`grid gap-4 mb-4 ${isIncoming ? 'grid-cols-2 md:grid-cols-3' : 'grid-cols-2 md:grid-cols-4'}`}>
               <div className="text-center p-3 bg-muted rounded-lg">
                 <div className="text-lg font-bold text-primary">
                   {formatMonths(currentProjection.monthsToPayOff)}
@@ -164,15 +205,19 @@ export default function PaymentSimulator({ debts }: PaymentSimulatorProps) {
                 <div className="text-lg font-bold text-green-600">
                   {formatCurrency(currentProjection.totalPaid)}
                 </div>
-                <div className="text-xs text-muted-foreground">{t('payment_simulator.total_paid')}</div>
+                <div className="text-xs text-muted-foreground">
+                  {isIncoming ? t('payment_simulator.total_collected') : t('payment_simulator.total_paid')}
+                </div>
               </div>
 
-              <div className="text-center p-3 bg-muted rounded-lg">
-                <div className="text-lg font-bold text-red-600">
-                  {formatCurrency(currentProjection.totalInterest)}
+              {!isIncoming && (
+                <div className="text-center p-3 bg-muted rounded-lg">
+                  <div className="text-lg font-bold text-red-600">
+                    {formatCurrency(currentProjection.totalInterest)}
+                  </div>
+                  <div className="text-xs text-muted-foreground">{t('payment_simulator.interest')}</div>
                 </div>
-                <div className="text-xs text-muted-foreground">{t('payment_simulator.interest')}</div>
-              </div>
+              )}
 
               <div className="text-center p-3 bg-muted rounded-lg">
                 <div className="text-lg font-bold">
@@ -180,33 +225,46 @@ export default function PaymentSimulator({ debts }: PaymentSimulatorProps) {
                 </div>
                 <div className="text-xs text-muted-foreground">{t('payment_simulator.monthly_payment')}</div>
               </div>
+
+              {isIncoming && currentProjection.expectedCollection !== undefined && (
+                <div className="text-center p-3 bg-muted rounded-lg">
+                  <div className="text-lg font-bold text-blue-600">
+                    {formatCurrency(currentProjection.expectedCollection)}
+                  </div>
+                  <div className="text-xs text-muted-foreground">{t('payment_simulator.expected_collection')}</div>
+                </div>
+              )}
             </div>
 
             {/* Ahorro Comparado */}
-            {savings && (savings.timeSaved > 0 || savings.interestSaved > 0) && (
+            {savings && (savings.timeSaved > 0 || savings.interestSaved > 0 || savings.totalSaved > 0) && (
               <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                 <h5 className="font-medium text-green-800 mb-2 flex items-center gap-2">
                   <DollarSign className="h-4 w-4" />
-                  {t('payment_simulator.savings_vs_minimum')}
+                  {isIncoming ? t('payment_simulator.collection_vs_minimum') : t('payment_simulator.savings_vs_minimum')}
                 </h5>
-                <div className="grid grid-cols-3 gap-4 text-sm">
+                <div className={`grid gap-4 text-sm ${isIncoming ? 'grid-cols-2' : 'grid-cols-3'}`}>
                   <div>
                     <div className="font-semibold text-green-700">
                       {savings.timeSaved} meses
                     </div>
                     <div className="text-green-600">{t('payment_simulator.time_saved')}</div>
                   </div>
-                  <div>
-                    <div className="font-semibold text-green-700">
-                      {formatCurrency(savings.interestSaved)}
+                  {!isIncoming && (
+                    <div>
+                      <div className="font-semibold text-green-700">
+                        {formatCurrency(savings.interestSaved)}
+                      </div>
+                      <div className="text-green-600">{t('payment_simulator.interest_saved')}</div>
                     </div>
-                    <div className="text-green-600">{t('payment_simulator.interest_saved')}</div>
-                  </div>
+                  )}
                   <div>
                     <div className="font-semibold text-green-700">
                       {formatCurrency(savings.totalSaved)}
                     </div>
-                    <div className="text-green-600">{t('payment_simulator.total_saved')}</div>
+                    <div className="text-green-600">
+                      {isIncoming ? t('payment_simulator.collection_saved') : t('payment_simulator.total_saved')}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -217,7 +275,9 @@ export default function PaymentSimulator({ debts }: PaymentSimulatorProps) {
               <div className="flex items-start gap-2">
                 <Clock className="h-4 w-4 text-blue-600 mt-0.5" />
                 <div className="text-sm">
-                  <div className="font-medium text-blue-800">{t('payment_simulator.freedom_date')}</div>
+                  <div className="font-medium text-blue-800">
+                    {isIncoming ? t('payment_simulator.collection_completion_date') : t('payment_simulator.freedom_date')}
+                  </div>
                   <div className="text-blue-700">
                     {currentProjection.payoffDate.toLocaleDateString('es-ES', {
                       year: 'numeric',
@@ -228,6 +288,17 @@ export default function PaymentSimulator({ debts }: PaymentSimulatorProps) {
                 </div>
               </div>
             </div>
+
+            {isIncoming && currentProjection.probability !== undefined && (
+              <div className="mt-4 p-3 bg-purple-50 border border-purple-200 rounded-lg">
+                <div className="text-sm">
+                  <div className="font-medium text-purple-800">Probabilidad de Cobro</div>
+                  <div className="text-purple-700">
+                    {(currentProjection.probability * 100).toFixed(1)}%
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
 

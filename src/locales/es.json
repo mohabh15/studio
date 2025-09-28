@@ -15,7 +15,14 @@
     "error": "Error",
     "amount": "Cantidad",
     "category": "Categoría",
-    "uncategorized": "Sin categoría"
+    "uncategorized": "Sin categoría",
+    "incoming_debt": "Deuda Entrante",
+    "outgoing_debt": "Deuda Saliente",
+    "collection": "Cobranza",
+    "debt_collection": "Cobro deuda",
+    "por_cobrar": "Por Cobrar",
+    "me_deben": "Me Deben",
+    "debo": "Debo"
   },
   "categories": {
     "groceries": "Comestibles",
@@ -30,6 +37,7 @@
     "other_expense": "Otros Gastos",
     "salary": "Salario",
     "savings": "Ahorros",
+    "debt_collection": "Cobro deuda",
     "other_income": "Otros Ingresos"
   },
   "nav": {
@@ -268,6 +276,7 @@
     "save": "Guardar",
     "update": "Actualizar",
     "saving": "Guardando...",
+    "debt_direction": "Dirección de la Deuda",
     "validation": {
       "amount_required": "El monto debe ser mayor a 0",
       "current_amount_negative": "El monto actual no puede ser negativo",
