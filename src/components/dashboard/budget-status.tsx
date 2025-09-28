@@ -46,7 +46,11 @@ export default function BudgetStatus({ transactions, budgets, categories, select
         spent,
         remaining,
         progress,
-        categoryName: t(category?.name || ''),
+        categoryName: (() => {
+          const stripped = category?.name.replace(/^categories\./, '') || '';
+          const translated = t(`categories.${stripped}`);
+          return translated === `categories.${stripped}` ? stripped.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) : translated;
+        })(),
         Icon,
       };
     });
