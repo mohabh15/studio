@@ -33,6 +33,13 @@ export const SessionNotifications: React.FC<SessionNotificationProps> = ({
     visible: boolean;
   }>>([]);
 
+  // Limpiar notificaciones cuando el usuario se desconecta
+  useEffect(() => {
+    if (sessionStatus === 'unauthenticated' && !loading) {
+      setNotifications([]);
+    }
+  }, [sessionStatus, loading]);
+
   // Manejar notificaciones de sesión
   useEffect(() => {
     if (loading) {
