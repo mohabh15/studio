@@ -1,27 +1,22 @@
-import type { Metadata } from 'next';
+'use client';
+
 import { Toaster } from '@/components/ui/toaster';
 import './globals.css';
 import { I18nProvider } from '@/context/i18n';
 import { ThemeProvider } from 'next-themes';
 import { UiPreferencesProvider } from '@/contexts/ui-preferences-context';
 import { AuthProvider } from '@/contexts/auth-context';
+import { DataProvider } from '@/contexts/data-context';
 import { AuthErrorBoundaryClient } from '@/components/auth/auth-error-boundary-client';
 import { ThemeInitializer } from '@/components/theme/theme-initializer';
 import { StatusBarThemeUpdater } from '@/components/theme/status-bar-theme-updater';
-
-export const metadata: Metadata = {
-  title: 'Budget3M',
-  description: 'Smart personal finance management',
-  icons: {
-    icon: '/icono.png',
-  },
-};
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -50,9 +45,10 @@ export default function RootLayout({
               <StatusBarThemeUpdater />
               <UiPreferencesProvider>
                 <AuthProvider>
-
-                  {children}
+                  <DataProvider>
+                      {children}
                   <Toaster />
+                  </DataProvider>
                 </AuthProvider>
               </UiPreferencesProvider>
             </ThemeProvider>

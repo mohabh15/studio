@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Debt, DebtPayment } from '@/lib/types';
-import { useFirestoreDebts, useFirestoreDebtPayments, useFirestoreTransactions } from '@/hooks/use-firestore';
+import { useData } from '@/contexts/data-context';
 import { useAuth } from '@/hooks/use-auth';
 import AppLayout from '@/components/layout/app-layout';
 import DashboardSkeleton from '@/components/dashboard/dashboard-skeleton';
@@ -47,9 +47,16 @@ export default function DebtsPage() {
    const [isClient, setIsClient] = useState(false);
    const userId = user?.uid;
    const { toast } = useToast();
-   const { debts, loading: debtsLoading, addDebt, updateDebt, deleteDebt, error: debtsError } = useFirestoreDebts(userId || '');
-  const { addDebtPayment } = useFirestoreDebtPayments(userId || '');
-  const { addTransaction } = useFirestoreTransactions(userId || '');
+   const {
+     debts,
+     debtsLoading,
+     debtsError,
+     addDebt,
+     updateDebt,
+     deleteDebt,
+     addDebtPayment,
+     addTransaction,
+   } = useData();
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [isPaymentDialogOpen, setPaymentDialogOpen] = useState(false);
   const [editingDebt, setEditingDebt] = useState<Debt | null>(null);

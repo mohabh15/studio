@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Transaction, Category } from '@/lib/types';
-import { useFirestoreTransactions, useFirestoreCategories } from '@/hooks/use-firestore';
+import { useData } from '@/contexts/data-context';
 import { useAuth } from '@/hooks/use-auth';
 import AppLayout from '@/components/layout/app-layout';
 import DashboardSkeleton from '@/components/dashboard/dashboard-skeleton';
@@ -72,8 +72,16 @@ export default function TransactionsPage() {
    const [isClient, setIsClient] = useState(false);
    const userId = user?.uid;
    const { toast } = useToast();
-   const { transactions: allTransactions, loading: transactionsLoading, updateTransaction, deleteTransaction, error: transactionsError } = useFirestoreTransactions(userId || '');
-   const { categories, loading: categoriesLoading, error: categoriesError } = useFirestoreCategories(userId || '');
+   const {
+     transactions: allTransactions,
+     categories,
+     transactionsLoading,
+     categoriesLoading,
+     transactionsError,
+     categoriesError,
+     updateTransaction,
+     deleteTransaction,
+   } = useData();
   const [filters, setFilters] = useState({
     category: '',
     type: '',

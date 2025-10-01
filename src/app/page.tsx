@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import type { Transaction, Budget, Category } from '@/lib/types';
-import { useFirestoreTransactions, useFirestoreBudgets, useFirestoreCategories, useFirestoreDebts } from '@/hooks/use-firestore';
+import { useData } from '@/contexts/data-context';
 import { useAuth } from '@/hooks/use-auth';
 import SummaryCards from '@/components/dashboard/summary-cards';
 import SpendingChart from '@/components/dashboard/spending-chart';
@@ -39,10 +39,20 @@ export default function DashboardPage() {
     const { toast } = useToast();
     const router = useRouter();
 
-   const { transactions: allTransactions, loading: transactionsLoading, error: transactionsError } = useFirestoreTransactions(userId || '');
-   const { budgets: allBudgets, loading: budgetsLoading, error: budgetsError } = useFirestoreBudgets(userId || '');
-   const { categories, loading: categoriesLoading, error: categoriesError } = useFirestoreCategories(userId || '');
-   const { debts, loading: debtsLoading, error: debtsError } = useFirestoreDebts(userId || '');
+   const {
+     transactions: allTransactions,
+     budgets: allBudgets,
+     categories,
+     debts,
+     transactionsLoading,
+     budgetsLoading,
+     categoriesLoading,
+     debtsLoading,
+     transactionsError,
+     budgetsError,
+     categoriesError,
+     debtsError,
+   } = useData();
 
   useEffect(() => {
     setIsClient(true);

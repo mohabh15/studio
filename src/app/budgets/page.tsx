@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import type { Category, Budget } from '@/lib/types';
-import { useFirestoreBudgets, useFirestoreCategories } from '@/hooks/use-firestore';
+import { useData } from '@/contexts/data-context';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -46,8 +46,17 @@ export default function BudgetsPage() {
    const [isClient, setIsClient] = useState(false);
    const userId = user?.uid;
    const { toast } = useToast();
-   const { budgets: allBudgets, loading: budgetsLoading, addBudget, updateBudget, deleteBudget, error: budgetsError } = useFirestoreBudgets(userId || '');
-   const { categories, loading: categoriesLoading, error: categoriesError } = useFirestoreCategories(userId || '');
+   const {
+     budgets: allBudgets,
+     categories,
+     budgetsLoading,
+     categoriesLoading,
+     budgetsError,
+     categoriesError,
+     addBudget,
+     updateBudget,
+     deleteBudget,
+   } = useData();
   const budgets = allBudgets; // TODO: filter by year if budgets have year
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [editingBudget, setEditingBudget] = useState<Budget | null>(null);
