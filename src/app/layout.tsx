@@ -5,7 +5,6 @@ import { I18nProvider } from '@/context/i18n';
 import { ThemeProvider } from 'next-themes';
 import { UiPreferencesProvider } from '@/contexts/ui-preferences-context';
 import { AuthProvider } from '@/contexts/auth-context';
-import { SessionNotifications } from '@/components/auth/session-notifications';
 import { AuthErrorBoundaryClient } from '@/components/auth/auth-error-boundary-client';
 import { ThemeInitializer } from '@/components/theme/theme-initializer';
 
@@ -47,12 +46,6 @@ export default function RootLayout({
             <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
               <UiPreferencesProvider>
                 <AuthProvider>
-                  {/* Notificaciones de sesión */}
-                  <SessionNotifications
-                    showToasts={true}
-                    warningThreshold={5}
-                    autoHideDelay={5000}
-                  />
 
                   {children}
                   <Toaster />
