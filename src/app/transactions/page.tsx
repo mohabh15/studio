@@ -130,6 +130,10 @@ export default function TransactionsPage() {
     });
   };
 
+  const isFiltersActive = () => {
+    return filters.category || filters.type || filters.fromDate || filters.toDate || filters.minAmount || filters.maxAmount;
+  };
+
   const handleEditTransaction = (transaction: Transaction) => {
     setEditingTransaction(transaction);
     setIsEditDialogOpen(true);
@@ -214,7 +218,7 @@ export default function TransactionsPage() {
 
         <Collapsible open={showFilters} onOpenChange={setShowFilters}>
           <CollapsibleContent>
-            <Card>
+            <Card className="mb-4">
               <CardHeader>
                 <CardTitle>{t('filters')}</CardTitle>
               </CardHeader>
