@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import type { Category, TransactionType } from '@/lib/types';
-import { useFirestoreCategories } from '@/hooks/use-firestore';
+import { useData } from '@/contexts/data-context';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -50,7 +50,7 @@ export default function SettingsPage() {
   const { showDebts, toggleShowDebts } = useShowDebts();
   const [isClient, setIsClient] = useState(false);
   const userId = user?.uid;
-  const { categories, loading: categoriesLoading, addCategory, updateCategory, deleteCategory, error: categoriesError } = useFirestoreCategories(userId || '');
+  const { categories, categoriesLoading, categoriesError, addCategory, updateCategory, deleteCategory } = useData();
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [deletingCategory, setDeletingCategory] = useState<Category | null>(null);
