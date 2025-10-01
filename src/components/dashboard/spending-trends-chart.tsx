@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { ChartContainer } from '@/components/ui/chart';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { type Transaction } from '@/lib/types';
 import { useI18n } from '@/hooks/use-i18n';
 import { formatMonthName } from '@/lib/utils';
@@ -16,6 +17,7 @@ type SpendingTrendsChartProps = {
 export default function SpendingTrendsChart({ transactions }: SpendingTrendsChartProps) {
   const { t, locale } = useI18n();
   const [isMobile, setIsMobile] = useState(false);
+  const [filter, setFilter] = useState<'month' | 'day'>('month');
 
   useEffect(() => {
     const checkIsMobile = () => {
@@ -29,30 +31,58 @@ export default function SpendingTrendsChart({ transactions }: SpendingTrendsChar
 
   const chartData = useMemo(() => {
     const now = new Date();
-    const months = [];
 
-    // Generate last 12 months
-    for (let i = 11; i >= 0; i--) {
-      const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
-      months.push({
-        year: date.getFullYear(),
-        month: date.getMonth(),
-        label: formatMonthName(date.getFullYear(), date.getMonth(), locale, true),
+    if (filter === 'month') {
+      const months = [];
+
+      // Generate last 12 months
+      for (let i = 11; i >= 0; i--) {
+        const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        months.push({
+          year: date.getFullYear(),
+          month: date.getMonth(),
+          label: formatMonthName(date.getFullYear(), date.getMonth(), locale, true),
+        });
+      }
+
+      return months.map(({ year, month, label }) => {
+        const total = transactions
+          .filter(tx => {
+            if (tx.type !== 'expense') return false;
+            const txDate = new Date(tx.date);
+            return txDate.getFullYear() === year && txDate.getMonth() === month;
+          })
+          .reduce((sum, tx) => sum + tx.amount, 0);
+
+        return { month: label, total };
+      });
+    } else {
+      // Generate last 30 days
+      const days = [];
+      for (let i = 29; i >= 0; i--) {
+        const date = new Date(now);
+        date.setDate(now.getDate() - i);
+        days.push({
+          date: new Date(date.getFullYear(), date.getMonth(), date.getDate()),
+          label: `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}`,
+        });
+      }
+
+      return days.map(({ date, label }) => {
+        const total = transactions
+          .filter(tx => {
+            if (tx.type !== 'expense') return false;
+            const txDate = new Date(tx.date);
+            return txDate.getFullYear() === date.getFullYear() &&
+                   txDate.getMonth() === date.getMonth() &&
+                   txDate.getDate() === date.getDate();
+          })
+          .reduce((sum, tx) => sum + tx.amount, 0);
+
+        return { day: label, total };
       });
     }
-
-    return months.map(({ year, month, label }) => {
-      const total = transactions
-        .filter(tx => {
-          if (tx.type !== 'expense') return false;
-          const txDate = new Date(tx.date);
-          return txDate.getFullYear() === year && txDate.getMonth() === month;
-        })
-        .reduce((sum, tx) => sum + tx.amount, 0);
-
-      return { month: label, total };
-    });
-  }, [transactions]);
+  }, [transactions, filter, locale]);
 
   const chartDataConfig = {
     total: {
@@ -88,12 +118,22 @@ export default function SpendingTrendsChart({ transactions }: SpendingTrendsChar
   return (
     <Card>
       <CardHeader>
-        <CardTitle className={isMobile ? 'text-lg' : 'text-xl'}>
-          {t('dashboard.spending_trends.title')}
-        </CardTitle>
-        <CardDescription className={isMobile ? 'text-sm' : ''}>
-          {t('dashboard.spending_trends.description')}
-        </CardDescription>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className={isMobile ? 'text-lg' : 'text-xl'}>
+              {t('dashboard.spending_trends.title')}
+            </CardTitle>
+            <CardDescription className={isMobile ? 'text-sm' : ''}>
+              {filter === 'month' ? t('dashboard.spending_trends.description') : t('dashboard.spending_trends.day_description')}
+            </CardDescription>
+          </div>
+          <Tabs value={filter} onValueChange={(value) => setFilter(value as 'month' | 'day')}>
+            <TabsList>
+              <TabsTrigger value="month">{t('dashboard.spending_trends.month')}</TabsTrigger>
+              <TabsTrigger value="day">{t('dashboard.spending_trends.day')}</TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
       </CardHeader>
       <CardContent>
         {chartData.some(d => d.total > 0) ? (
@@ -102,12 +142,12 @@ export default function SpendingTrendsChart({ transactions }: SpendingTrendsChar
               <LineChart data={chartData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis
-                  dataKey="month"
+                  dataKey={filter === 'month' ? 'month' : 'day'}
                   tick={{ fontSize: isMobile ? 11 : 12 }}
-                  interval={0}
-                  angle={isMobile ? -45 : -15}
+                  interval={filter === 'day' ? 1 : 0}
+                  angle={filter === 'day' ? -75 : -60}
                   textAnchor={isMobile ? 'end' : 'end'}
-                  height={isMobile ? 70 : 60}
+                  height={80}
                 />
                 <YAxis
                   tick={{ fontSize: isMobile ? 12 : 14 }}

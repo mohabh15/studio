@@ -90,8 +90,11 @@
     "spending_trends": {
       "title": "Tendencias de Gastos",
       "description": "Evolución mensual de los gastos totales para identificar patrones estacionales.",
+      "day_description": "Evolución diaria de los gastos en los últimos 30 días.",
       "no_data": "No hay datos de tendencias para mostrar.",
-      "total": "Total"
+      "total": "Total",
+      "month": "Mes",
+      "day": "Día"
     },
     "recent_transactions": {
       "title": "Transacciones Recientes",

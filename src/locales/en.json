@@ -90,8 +90,11 @@
     "spending_trends": {
       "title": "Spending Trends",
       "description": "Monthly evolution of total expenses to identify seasonal patterns.",
+      "day_description": "Daily evolution of expenses in the last 30 days.",
       "no_data": "No trend data to display.",
-      "total": "Total"
+      "total": "Total",
+      "month": "Month",
+      "day": "Day"
     },
     "recent_transactions": {
       "title": "Recent Transactions",
