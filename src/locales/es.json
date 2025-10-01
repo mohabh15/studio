@@ -259,7 +259,8 @@
     "delete_debt_title": "¿Eliminar deuda?",
     "delete_debt_description": "Esta acción no se puede deshacer. Se eliminará permanentemente la deuda \"{{description}}\" del sistema.",
     "error_loading_data": "Error al cargar datos",
-    "error_loading_description": "Algunos datos no pudieron cargarse. La aplicación sigue siendo funcional."
+    "error_loading_description": "Algunos datos no pudieron cargarse. La aplicación sigue siendo funcional.",
+    "inactive": "Inactivas"
   },
   "debt_dialog": {
     "edit_title": "Editar Deuda",
@@ -297,9 +298,13 @@
     "current_balance": "Monto actual: {{amount}}",
     "minimum_payment": "Pago mínimo: {{amount}}",
     "payment_amount": "Monto del Pago",
+    "collection_amount": "Monto del Cobro",
     "payment_type": "Tipo de Pago",
+    "collection_type": "Tipo de Cobro",
     "payment_date": "Fecha del Pago",
+    "collection_date": "Fecha del Cobro",
     "description_optional": "Descripción (Opcional)",
+    "collection_description": "Descripción del Cobro",
     "description_placeholder": "Añade una descripción para este pago...",
     "cancel": "Cancelar",
     "register_payment": "Registrar Pago",

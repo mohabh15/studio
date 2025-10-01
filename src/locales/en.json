@@ -246,7 +246,8 @@
     "delete_debt_title": "Delete debt?",
     "delete_debt_description": "This action cannot be undone. The debt \"{{description}}\" will be permanently deleted from the system.",
     "error_loading_data": "Error loading data",
-    "error_loading_description": "Some data could not be loaded. The application is still functional."
+    "error_loading_description": "Some data could not be loaded. The application is still functional.",
+    "inactive": "Inactive"
   },
   "debt_dialog": {
     "edit_title": "Edit Debt",
@@ -284,9 +285,13 @@
     "current_balance": "Current balance: {{amount}}",
     "minimum_payment": "Minimum payment: {{amount}}",
     "payment_amount": "Payment Amount",
+    "collection_amount": "Collection Amount",
     "payment_type": "Payment Type",
+    "collection_type": "Collection Type",
     "payment_date": "Payment Date",
+    "collection_date": "Collection Date",
     "description_optional": "Description (Optional)",
+    "collection_description": "Collection Description",
     "description_placeholder": "Add a description for this payment...",
     "cancel": "Cancel",
     "register_payment": "Register Payment",

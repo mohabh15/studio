@@ -40,6 +40,7 @@ export type Debt = {
   descripcion?: string;
   fecha_creacion: string; // fecha cuando se creó la deuda (ISO string)
   direction?: string;
+  status?: 'active' | 'inactive';
 };
 
 export type DebtPayment = {

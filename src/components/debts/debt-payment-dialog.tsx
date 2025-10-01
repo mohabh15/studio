@@ -87,6 +87,9 @@ export default function DebtPaymentDialog({ isOpen, onOpenChange, onSave, debts 
     if (selectedDebt) {
       const isIncoming = selectedDebt.direction === 'incoming';
       form.setValue('tipo', isIncoming ? 'collection' : 'regular');
+      if (isIncoming) {
+        form.setValue('amount', selectedDebt.monto_actual);
+      }
     }
   }, [selectedDebt, form]);
 
@@ -169,7 +172,7 @@ export default function DebtPaymentDialog({ isOpen, onOpenChange, onSave, debts 
                 name="amount"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('debt_payment_dialog.payment_amount')}</FormLabel>
+                    <FormLabel>{selectedTipo === 'collection' ? t('debt_payment_dialog.collection_amount') : t('debt_payment_dialog.payment_amount')}</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
@@ -189,7 +192,7 @@ export default function DebtPaymentDialog({ isOpen, onOpenChange, onSave, debts 
                 name="tipo"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('debt_payment_dialog.payment_type')}</FormLabel>
+                    <FormLabel>{selectedTipo === 'collection' ? t('debt_payment_dialog.collection_type') : t('debt_payment_dialog.payment_type')}</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
@@ -218,7 +221,7 @@ export default function DebtPaymentDialog({ isOpen, onOpenChange, onSave, debts 
               name="date"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('debt_payment_dialog.payment_date')}</FormLabel>
+                  <FormLabel>{selectedTipo === 'collection' ? t('debt_payment_dialog.collection_date') : t('debt_payment_dialog.payment_date')}</FormLabel>
                   <FormControl>
                     <Input
                       type="date"
@@ -235,7 +238,7 @@ export default function DebtPaymentDialog({ isOpen, onOpenChange, onSave, debts 
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('debt_payment_dialog.description_optional')}</FormLabel>
+                  <FormLabel>{selectedTipo === 'collection' ? t('debt_payment_dialog.collection_description') : t('debt_payment_dialog.description_optional')}</FormLabel>
                   <FormControl>
                     <Textarea
                       placeholder={t('debt_payment_dialog.description_placeholder')}

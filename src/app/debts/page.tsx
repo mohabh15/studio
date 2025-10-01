@@ -126,7 +126,11 @@ export default function DebtsPage() {
 
         // Actualizar el monto actual de la deuda
         const newAmount = Math.max(0, selectedDebt.monto_actual - paymentData.amount);
-        await updateDebt(selectedDebt.id, { monto_actual: newAmount });
+        const updateData: Partial<Debt> = { monto_actual: newAmount };
+        if (newAmount === 0) {
+          updateData.status = 'inactive';
+        }
+        await updateDebt(selectedDebt.id, updateData);
       }
 
       setPaymentDialogOpen(false);
@@ -159,7 +163,15 @@ export default function DebtsPage() {
   // Calcular totales separados
   const totalOutgoing = debts.filter(d => getDebtDirection(d) === 'outgoing').reduce((sum, debt) => sum + debt.monto_actual, 0);
   const totalIncoming = debts.filter(d => getDebtDirection(d) === 'incoming').reduce((sum, debt) => sum + debt.monto_actual, 0);
-  const filteredDebts = debts.filter(debt => filter === 'all' || getDebtDirection(debt) === filter);
+  const filteredDebts = debts.filter(debt => {
+    if (filter === 'all') {
+      return debt.status !== 'inactive';
+    } else if (filter === 'inactive') {
+      return debt.status === 'inactive';
+    } else {
+      return debt.status !== 'inactive' && getDebtDirection(debt) === filter;
+    }
+  });
 
   if (authLoading || !isClient) {
     return <DashboardSkeleton />;
@@ -250,6 +262,7 @@ export default function DebtsPage() {
             <TabsTrigger value="all">Todas</TabsTrigger>
             <TabsTrigger value="outgoing">Debo</TabsTrigger>
             <TabsTrigger value="incoming">Me Deben</TabsTrigger>
+            <TabsTrigger value="inactive">{t('debts_page.inactive')}</TabsTrigger>
           </TabsList>
         </Tabs>
 

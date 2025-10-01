@@ -3,10 +3,8 @@
 
 
 - corregir traducciones en pagina deuda
-- corregir modal de pago para integrar bien cobros
 - comprobar que al eliminar una deuda se eliminen las transacciones asociadas a esta
-- añadir filtro deudas inactivas, y hacer que cuando una deuda este totalmente cobrada o pagada 
-   pase a inactiva y solo se muestre en dicho filtro
+- al eliminar una transaccion de una deuda inactiva que se mire si vuelve a tener saldo aun por pagar y cambiar a activa
 
 
 
