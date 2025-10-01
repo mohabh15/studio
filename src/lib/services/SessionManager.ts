@@ -286,7 +286,7 @@ class SessionPersistenceManager {
   private readonly STORAGE_KEY = 'app_sessions';
   private readonly METADATA_KEY = 'session_metadata';
 
-  constructor(private loggerBase: Logger) {
+  constructor(private loggerBase: Logger, private config: SessionManagerConfig) {
     this.logger = loggerBase;
   }
 
@@ -358,46 +358,42 @@ class SessionPersistenceManager {
   }
 
   async isSessionExpired(sessionData: SessionData, metadata: SessionMetadata): Promise<boolean> {
-    const now = Date.now();
-    const absoluteTimeout = this.config.absoluteTimeoutDays * 24 * 60 * 60 * 1000;
-    const inactivityTimeout = this.config.inactivityTimeoutMinutes * 60 * 1000;
-
-    // Verificar expiración absoluta
-    const sessionAge = now - metadata.createdAt;
-    if (sessionAge > absoluteTimeout) {
-      this.logger.debug('Sesión expirada por tiempo absoluto', {
-        sessionId: metadata.sessionId,
-        age: sessionAge,
-        maxAge: absoluteTimeout,
-      });
-      return true;
+    // Si ambos timeouts son 0, la sesión nunca caduca
+    if (this.config.inactivityTimeoutMinutes === 0 && this.config.absoluteTimeoutDays === 0) {
+      return false;
     }
 
-    // Verificar expiración por inactividad
-    const timeSinceLastActivity = now - metadata.lastActivityAt;
-    if (timeSinceLastActivity > inactivityTimeout) {
-      this.logger.debug('Sesión expirada por inactividad', {
-        sessionId: metadata.sessionId,
-        timeSinceActivity: timeSinceLastActivity,
-        maxInactivity: inactivityTimeout,
-      });
-      return true;
+    const now = Date.now();
+
+    // Verificar expiración absoluta solo si está configurada
+    if (this.config.absoluteTimeoutDays > 0) {
+      const absoluteTimeout = this.config.absoluteTimeoutDays * 24 * 60 * 60 * 1000;
+      const sessionAge = now - metadata.createdAt;
+      if (sessionAge > absoluteTimeout) {
+        this.logger.debug('Sesión expirada por tiempo absoluto', {
+          sessionId: metadata.sessionId,
+          age: sessionAge,
+          maxAge: absoluteTimeout,
+        });
+        return true;
+      }
+    }
+
+    // Verificar expiración por inactividad solo si está configurada
+    if (this.config.inactivityTimeoutMinutes > 0) {
+      const inactivityTimeout = this.config.inactivityTimeoutMinutes * 60 * 1000;
+      const timeSinceLastActivity = now - metadata.lastActivityAt;
+      if (timeSinceLastActivity > inactivityTimeout) {
+        this.logger.debug('Sesión expirada por inactividad', {
+          sessionId: metadata.sessionId,
+          timeSinceActivity: timeSinceLastActivity,
+          maxInactivity: inactivityTimeout,
+        });
+        return true;
+      }
     }
 
     return false;
-  }
-
-  private get config(): SessionManagerConfig {
-    // Configuración por defecto
-    return {
-      inactivityTimeoutMinutes: 30,
-      absoluteTimeoutDays: 7,
-      checkIntervalMinutes: 1,
-      maxConcurrentSessions: 5,
-      autoExtendSession: true,
-      warningThresholdMinutes: 5,
-      persistence: 'local',
-    };
   }
 }
 
@@ -431,7 +427,7 @@ export class SessionManager {
     this.logger = new SessionManagerLogger();
     this.metadataManager = SessionMetadataManager.getInstance();
     this.timerManager = new ActivityTimerManager(this.config, this.logger);
-    this.persistenceManager = new SessionPersistenceManager(this.logger);
+    this.persistenceManager = new SessionPersistenceManager(this.logger, this.config);
 
     this.initializeEventSystem();
     this.startPeriodicCheck();

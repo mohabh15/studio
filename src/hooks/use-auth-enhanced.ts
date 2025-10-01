@@ -428,16 +428,13 @@ export function useAuthEnhanced(config: UseAuthEnhancedConfig = {}): UseAuthEnha
       setLoading(true);
       setError(null);
 
-      // Refrescar tokens
-      await tokenManager.refreshTokens();
-
       // Actualizar actividad de sesión
       await sessionManager.updateActivity();
 
       return { success: true, message: 'Sesión refrescada' };
     } catch (error) {
       const authError: AuthError = {
-        code: 'auth/token-expired' as AuthErrorCode,
+        code: 'auth/session-expired' as AuthErrorCode,
         message: 'Error refrescando sesión',
         timestamp: Date.now(),
         recoverable: false,

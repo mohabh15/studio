@@ -8,8 +8,6 @@
 - añadir filtro deudas inactivas, y hacer que cuando una deuda este totalmente cobrada o pagada 
    pase a inactiva y solo se muestre en dicho filtro
 
-- filtro dias/mes grafico tendencia de gastos 
-
 
 
 

@@ -5,7 +5,6 @@
  * - Gestión segura de tokens JWT
  * - Manejo de cookies HTTP-only y secure
  * - Verificación de expiración automática
- * - Sistema de refresh automático de tokens
  * - Manejo robusto de errores de red y timeouts
  * - Sistema de logging para debugging
  * - Fallback a localStorage/sessionStorage
@@ -27,10 +26,6 @@ import { safeLocalStorage, safeSessionStorage, safeCookieUtils, safeLocation } f
 // ============================================================================
 
 interface TokenManagerConfig {
-  /** Tiempo en minutos antes de que expire el token para intentar refresh */
-  refreshThresholdMinutes: number;
-  /** Número máximo de reintentos para refresh */
-  maxRefreshRetries: number;
   /** Timeout para operaciones de red en milisegundos */
   networkTimeoutMs: number;
   /** Indica si usar cookies seguras */
@@ -43,11 +38,6 @@ interface TokenManagerConfig {
   useSameSite: boolean;
 }
 
-interface RefreshTokenResponse {
-  accessToken: string;
-  refreshToken: string;
-  expirationTime: number;
-}
 
 interface Logger {
   info: (message: string, data?: any) => void;
@@ -238,33 +228,6 @@ class NetworkUtils {
     }
   }
 
-  /**
-   * Reintenta una operación con backoff exponencial
-   */
-  static async retryWithBackoff<T>(
-    operation: () => Promise<T>,
-    maxRetries: number = 3,
-    baseDelay: number = 1000
-  ): Promise<T> {
-    let lastError: Error;
-
-    for (let i = 0; i <= maxRetries; i++) {
-      try {
-        return await operation();
-      } catch (error) {
-        lastError = error as Error;
-
-        if (i === maxRetries || (error as NetworkError)?.retryable === false) {
-          throw lastError;
-        }
-
-        const delay = baseDelay * Math.pow(2, i);
-        await new Promise(resolve => setTimeout(resolve, delay));
-      }
-    }
-
-    throw lastError!;
-  }
 }
 
 // ============================================================================
@@ -274,13 +237,9 @@ class NetworkUtils {
 export class TokenManager {
   private config: TokenManagerConfig;
   private logger: Logger;
-  private refreshPromise: Promise<TokenData> | null = null;
-  private refreshTimer: NodeJS.Timeout | null = null;
 
   constructor(config: Partial<TokenManagerConfig> = {}) {
     this.config = {
-      refreshThresholdMinutes: 5,
-      maxRefreshRetries: 3,
       networkTimeoutMs: 10000,
       useSecureCookies: true,
       cookiePath: '/',
@@ -289,7 +248,6 @@ export class TokenManager {
     };
 
     this.logger = new TokenManagerLogger();
-    this.setupRefreshTimer();
   }
 
   // ============================================================================
@@ -313,9 +271,6 @@ export class TokenManager {
 
       // Fallback a localStorage/sessionStorage
       await this.saveTokensToStorage(tokenData, persistence);
-
-      // Programar refresh automático
-      this.scheduleTokenRefresh(tokenData);
 
       this.logger.info('Tokens guardados exitosamente');
     } catch (error) {
@@ -365,9 +320,6 @@ export class TokenManager {
 
       // Limpiar storage
       await this.clearTokensFromStorage();
-
-      // Cancelar refresh automático
-      this.cancelTokenRefresh();
 
       this.logger.info('Tokens limpiados exitosamente');
     } catch (error) {
@@ -524,10 +476,7 @@ export class TokenManager {
       return true;
     }
 
-    const isExpired = JWTUtils.isTokenExpired(
-      tokens.accessToken,
-      this.config.refreshThresholdMinutes
-    );
+    const isExpired = JWTUtils.isTokenExpired(tokens.accessToken, 0);
 
     this.logger.debug('Verificación de expiración', {
       isExpired,
@@ -554,118 +503,8 @@ export class TokenManager {
   // REFRESH AUTOMÁTICO DE TOKENS
   // ============================================================================
 
-  /**
-   * Programa el refresh automático de tokens
-   */
-  private scheduleTokenRefresh(tokenData: TokenData): void {
-    this.cancelTokenRefresh();
 
-    const timeUntilRefresh = Math.max(
-      0,
-      tokenData.expirationTime - Date.now() - (this.config.refreshThresholdMinutes * 60 * 1000)
-    );
 
-    if (timeUntilRefresh > 0) {
-      this.refreshTimer = setTimeout(() => {
-        this.logger.info('Ejecutando refresh automático de tokens');
-        this.refreshTokens();
-      }, timeUntilRefresh);
-
-      this.logger.debug('Refresh programado', {
-        inMinutes: Math.floor(timeUntilRefresh / (60 * 1000)),
-      });
-    }
-  }
-
-  /**
-   * Cancela el refresh automático
-   */
-  private cancelTokenRefresh(): void {
-    if (this.refreshTimer) {
-      clearTimeout(this.refreshTimer);
-      this.refreshTimer = null;
-    }
-  }
-
-  /**
-   * Realiza refresh de tokens
-   */
-  async refreshTokens(): Promise<TokenData> {
-    // Evitar múltiples refresh simultáneos
-    if (this.refreshPromise) {
-      this.logger.debug('Refresh ya en progreso, esperando...');
-      return this.refreshPromise;
-    }
-
-    this.refreshPromise = this.performTokenRefresh();
-
-    try {
-      const result = await this.refreshPromise;
-      this.logger.info('Refresh de tokens exitoso');
-      return result;
-    } catch (error) {
-      this.logger.error('Error en refresh de tokens', error);
-      throw error;
-    } finally {
-      this.refreshPromise = null;
-    }
-  }
-
-  /**
-   * Realiza el refresh de tokens con reintentos
-   */
-  private async performTokenRefresh(): Promise<TokenData> {
-    const tokens = await this.getTokens();
-
-    if (!tokens) {
-      throw this.createAuthError('auth/token-expired', 'No hay tokens para refrescar', false);
-    }
-
-    const refreshOperation = async () => {
-      this.logger.debug('Enviando petición de refresh');
-
-      const response = await NetworkUtils.fetchWithTimeout(
-        '/api/auth/refresh',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${tokens.refreshToken}`,
-          },
-        },
-        this.config.networkTimeoutMs
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw this.createNetworkError(
-          `Error del servidor: ${response.status}`,
-          response.status,
-          response.status >= 500
-        );
-      }
-
-      const refreshData: RefreshTokenResponse = await response.json();
-
-      const newTokenData: TokenData = {
-        accessToken: refreshData.accessToken,
-        refreshToken: refreshData.refreshToken,
-        expirationTime: refreshData.expirationTime,
-        issuedAtTime: Date.now(),
-        tokenType: 'Bearer',
-      };
-
-      // Guardar nuevos tokens
-      await this.saveTokens(newTokenData);
-
-      return newTokenData;
-    };
-
-    return NetworkUtils.retryWithBackoff(
-      refreshOperation,
-      this.config.maxRefreshRetries
-    );
-  }
 
   // ============================================================================
   // DECODIFICACIÓN DE TOKENS JWT
@@ -723,43 +562,6 @@ export class TokenManager {
   // CONFIGURACIÓN DEL TIMER DE REFRESH
   // ============================================================================
 
-  /**
-   * Configura el timer de refresh basado en tokens actuales
-   */
-  private setupRefreshTimer(): void {
-    // Solo configurar el timer en el navegador, no en SSR
-    if (typeof window === 'undefined') {
-      return;
-    }
-
-    // Verificar tokens cada minuto
-    setInterval(async () => {
-      // Verificar nuevamente que estamos en el navegador
-      if (typeof window === 'undefined' || typeof document === 'undefined') {
-        return;
-      }
-
-      try {
-        const tokens = await this.getTokens();
-
-        if (!tokens) {
-          this.cancelTokenRefresh();
-          return;
-        }
-
-        const timeUntilExpiration = JWTUtils.getTimeUntilExpiration(tokens.accessToken);
-
-        if (timeUntilExpiration <= this.config.refreshThresholdMinutes) {
-          this.logger.info('Token próximo a expirar, ejecutando refresh');
-          this.refreshTokens().catch(error => {
-            this.logger.error('Error en refresh automático', error);
-          });
-        }
-      } catch (error) {
-        this.logger.error('Error en verificación periódica de tokens', error);
-      }
-    }, 60 * 1000); // Verificar cada minuto
-  }
 
   // ============================================================================
   // MANEJO DE ERRORES
@@ -831,7 +633,6 @@ export class TokenManager {
   async getStats(): Promise<{
     hasTokens: boolean;
     timeUntilExpiration: number;
-    isRefreshing: boolean;
     lastError?: string;
   }> {
     const tokens = await this.getTokens();
@@ -839,7 +640,6 @@ export class TokenManager {
     return {
       hasTokens: !!tokens,
       timeUntilExpiration: tokens ? JWTUtils.getTimeUntilExpiration(tokens.accessToken) : 0,
-      isRefreshing: !!this.refreshPromise,
     };
   }
 
@@ -855,8 +655,6 @@ export class TokenManager {
    * Limpieza al destruir la instancia
    */
   destroy(): void {
-    this.cancelTokenRefresh();
-    this.refreshPromise = null;
     this.logger.info('TokenManager destruido');
   }
 }
@@ -875,4 +673,4 @@ export const tokenManager = new TokenManager();
 // ============================================================================
 
 export { JWTUtils, NetworkUtils };
-export type { TokenManagerConfig, RefreshTokenResponse, NetworkError };
+export type { TokenManagerConfig, NetworkError };

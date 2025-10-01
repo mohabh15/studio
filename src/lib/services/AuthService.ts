@@ -246,33 +246,19 @@ export class AuthService {
 
       // Configurar TokenManager
       tokenManager.updateConfig({
-        refreshThresholdMinutes: 5,
-        maxRefreshRetries: this.config.service.maxRetries,
         networkTimeoutMs: this.config.service.operationTimeoutMs,
       });
 
-      // Configurar SessionManager (sin timeout si no está especificado)
-      if (this.config.sessionTimeoutMinutes) {
-        sessionManager.updateConfig({
-          inactivityTimeoutMinutes: this.config.sessionTimeoutMinutes,
-          absoluteTimeoutDays: 7,
-          checkIntervalMinutes: 1,
-          maxConcurrentSessions: 5,
-          autoExtendSession: true,
-          warningThresholdMinutes: 5,
-          persistence: this.config.defaultPersistence,
-        });
-      } else {
-        sessionManager.updateConfig({
-          inactivityTimeoutMinutes: 0, // Sin timeout
-          absoluteTimeoutDays: 0, // Sin timeout absoluto
-          checkIntervalMinutes: 1,
-          maxConcurrentSessions: 5,
-          autoExtendSession: false, // No extender automáticamente
-          warningThresholdMinutes: 0, // Sin warnings
-          persistence: this.config.defaultPersistence,
-        });
-      }
+      // Configurar SessionManager (siempre sin timeout)
+      sessionManager.updateConfig({
+        inactivityTimeoutMinutes: 0, // Sin timeout
+        absoluteTimeoutDays: 0, // Sin timeout absoluto
+        checkIntervalMinutes: 1,
+        maxConcurrentSessions: 5,
+        autoExtendSession: false, // No extender automáticamente
+        warningThresholdMinutes: 0, // Sin warnings
+        persistence: this.config.defaultPersistence,
+      });
 
       // Configurar listeners de Firebase
       this.setupFirebaseListeners();
