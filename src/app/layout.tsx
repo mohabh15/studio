@@ -7,6 +7,7 @@ import { UiPreferencesProvider } from '@/contexts/ui-preferences-context';
 import { AuthProvider } from '@/contexts/auth-context';
 import { AuthErrorBoundaryClient } from '@/components/auth/auth-error-boundary-client';
 import { ThemeInitializer } from '@/components/theme/theme-initializer';
+import { StatusBarThemeUpdater } from '@/components/theme/status-bar-theme-updater';
 
 export const metadata: Metadata = {
   title: 'Budget3M',
@@ -25,6 +26,8 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+        <meta name="theme-color" content="#000000" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <link rel="icon" href="/icono.png" type="image/png" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -44,6 +47,7 @@ export default function RootLayout({
         <AuthErrorBoundaryClient>
           <I18nProvider>
             <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+              <StatusBarThemeUpdater />
               <UiPreferencesProvider>
                 <AuthProvider>
 
