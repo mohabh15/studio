@@ -1,6 +1,6 @@
 
 
-- cambios fluidos entre screens
+- cambios fluidos entre screens con prefecth
 - arreglar errores de logo no se ve siempre, quitar el de firestore
 - corregir traducciones en pagina deuda
 - comprobar que al eliminar una deuda se eliminen las transacciones asociadas a esta

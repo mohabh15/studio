@@ -106,27 +106,29 @@ export default function SpendingChart({ transactions, categories, selectedYear, 
   };
 
   // Configuración responsive del gráfico
-  const responsiveConfig = useMemo(() => {
-    if (isMobile) {
-      return {
-        height: 320, // Ajustado para eliminar espacio vacío
-        outerRadius: 70, // Reducido para dejar espacio a la leyenda
-        innerRadius: 35,
-        legendHeight: 100, // Ajustado para eliminar espacio vacío
-        fontSize: 11, // Reducido ligeramente para que quepa mejor
-        showLegend: true, // Siempre mostrar la leyenda
-      };
-    } else {
-      return {
-        height: 350,
-        outerRadius: 150,
-        innerRadius: 80,
-        legendHeight: 60,
-        fontSize: 14,
-        showLegend: true,
-      };
-    }
-  }, [isMobile]);
+   const responsiveConfig = useMemo(() => {
+     if (isMobile) {
+       return {
+         height: 260, // Reducido aún más para eliminar espacio vacío
+         outerRadius: 70, // Ajustado para mejor proporción
+         innerRadius: 35,
+         legendHeight: 70, // Optimizado para el nuevo tamaño
+         fontSize: 11, // Ligeramente aumentado para mejor legibilidad
+         showLegend: true,
+         chartPadding: { top: 10, bottom: 10, left: 10, right: 10 },
+       };
+     } else {
+       return {
+         height: 300, // Reducido para mejor proporción
+         outerRadius: 120, // Ajustado para mejor centrado
+         innerRadius: 60,
+         legendHeight: 45, // Reducido para mejor balance
+         fontSize: 12, // Tamaño óptimo para desktop
+         showLegend: true,
+         chartPadding: { top: 15, bottom: 15, left: 15, right: 15 },
+       };
+     }
+   }, [isMobile]);
 
   return (
     <Card className="glass-card depth-3 hover-lift">
@@ -138,20 +140,20 @@ export default function SpendingChart({ transactions, categories, selectedYear, 
           {t('dashboard.spending_overview.description')}
         </CardDescription>
       </CardHeader>
-      <CardContent className={isMobile ? "pt-1 -mt-1" : "pt-2"}>
+      <CardContent className={isMobile ? "p-2" : "p-3"}>
         {chartData.length > 0 ? (
-          <ChartContainer config={chartDataConfig} className={`w-full ${isMobile ? 'min-h-[350px]' : 'min-h-[400px]'} chart-container`}>
+          <ChartContainer config={chartDataConfig} className={`w-full ${isMobile ? 'min-h-[280px]' : 'min-h-[320px]'} chart-container`}>
             <ResponsiveContainer width="100%" height={responsiveConfig.height}>
               <PieChart>
                 <Pie
                   data={chartData}
                   cx="50%"
-                  cy={isMobile ? "35%" : "48%"} // Movido hacia arriba para dejar espacio a la leyenda
+                  cy={isMobile ? "40%" : "42%"} // Mejor centrado para ambos dispositivos
                   outerRadius={responsiveConfig.outerRadius}
                   innerRadius={responsiveConfig.innerRadius}
                   fill="hsl(var(--chart-1))"
                   dataKey="total"
-                  paddingAngle={3}
+                  paddingAngle={isMobile ? 2 : 3} // Espaciado optimizado por dispositivo
                   stroke="hsl(var(--border))"
                   strokeWidth={1}
                 >
@@ -172,22 +174,25 @@ export default function SpendingChart({ transactions, categories, selectedYear, 
                 />
                 {responsiveConfig.showLegend && (
                   <Legend
-                    verticalAlign={isMobile ? "bottom" : "bottom"}
+                    verticalAlign="bottom"
+                    align={isMobile ? "center" : "center"}
                     height={responsiveConfig.legendHeight}
                     wrapperStyle={{
-                      paddingTop: isMobile ? '0px' : '8px',
-                      paddingBottom: isMobile ? '0px' : '8px',
-                      fontSize: responsiveConfig.fontSize
+                      paddingTop: isMobile ? '8px' : '12px',
+                      paddingBottom: isMobile ? '2px' : '4px',
+                      fontSize: responsiveConfig.fontSize,
+                      lineHeight: 1.3
                     }}
                     formatter={(value, entry) => (
                       <span style={{
                         color: entry.color,
                         fontSize: responsiveConfig.fontSize,
-                        maxWidth: isMobile ? '120px' : 'none',
+                        maxWidth: isMobile ? '100px' : '140px',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
                         whiteSpace: 'nowrap',
-                        textShadow: '0 1px 2px rgba(0, 0, 0, 0.3)'
+                        textShadow: '0 1px 2px rgba(0, 0, 0, 0.3)',
+                        display: 'inline-block'
                       }}>
                         {value}
                       </span>
@@ -199,7 +204,7 @@ export default function SpendingChart({ transactions, categories, selectedYear, 
           </ChartContainer>
         ) : (
           <div className={`flex w-full items-center justify-center rounded-xl border-2 border-dashed border-border/50 glass-effect ${
-            isMobile ? 'h-[350px]' : 'h-[400px]'
+            isMobile ? 'h-[280px]' : 'h-[320px]'
           }`}>
             <div className="text-center">
               <p className={`text-muted-foreground/80 mb-2 ${isMobile ? 'text-sm' : ''}`}>
