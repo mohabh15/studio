@@ -109,20 +109,20 @@ export default function SpendingChart({ transactions, categories, selectedYear, 
    const responsiveConfig = useMemo(() => {
      if (isMobile) {
        return {
-         height: 260, // Reducido aún más para eliminar espacio vacío
-         outerRadius: 70, // Ajustado para mejor proporción
-         innerRadius: 35,
-         legendHeight: 70, // Optimizado para el nuevo tamaño
-         fontSize: 11, // Ligeramente aumentado para mejor legibilidad
+         height: 240, // Reducido para mejor ajuste
+         outerRadius: 60, // Reducido para que quepa completamente
+         innerRadius: 30, // Proporcional al outerRadius
+         legendHeight: 70, // Mantiene espacio para leyenda
+         fontSize: 11, // Legibilidad óptima
          showLegend: true,
          chartPadding: { top: 10, bottom: 10, left: 10, right: 10 },
        };
      } else {
        return {
-         height: 300, // Reducido para mejor proporción
-         outerRadius: 120, // Ajustado para mejor centrado
-         innerRadius: 60,
-         legendHeight: 45, // Reducido para mejor balance
+         height: 280, // Reducido para mejor proporción
+         outerRadius: 120, // Reducido para mejor centrado y visibilidad
+         innerRadius: 60, // Proporcional al outerRadius
+         legendHeight: 45, // Espacio adecuado para leyenda
          fontSize: 12, // Tamaño óptimo para desktop
          showLegend: true,
          chartPadding: { top: 15, bottom: 15, left: 15, right: 15 },
@@ -142,13 +142,13 @@ export default function SpendingChart({ transactions, categories, selectedYear, 
       </CardHeader>
       <CardContent className={isMobile ? "p-2" : "p-3"}>
         {chartData.length > 0 ? (
-          <ChartContainer config={chartDataConfig} className={`w-full ${isMobile ? 'min-h-[280px]' : 'min-h-[320px]'} chart-container`}>
+          <ChartContainer config={chartDataConfig} className={`w-full ${isMobile ? 'min-h-[260px]' : 'min-h-[300px]'} chart-container`}>
             <ResponsiveContainer width="100%" height={responsiveConfig.height}>
               <PieChart>
                 <Pie
                   data={chartData}
                   cx="50%"
-                  cy={isMobile ? "40%" : "42%"} // Mejor centrado para ambos dispositivos
+                  cy={isMobile ? "40%" : "38%"} // Mejor centrado para ambos dispositivos
                   outerRadius={responsiveConfig.outerRadius}
                   innerRadius={responsiveConfig.innerRadius}
                   fill="hsl(var(--chart-1))"
@@ -178,7 +178,7 @@ export default function SpendingChart({ transactions, categories, selectedYear, 
                     align={isMobile ? "center" : "center"}
                     height={responsiveConfig.legendHeight}
                     wrapperStyle={{
-                      paddingTop: isMobile ? '8px' : '12px',
+                      paddingTop: isMobile ? '16px' : '12px', // Ajustado para móvil: espacio equilibrado entre gráfico y leyenda
                       paddingBottom: isMobile ? '2px' : '4px',
                       fontSize: responsiveConfig.fontSize,
                       lineHeight: 1.3
@@ -204,7 +204,7 @@ export default function SpendingChart({ transactions, categories, selectedYear, 
           </ChartContainer>
         ) : (
           <div className={`flex w-full items-center justify-center rounded-xl border-2 border-dashed border-border/50 glass-effect ${
-            isMobile ? 'h-[280px]' : 'h-[320px]'
+            isMobile ? 'h-[260px]' : 'h-[300px]'
           }`}>
             <div className="text-center">
               <p className={`text-muted-foreground/80 mb-2 ${isMobile ? 'text-sm' : ''}`}>
