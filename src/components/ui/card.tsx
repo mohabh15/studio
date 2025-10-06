@@ -9,7 +9,18 @@ const Card = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "rounded-lg bg-card text-card-foreground shadow-sm border-0",
+      // Estilos base para tema oscuro elegante
+      "rounded-xl bg-card text-card-foreground",
+      // Bordes sutiles con colores de la paleta oscura
+      "border border-border/50",
+      // Sombras elegantes mejoradas para tema oscuro
+      "shadow-lg shadow-black/20",
+      // Gradiente sutil para profundidad visual
+      "gradient-card",
+      // Transiciones suaves para interacciones
+      "transition-all duration-300 ease-in-out",
+      // Efectos hover para mejor experiencia visual
+      "hover:shadow-xl hover:shadow-black/30 hover:border-border hover:-translate-y-1",
       className
     )}
     {...props}

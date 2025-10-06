@@ -13,10 +13,10 @@ export function StatusBarThemeUpdater() {
   useEffect(() => {
     const currentTheme = resolvedTheme || theme;
 
-    // Colores para la barra de estado
+    // Colores para la barra de estado usando variables del tema oscuro elegante
     const colors = {
-      light: '#f5f5f5', // hsl(0, 0%, 96%)
-      dark: '#000000', // hsl(0, 0%, 0%)
+      light: 'hsl(0, 0%, 96%)', // Fondo claro
+      dark: 'hsl(220, 27%, 8%)', // Fondo oscuro elegante
     };
 
     const themeColor = currentTheme === 'dark' ? colors.dark : colors.light;

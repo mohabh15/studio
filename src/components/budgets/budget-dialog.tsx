@@ -91,12 +91,15 @@ export default function BudgetDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>
-            {budget ? t('budget_dialog.edit_title') : t('budget_dialog.add_title')}
-          </DialogTitle>
-          <DialogDescription>
+      <DialogContent className="sm:max-w-[425px] glass-card depth-3">
+        <DialogHeader className="space-y-3 pb-4 border-b border-border/30">
+          <div className="relative">
+            <DialogTitle className="text-xl font-semibold bg-gradient-to-r from-primary via-primary/90 to-accent bg-clip-text text-transparent">
+              {budget ? t('budget_dialog.edit_title') : t('budget_dialog.add_title')}
+            </DialogTitle>
+            <div className="absolute -bottom-2 left-0 w-12 h-0.5 bg-gradient-to-r from-primary to-accent rounded-full"></div>
+          </div>
+          <DialogDescription className="text-muted-foreground/80 leading-relaxed">
             {budget ? t('budget_dialog.edit_description') : t('budget_dialog.add_description')}
           </DialogDescription>
         </DialogHeader>
@@ -107,14 +110,14 @@ export default function BudgetDialog({
               name="category"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('common.category')}</FormLabel>
+                  <FormLabel className="text-sm font-medium text-foreground/90">{t('common.category')}</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value} disabled={!!budget}>
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger className="glass-effect hover-lift transition-all duration-300 hover:bg-background/80 hover:border-primary/50 focus:border-primary/60 focus:ring-2 focus:ring-primary/20">
                         <SelectValue placeholder={t('budget_dialog.select_category')} />
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent>
+                    <SelectContent className="glass-card depth-2 border-border/40">
                       <ScrollArea className="h-72">
                         {availableCategories.map(cat => {
                           const Icon = getIcon(cat.icon as any);
@@ -126,11 +129,15 @@ export default function BudgetDialog({
                           const categoryType = cat.type === 'income' ? t('budget_dialog.category_type_income') : t('budget_dialog.category_type_expense');
 
                           return (
-                            <SelectItem key={cat.id} value={cat.id}>
+                            <SelectItem
+                              key={cat.id}
+                              value={cat.id}
+                              className="hover:bg-primary/10 focus:bg-primary/10 transition-colors duration-200"
+                            >
                               <div className="flex items-center gap-2">
-                                <Icon className="h-4 w-4" />
-                                <span>{categoryName}</span>
-                                <span className="text-xs text-muted-foreground ml-auto">({categoryType})</span>
+                                <Icon className="h-4 w-4 text-primary" />
+                                <span className="font-medium">{categoryName}</span>
+                                <span className="text-xs text-muted-foreground/70 ml-auto">({categoryType})</span>
                               </div>
                             </SelectItem>
                           );
@@ -143,20 +150,30 @@ export default function BudgetDialog({
               )}
             />
              <FormField
-              control={form.control}
-              name="amount"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('common.amount')}</FormLabel>
-                  <FormControl>
-                    <Input type="number" placeholder="0.00" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <DialogFooter>
-              <Button type="submit">{t('common.save')}</Button>
+               control={form.control}
+               name="amount"
+               render={({ field }) => (
+                 <FormItem>
+                   <FormLabel className="text-sm font-medium text-foreground/90">{t('common.amount')}</FormLabel>
+                   <FormControl>
+                     <Input
+                       type="number"
+                       placeholder="0.00"
+                       className="glass-effect hover-lift transition-all duration-300 focus:bg-background/80 focus:border-primary/60 focus:ring-2 focus:ring-primary/20"
+                       {...field}
+                     />
+                   </FormControl>
+                   <FormMessage />
+                 </FormItem>
+               )}
+             />
+            <DialogFooter className="pt-4 border-t border-border/30">
+              <Button
+                type="submit"
+                className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white font-medium px-6 py-2 h-10 shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300 hover-lift"
+              >
+                {t('common.save')}
+              </Button>
             </DialogFooter>
           </form>
         </Form>

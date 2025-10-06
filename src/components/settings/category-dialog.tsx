@@ -106,12 +106,15 @@ export default function CategoryDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>
-            {category ? t('category_dialog.edit_title') : t('category_dialog.add_title')}
-          </DialogTitle>
-          <DialogDescription>
+      <DialogContent className="sm:max-w-[425px] glass-card depth-3">
+        <DialogHeader className="space-y-3 pb-4 border-b border-border/30">
+          <div className="relative">
+            <DialogTitle className="text-xl font-semibold bg-gradient-to-r from-primary via-primary/90 to-accent bg-clip-text text-transparent">
+              {category ? t('category_dialog.edit_title') : t('category_dialog.add_title')}
+            </DialogTitle>
+            <div className="absolute -bottom-2 left-0 w-12 h-0.5 bg-gradient-to-r from-primary to-accent rounded-full"></div>
+          </div>
+          <DialogDescription className="text-muted-foreground/80 leading-relaxed">
             {category ? t('category_dialog.edit_description') : t('category_dialog.add_description')}
           </DialogDescription>
         </DialogHeader>
@@ -122,9 +125,13 @@ export default function CategoryDialog({
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('category_dialog.name')}</FormLabel>
+                  <FormLabel className="text-sm font-medium text-foreground/90">{t('category_dialog.name')}</FormLabel>
                   <FormControl>
-                    <Input placeholder={t('category_dialog.name_placeholder')} {...field} />
+                    <Input
+                      placeholder={t('category_dialog.name_placeholder')}
+                      className="glass-effect hover-lift transition-all duration-300 focus:bg-background/80 focus:border-primary/60 focus:ring-2 focus:ring-primary/20"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -135,22 +142,26 @@ export default function CategoryDialog({
               name="icon"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('category_dialog.icon')}</FormLabel>
+                  <FormLabel className="text-sm font-medium text-foreground/90">{t('category_dialog.icon')}</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger className="glass-effect hover-lift transition-all duration-300 hover:bg-background/80 hover:border-primary/50 focus:border-primary/60 focus:ring-2 focus:ring-primary/20">
                         <SelectValue placeholder={t('category_dialog.icon_placeholder')} />
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent>
+                    <SelectContent className="glass-card depth-2 border-border/40">
                       <ScrollArea className="h-72">
                         {commonIconNames.map(iconName => {
                           const Icon = getIcon(iconName as keyof typeof LucideIcons);
                           return (
-                            <SelectItem key={iconName} value={iconName}>
+                            <SelectItem
+                              key={iconName}
+                              value={iconName}
+                              className="hover:bg-primary/10 focus:bg-primary/10 transition-colors duration-200"
+                            >
                               <div className="flex items-center gap-2">
-                                <Icon className="h-4 w-4" />
-                                <span>{iconName}</span>
+                                <Icon className="h-4 w-4 text-primary" />
+                                <span className="font-medium">{iconName}</span>
                               </div>
                             </SelectItem>
                           );
@@ -167,24 +178,33 @@ export default function CategoryDialog({
               name="type"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('category_dialog.type')}</FormLabel>
+                  <FormLabel className="text-sm font-medium text-foreground/90">{t('category_dialog.type')}</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger className="glass-effect hover-lift transition-all duration-300 hover:bg-background/80 hover:border-primary/50 focus:border-primary/60 focus:ring-2 focus:ring-primary/20">
                         <SelectValue />
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent>
-                      <SelectItem value="expense">{t('common.expense')}</SelectItem>
-                      <SelectItem value="income">{t('common.income')}</SelectItem>
+                    <SelectContent className="glass-card depth-2 border-border/40">
+                      <SelectItem value="expense" className="hover:bg-primary/10 focus:bg-primary/10 transition-colors duration-200">
+                        <span className="font-medium text-error">{t('common.expense')}</span>
+                      </SelectItem>
+                      <SelectItem value="income" className="hover:bg-primary/10 focus:bg-primary/10 transition-colors duration-200">
+                        <span className="font-medium text-success">{t('common.income')}</span>
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <DialogFooter>
-              <Button type="submit">{t('common.save')}</Button>
+            <DialogFooter className="pt-4 border-t border-border/30">
+              <Button
+                type="submit"
+                className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white font-medium px-6 py-2 h-10 shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300 hover-lift"
+              >
+                {t('common.save')}
+              </Button>
             </DialogFooter>
           </form>
         </Form>

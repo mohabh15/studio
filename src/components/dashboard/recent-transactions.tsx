@@ -28,11 +28,15 @@ export default function RecentTransactions({ transactions, categories }: RecentT
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{t('dashboard.recent_transactions.title')}</CardTitle>
-        <CardDescription>{t('dashboard.recent_transactions.description')}</CardDescription>
-      </CardHeader>
+     <Card className="glass-card depth-3 hover-lift">
+       <CardHeader className="pb-4">
+         <CardTitle className="font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+           {t('dashboard.recent_transactions.title')}
+         </CardTitle>
+         <CardDescription className="text-muted-foreground/80">
+           {t('dashboard.recent_transactions.description')}
+         </CardDescription>
+       </CardHeader>
       <CardContent>
         {recentTransactions.length > 0 ? (
           <Table>
@@ -44,19 +48,30 @@ export default function RecentTransactions({ transactions, categories }: RecentT
               </TableRow>
             </TableHeader>
             <TableBody>
-              {recentTransactions.map((tx) => {
+              {recentTransactions.map((tx, index) => {
                 const category = findCategory(tx.category);
                 const Icon = category ? getIcon(category.icon as keyof typeof LucideIcons) : LucideIcons.Package;
                 return (
-                  <TableRow key={tx.id}>
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
-                          <Icon className="h-5 w-5 text-muted-foreground" />
+                  <TableRow
+                    key={tx.id}
+                    className={`group transition-all duration-200 hover:bg-muted/50 hover:shadow-sm ${index % 2 === 0 ? 'bg-muted/20' : ''}`}
+                  >
+                    <TableCell className="py-4">
+                      <div className="flex items-center gap-4">
+                        <div className={`flex h-12 w-12 items-center justify-center rounded-xl transition-all duration-200 group-hover:scale-110 ${
+                          tx.type === 'income'
+                            ? 'bg-success/20 group-hover:bg-success/30'
+                            : 'bg-error/20 group-hover:bg-error/30'
+                        }`}>
+                          <Icon className={`h-5 w-5 ${
+                            tx.type === 'income' ? 'text-success' : 'text-error'
+                          }`} />
                         </div>
-                        <div>
-                          <p className="font-medium">{tx.merchant || 'N/A'}</p>
-                          <p className="text-sm text-muted-foreground">{category ? (() => {
+                        <div className="flex-1">
+                          <p className="font-semibold text-foreground group-hover:text-primary transition-colors">
+                            {tx.merchant || 'N/A'}
+                          </p>
+                          <p className="text-sm text-muted-foreground/80">{category ? (() => {
                             const stripped = category.name.replace(/^categories\./, '');
                             const translated = t(`categories.${stripped}`);
                             return translated === `categories.${stripped}` ? stripped.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) : translated;
@@ -64,9 +79,20 @@ export default function RecentTransactions({ transactions, categories }: RecentT
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell className="hidden sm:table-cell">{format(new Date(tx.date), 'MMM d, yyyy')}</TableCell>
-                    <TableCell className="text-right font-medium">
-                      <Badge variant={tx.type === 'income' ? 'default' : 'secondary'} className={tx.type === 'income' ? 'bg-green-500/20 text-green-500' : ''}>
+                    <TableCell className="hidden sm:table-cell py-4">
+                      <span className="text-sm text-muted-foreground/80 font-medium">
+                        {format(new Date(tx.date), 'MMM d, yyyy')}
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-right py-4">
+                      <Badge
+                        variant={tx.type === 'income' ? 'success' : 'error'}
+                        className={`font-semibold transition-all duration-200 group-hover:scale-105 ${
+                          tx.type === 'income'
+                            ? 'shadow-success/30 shadow-sm'
+                            : 'shadow-error/30 shadow-sm'
+                        }`}
+                      >
                         {tx.type === 'income' ? '+' : '-'} {formatCurrency(tx.amount)}
                       </Badge>
                     </TableCell>
@@ -76,8 +102,13 @@ export default function RecentTransactions({ transactions, categories }: RecentT
             </TableBody>
           </Table>
         ) : (
-          <div className="flex h-[200px] w-full items-center justify-center rounded-md border-2 border-dashed">
-            <p className="text-muted-foreground">{t('dashboard.recent_transactions.no_transactions')}</p>
+          <div className="flex h-[250px] w-full items-center justify-center rounded-xl border-2 border-dashed border-border/50 glass-effect">
+            <div className="text-center">
+              <p className="text-muted-foreground/80 mb-2">
+                {t('dashboard.recent_transactions.no_transactions')}
+              </p>
+              <div className="text-4xl opacity-50">💳</div>
+            </div>
           </div>
         )}
       </CardContent>

@@ -87,7 +87,7 @@ export default function SpendingTrendsChart({ transactions }: SpendingTrendsChar
   const chartDataConfig = {
     total: {
       label: t('dashboard.spending_trends.total'),
-      color: '#FF6B6B',
+      color: 'hsl(var(--chart-1))',
     },
   };
 
@@ -102,11 +102,13 @@ export default function SpendingTrendsChart({ transactions }: SpendingTrendsChar
     if (active && payload && payload.length) {
       const data = payload[0];
       return (
-        <div className={`bg-background border border-border rounded-lg shadow-lg ${
-          isMobile ? 'p-2' : 'p-3'
+        <div className={`glass-effect border border-border/50 rounded-xl shadow-xl depth-2 ${
+          isMobile ? 'p-3' : 'p-4'
         }`}>
-          <p className={`font-medium ${isMobile ? 'text-sm' : ''}`}>{label}</p>
-          <p className={`text-primary font-semibold ${isMobile ? 'text-sm' : ''}`}>
+          <p className={`font-semibold text-foreground mb-1 ${isMobile ? 'text-sm' : ''}`}>
+            {label}
+          </p>
+          <p className={`font-bold text-primary ${isMobile ? 'text-base' : 'text-lg'}`}>
             {formatCurrency(data.value)}
           </p>
         </div>
@@ -116,14 +118,14 @@ export default function SpendingTrendsChart({ transactions }: SpendingTrendsChar
   };
 
   return (
-    <Card>
-      <CardHeader>
+    <Card className="glass-card depth-3 hover-lift">
+      <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className={isMobile ? 'text-lg' : 'text-xl'}>
+            <CardTitle className={`font-bold ${isMobile ? 'text-lg' : 'text-xl'} bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent`}>
               {t('dashboard.spending_trends.title')}
             </CardTitle>
-            <CardDescription className={isMobile ? 'text-sm' : ''}>
+            <CardDescription className={`${isMobile ? 'text-sm' : ''} text-muted-foreground/80`}>
               {filter === 'month' ? t('dashboard.spending_trends.description') : t('dashboard.spending_trends.day_description')}
             </CardDescription>
           </div>
@@ -135,43 +137,65 @@ export default function SpendingTrendsChart({ transactions }: SpendingTrendsChar
           </Tabs>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className={isMobile ? "pt-1 -mt-2" : "pt-2"}>
         {chartData.some(d => d.total > 0) ? (
-          <ChartContainer config={chartDataConfig} className={`w-full ${isMobile ? 'min-h-[200px]' : 'min-h-[350px]'}`}>
+          <ChartContainer config={chartDataConfig} className={`w-full ${isMobile ? 'min-h-[250px]' : 'min-h-[400px]'} chart-container`}>
             <ResponsiveContainer width="100%" height={isMobile ? 250 : 350}>
-              <LineChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" />
+              <LineChart data={chartData} margin={isMobile ? { top: 2, right: 30, left: 20, bottom: 5 } : { top: 5, right: 30, left: 20, bottom: 5 }}>
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="hsl(var(--border)/0.3)"
+                  opacity={0.5}
+                />
                 <XAxis
                   dataKey={filter === 'month' ? 'month' : 'day'}
-                  tick={{ fontSize: isMobile ? 11 : 12 }}
+                  tick={{ fontSize: isMobile ? 11 : 12, fill: 'hsl(var(--muted-foreground))' }}
                   interval={filter === 'day' ? 1 : 0}
                   angle={filter === 'day' ? -75 : -60}
                   textAnchor={isMobile ? 'end' : 'end'}
                   height={80}
+                  stroke="hsl(var(--border))"
                 />
                 <YAxis
-                  tick={{ fontSize: isMobile ? 12 : 14 }}
+                  tick={{ fontSize: isMobile ? 12 : 14, fill: 'hsl(var(--muted-foreground))' }}
                   tickFormatter={formatCurrency}
+                  stroke="hsl(var(--border))"
                 />
                 <Tooltip content={<CustomTooltip />} />
                 <Line
                   type="monotone"
                   dataKey="total"
-                  stroke="#FF6B6B"
-                  strokeWidth={2}
-                  dot={{ fill: '#FF6B6B', strokeWidth: 2, r: 4 }}
-                  activeDot={{ r: 6 }}
+                  stroke="hsl(var(--chart-1))"
+                  strokeWidth={3}
+                  dot={{
+                    fill: 'hsl(var(--chart-1))',
+                    strokeWidth: 2,
+                    r: 4,
+                    stroke: 'hsl(var(--background))'
+                  }}
+                  activeDot={{
+                    r: 6,
+                    fill: 'hsl(var(--primary))',
+                    stroke: 'hsl(var(--background))',
+                    strokeWidth: 2
+                  }}
+                  style={{
+                    filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2))'
+                  }}
                 />
               </LineChart>
             </ResponsiveContainer>
           </ChartContainer>
         ) : (
-          <div className={`flex w-full items-center justify-center rounded-md border-2 border-dashed ${
-            isMobile ? 'h-[200px]' : 'h-[400px]'
+          <div className={`flex w-full items-center justify-center rounded-xl border-2 border-dashed border-border/50 glass-effect ${
+            isMobile ? 'h-[250px]' : 'h-[400px]'
           }`}>
-            <p className={`text-muted-foreground ${isMobile ? 'text-sm' : ''}`}>
-              {t('dashboard.spending_trends.no_data')}
-            </p>
+            <div className="text-center">
+              <p className={`text-muted-foreground/80 mb-2 ${isMobile ? 'text-sm' : ''}`}>
+                {t('dashboard.spending_trends.no_data')}
+              </p>
+              <div className="text-4xl opacity-50">📈</div>
+            </div>
           </div>
         )}
       </CardContent>

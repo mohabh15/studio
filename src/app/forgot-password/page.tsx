@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { cn } from '@/lib/utils';
 import Link from 'next/link';
 
 interface ForgotPasswordFormData {
@@ -74,12 +75,12 @@ export default function ForgotPasswordPage() {
   // Si el email se envió exitosamente, mostrar página de confirmación
   if (isSuccess) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background p-4">
-        <Card className="w-full max-w-md">
-          <CardHeader className="space-y-1 text-center">
-            <div className="mx-auto w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-4">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/20 p-4">
+        <Card className="w-full max-w-md glass-card depth-3 border-border/40">
+          <CardHeader className="space-y-4 text-center pb-6">
+            <div className="mx-auto w-16 h-16 bg-gradient-to-br from-success/20 to-success/10 rounded-full flex items-center justify-center mb-4 border border-success/30">
               <svg
-                className="w-6 h-6 text-green-600"
+                className="w-8 h-8 text-success"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -92,10 +93,13 @@ export default function ForgotPasswordPage() {
                 />
               </svg>
             </div>
-            <CardTitle className="text-2xl font-bold text-green-800">
-              ¡Email enviado!
-            </CardTitle>
-            <CardDescription className="text-center">
+            <div className="relative">
+              <CardTitle className="text-2xl font-bold bg-gradient-to-r from-success to-success/80 bg-clip-text text-transparent">
+                ¡Email enviado!
+              </CardTitle>
+              <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-8 h-0.5 bg-gradient-to-r from-success to-success/80 rounded-full"></div>
+            </div>
+            <CardDescription className="text-muted-foreground/80 leading-relaxed">
               Revisa tu bandeja de entrada y carpeta de spam para las instrucciones de recuperación.
             </CardDescription>
           </CardHeader>
@@ -117,7 +121,7 @@ export default function ForgotPasswordPage() {
             </div>
             <Button
               onClick={() => router.push('/login')}
-              className="w-full"
+              className="w-full h-11 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white font-medium shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300 hover-lift"
             >
               Volver al inicio de sesión
             </Button>
@@ -128,39 +132,57 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold">Recuperar Contraseña</CardTitle>
-          <CardDescription>
-            Ingresa tu email para recibir instrucciones de recuperación
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/20 p-4">
+      <Card className="w-full max-w-md glass-card depth-3 border-border/40">
+        <CardHeader className="space-y-4 pb-6">
+          <div className="relative">
+            <CardTitle className="text-2xl font-bold bg-gradient-to-r from-primary via-primary/90 to-accent bg-clip-text text-transparent">
+              Recuperar Contraseña
+            </CardTitle>
+            <div className="absolute -bottom-1 left-0 w-8 h-0.5 bg-gradient-to-r from-primary to-accent rounded-full"></div>
+          </div>
+          <CardDescription className="text-muted-foreground/80 leading-relaxed">
+            Ingresa tu email para recibir instrucciones de recuperación de contraseña
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-sm font-medium text-foreground/90">Email</Label>
               <Input
                 id="email"
                 type="email"
                 value={formData.email}
                 onChange={(e) => handleInputChange('email', e.target.value)}
-                className={validationErrors.email ? 'border-red-500' : ''}
+                className={cn(
+                  "glass-effect hover-lift transition-all duration-300 focus:bg-background/80 focus:border-primary/60 focus:ring-2 focus:ring-primary/20",
+                  validationErrors.email ? 'border-error/60 bg-error/5' : ''
+                )}
                 placeholder="tu@email.com"
                 disabled={loading}
                 autoComplete="email"
               />
               {validationErrors.email && (
-                <p className="text-sm text-red-500">{validationErrors.email}</p>
+                <p className="text-sm text-error flex items-center gap-1">
+                  <span className="w-1 h-1 bg-error rounded-full"></span>
+                  {validationErrors.email}
+                </p>
               )}
             </div>
 
             <Button
               type="submit"
-              className="w-full"
+              className="w-full h-11 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white font-medium shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300 hover-lift"
               disabled={loading}
             >
-              {loading ? 'Enviando...' : 'Enviar instrucciones'}
+              {loading ? (
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Enviando...
+                </div>
+              ) : (
+                'Enviar instrucciones'
+              )}
             </Button>
           </form>
 

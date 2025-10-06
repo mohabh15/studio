@@ -154,29 +154,34 @@ export default function AddTransactionDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[480px] p-6">
-        <DialogHeader className="space-y-2">
-          <DialogTitle>{t('add_transaction_dialog.title')}</DialogTitle>
-          <DialogDescription>
+      <DialogContent className="sm:max-w-[480px] p-6 glass-card depth-3">
+        <DialogHeader className="space-y-3 pb-4 border-b border-border/30">
+          <div className="relative">
+            <DialogTitle className="text-xl font-semibold bg-gradient-to-r from-primary via-primary/90 to-accent bg-clip-text text-transparent">
+              {t('add_transaction_dialog.title')}
+            </DialogTitle>
+            <div className="absolute -bottom-2 left-0 w-12 h-0.5 bg-gradient-to-r from-primary to-accent rounded-full"></div>
+          </div>
+          <DialogDescription className="text-muted-foreground/80 leading-relaxed">
             {t('add_transaction_dialog.description')}
           </DialogDescription>
         </DialogHeader>
         <div className="relative mt-3">
           <Button
             variant="outline"
-            className="w-full"
+            className="w-full h-12 glass-effect hover-lift interactive-scale border-primary/30 hover:border-primary/60 hover:bg-primary/5 transition-all duration-300"
             onClick={() => document.getElementById('receipt-upload')?.click()}
             disabled={isScanning}
           >
             {isScanning ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                {t('add_transaction_dialog.scanning')}...
+                <Loader2 className="mr-2 h-4 w-4 animate-spin text-primary" />
+                <span className="text-primary font-medium">{t('add_transaction_dialog.scanning')}...</span>
               </>
             ) : (
               <>
-                <ScanLine className="mr-2 h-4 w-4" />
-                {t('add_transaction_dialog.scan_receipt')}
+                <ScanLine className="mr-2 h-4 w-4 text-primary" />
+                <span className="font-medium">{t('add_transaction_dialog.scan_receipt')}</span>
               </>
             )}
           </Button>
@@ -189,32 +194,43 @@ export default function AddTransactionDialog({
           />
         </div>
 
-        <div className="relative my-3 flex items-center justify-center">
+        <div className="relative my-4 flex items-center justify-center">
           <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t" />
+            <span className="w-full border-t border-border/40" />
           </div>
-          <span className="relative bg-background px-2 text-xs uppercase text-muted-foreground">
+          <span className="relative bg-card/90 backdrop-blur-sm px-3 py-1 text-xs uppercase text-muted-foreground/80 font-medium rounded-full border border-border/30">
             {t('add_transaction_dialog.or_manual')}
           </span>
         </div>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-3">
               <Button
                 type="button"
                 variant={activeType === 'expense' ? 'default' : 'outline'}
-                className={activeType === 'expense' ? 'bg-red-500 hover:bg-red-600 text-white' : 'hover:bg-red-500'}
+                className={cn(
+                  "h-11 transition-all duration-300 hover-lift interactive-scale font-medium",
+                  activeType === 'expense'
+                    ? 'bg-gradient-to-r from-error to-error/80 hover:from-error/90 hover:to-error/70 text-white shadow-lg shadow-error/25 border-0'
+                    : 'glass-effect border-error/30 hover:border-error/50 hover:bg-error/5 text-error hover:text-error'
+                )}
                 onClick={() => setActiveType('expense')}
               >
-                {t('common.expense')}
+                <span className="drop-shadow-sm">{t('common.expense')}</span>
               </Button>
               <Button
                 type="button"
                 variant={activeType === 'income' ? 'default' : 'outline'}
+                className={cn(
+                  "h-11 transition-all duration-300 hover-lift interactive-scale font-medium",
+                  activeType === 'income'
+                    ? 'bg-gradient-to-r from-success to-success/80 hover:from-success/90 hover:to-success/70 text-white shadow-lg shadow-success/25 border-0'
+                    : 'glass-effect border-success/30 hover:border-success/50 hover:bg-success/5 text-success hover:text-success'
+                )}
                 onClick={() => setActiveType('income')}
               >
-                {t('common.income')}
+                <span className="drop-shadow-sm">{t('common.income')}</span>
               </Button>
             </div>
 
@@ -223,9 +239,14 @@ export default function AddTransactionDialog({
               name="amount"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('add_transaction_dialog.amount')}</FormLabel>
+                  <FormLabel className="text-sm font-medium text-foreground/90">{t('add_transaction_dialog.amount')}</FormLabel>
                   <FormControl>
-                    <Input type="number" placeholder="0.00" {...field} />
+                    <Input
+                      type="number"
+                      placeholder="0.00"
+                      className="glass-effect hover-lift transition-all duration-300 focus:bg-background/80 focus:border-primary/60 focus:ring-2 focus:ring-primary/20"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -237,23 +258,27 @@ export default function AddTransactionDialog({
                 name="date"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('add_transaction_dialog.date')}</FormLabel>
+                    <FormLabel className="text-sm font-medium text-foreground/90">{t('add_transaction_dialog.date')}</FormLabel>
                     <Popover>
                       <PopoverTrigger asChild>
                         <FormControl>
                           <Button
                             variant={'outline'}
                             className={cn(
-                              'w-full pl-3 text-left font-normal',
+                              'w-full pl-3 text-left font-normal glass-effect hover-lift transition-all duration-300 hover:bg-background/80 hover:border-primary/50',
                               !field.value && 'text-muted-foreground'
                             )}
                           >
-                            {field.value ? format(field.value, 'PPP') : <span>{t('add_transaction_dialog.pick_a_date')}</span>}
-                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            {field.value ? (
+                              <span className="text-foreground">{format(field.value, 'PPP')}</span>
+                            ) : (
+                              <span className="text-muted-foreground/70">{t('add_transaction_dialog.pick_a_date')}</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-70 text-primary" />
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
+                      <PopoverContent className="w-auto p-0 glass-card depth-2 border-border/40" align="start">
                         <Calendar
                           mode="single"
                           selected={field.value}
@@ -272,16 +297,20 @@ export default function AddTransactionDialog({
                 name="category"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('add_transaction_dialog.category')}</FormLabel>
+                    <FormLabel className="text-sm font-medium text-foreground/90">{t('add_transaction_dialog.category')}</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger className="glass-effect hover-lift transition-all duration-300 hover:bg-background/80 hover:border-primary/50 focus:border-primary/60 focus:ring-2 focus:ring-primary/20">
                           <SelectValue placeholder={t('add_transaction_dialog.select_category')} />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent>
+                      <SelectContent className="glass-card depth-2 border-border/40">
                         {filteredCategories.map(cat => (
-                          <SelectItem key={cat.id} value={cat.id}>
+                          <SelectItem
+                            key={cat.id}
+                            value={cat.id}
+                            className="hover:bg-primary/10 focus:bg-primary/10 transition-colors duration-200"
+                          >
                             {(() => {
                               const stripped = cat.name.replace(/^categories\./, '');
                               const translated = t(`categories.${stripped}`);
@@ -302,9 +331,13 @@ export default function AddTransactionDialog({
               name="merchant"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('add_transaction_dialog.merchant')}</FormLabel>
+                  <FormLabel className="text-sm font-medium text-foreground/90">{t('add_transaction_dialog.merchant')}</FormLabel>
                   <FormControl>
-                    <Input placeholder={t('add_transaction_dialog.merchant_placeholder')} {...field} />
+                    <Input
+                      placeholder={t('add_transaction_dialog.merchant_placeholder')}
+                      className="glass-effect hover-lift transition-all duration-300 focus:bg-background/80 focus:border-primary/60 focus:ring-2 focus:ring-primary/20"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -316,17 +349,26 @@ export default function AddTransactionDialog({
               name="notes"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('add_transaction_dialog.notes')}</FormLabel>
+                  <FormLabel className="text-sm font-medium text-foreground/90">{t('add_transaction_dialog.notes')}</FormLabel>
                   <FormControl>
-                    <Textarea placeholder={t('add_transaction_dialog.notes_placeholder')} {...field} />
+                    <Textarea
+                      placeholder={t('add_transaction_dialog.notes_placeholder')}
+                      className="glass-effect hover-lift transition-all duration-300 focus:bg-background/80 focus:border-primary/60 focus:ring-2 focus:ring-primary/20 min-h-[80px] resize-none"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            <DialogFooter>
-              <Button type="submit">{t('add_transaction_dialog.save_transaction')}</Button>
+            <DialogFooter className="pt-4 border-t border-border/30">
+              <Button
+                type="submit"
+                className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white font-medium px-6 py-2 h-10 shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300 hover-lift"
+              >
+                {t('add_transaction_dialog.save_transaction')}
+              </Button>
             </DialogFooter>
           </form>
         </Form>
@@ -334,3 +376,4 @@ export default function AddTransactionDialog({
     </Dialog>
   );
 }
+

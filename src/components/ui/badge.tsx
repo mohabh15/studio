@@ -4,17 +4,18 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const badgeVariants = cva(
-  "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+  "inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background",
   {
     variants: {
       variant: {
-        default:
-          "border-transparent bg-primary text-primary-foreground hover:bg-primary/80",
-        secondary:
-          "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        destructive:
-          "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
-        outline: "text-foreground",
+        default: "border-transparent bg-primary/90 text-primary-foreground hover:bg-primary hover:shadow-md hover:shadow-primary/25 backdrop-blur-sm",
+        secondary: "border-transparent bg-secondary/80 text-secondary-foreground hover:bg-secondary hover:shadow-sm backdrop-blur-sm",
+        destructive: "border-transparent bg-destructive/90 text-destructive-foreground hover:bg-destructive hover:shadow-md hover:shadow-destructive/25",
+        outline: "text-foreground border-border/50 bg-background/50 hover:bg-background hover:border-border hover:shadow-sm backdrop-blur-sm",
+        success: "border-transparent bg-success/90 text-success-foreground hover:bg-success hover:shadow-md hover:shadow-success/25",
+        warning: "border-transparent bg-warning/90 text-warning-foreground hover:bg-warning hover:shadow-md hover:shadow-warning/25",
+        info: "border-transparent bg-info/90 text-info-foreground hover:bg-info hover:shadow-md hover:shadow-info/25",
+        error: "border-transparent bg-error/90 text-error-foreground hover:bg-error hover:shadow-md hover:shadow-error/25",
       },
     },
     defaultVariants: {

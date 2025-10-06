@@ -13,6 +13,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Progress } from '@/components/ui/progress';
 import { ThemeToggle } from '@/components/theme/theme-toggle';
 import Link from 'next/link';
+import { cn } from '@/lib/utils';
 import type { LoginFormData, AuthError } from '@/lib/types/auth';
 
 export default function LoginPage() {
@@ -180,62 +181,80 @@ export default function LoginPage() {
   const currentError = getErrorMessage(authError);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/20 p-4">
+      <Card className="w-full max-w-md glass-card depth-3 border-border/40">
+        <CardHeader className="space-y-4 pb-6">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-2xl font-bold">Iniciar Sesión</CardTitle>
+            <div className="relative">
+              <CardTitle className="text-2xl font-bold bg-gradient-to-r from-primary via-primary/90 to-accent bg-clip-text text-transparent">
+                Iniciar Sesión
+              </CardTitle>
+              <div className="absolute -bottom-1 left-0 w-8 h-0.5 bg-gradient-to-r from-primary to-accent rounded-full"></div>
+            </div>
             <div className="flex items-center space-x-2">
               <ThemeToggle />
             </div>
           </div>
-          <CardDescription>
-            Ingresa tus credenciales para acceder a tu cuenta
+          <CardDescription className="text-muted-foreground/80 leading-relaxed">
+            Ingresa tus credenciales para acceder a tu cuenta financiera
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-sm font-medium text-foreground/90">Email</Label>
               <Input
                 id="email"
                 type="email"
                 value={formData.email}
                 onChange={(e) => handleInputChange('email', e.target.value)}
-                className={validationErrors.email ? 'border-red-500' : ''}
+                className={cn(
+                  "glass-effect hover-lift transition-all duration-300 focus:bg-background/80 focus:border-primary/60 focus:ring-2 focus:ring-primary/20",
+                  validationErrors.email ? 'border-error/60 bg-error/5' : ''
+                )}
                 placeholder="tu@email.com"
                 disabled={loading || googleLoading}
               />
               {validationErrors.email && (
-                <p className="text-sm text-red-500">{validationErrors.email}</p>
+                <p className="text-sm text-error flex items-center gap-1">
+                  <span className="w-1 h-1 bg-error rounded-full"></span>
+                  {validationErrors.email}
+                </p>
               )}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">Contraseña</Label>
+              <Label htmlFor="password" className="text-sm font-medium text-foreground/90">Contraseña</Label>
               <Input
                 id="password"
                 type="password"
                 value={formData.password}
                 onChange={(e) => handleInputChange('password', e.target.value)}
-                className={validationErrors.password ? 'border-red-500' : ''}
+                className={cn(
+                  "glass-effect hover-lift transition-all duration-300 focus:bg-background/80 focus:border-primary/60 focus:ring-2 focus:ring-primary/20",
+                  validationErrors.password ? 'border-error/60 bg-error/5' : ''
+                )}
                 placeholder="••••••••"
                 disabled={loading || googleLoading}
               />
               {validationErrors.password && (
-                <p className="text-sm text-red-500">{validationErrors.password}</p>
+                <p className="text-sm text-error flex items-center gap-1">
+                  <span className="w-1 h-1 bg-error rounded-full"></span>
+                  {validationErrors.password}
+                </p>
               )}
             </div>
 
             {/* Opción de "Recordarme" */}
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-3 p-3 glass-card depth-1 border border-border/40 rounded-lg">
               <Checkbox
                 id="rememberMe"
                 checked={formData.rememberMe}
                 onCheckedChange={(checked) => handleInputChange('rememberMe', !!checked)}
                 disabled={loading || googleLoading}
+                className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
               />
-              <Label htmlFor="rememberMe" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              <Label htmlFor="rememberMe" className="text-sm font-medium leading-none text-foreground/90 cursor-pointer peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                 Recordarme (mantener sesión activa)
               </Label>
             </div>
@@ -259,10 +278,17 @@ export default function LoginPage() {
 
             <Button
               type="submit"
-              className="w-full"
+              className="w-full h-11 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white font-medium shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300 hover-lift"
               disabled={loading || googleLoading}
             >
-              {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
+              {loading ? (
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Iniciando sesión...
+                </div>
+              ) : (
+                'Iniciar Sesión'
+              )}
             </Button>
           </form>
 
@@ -278,14 +304,14 @@ export default function LoginPage() {
           <Button
             type="button"
             variant="outline"
-            className="w-full"
+            className="w-full h-11 glass-effect hover-lift transition-all duration-300 hover:bg-background/80 hover:border-border/60 border-border/40"
             onClick={handleGoogleSignIn}
             disabled={loading || googleLoading}
           >
             {googleLoading ? (
               <div className="flex items-center space-x-2">
-                <div className="w-4 h-4 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
-                <span>Conectando...</span>
+                <div className="w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+                <span className="text-primary font-medium">Conectando...</span>
               </div>
             ) : (
               <div className="flex items-center justify-center space-x-2">
@@ -296,7 +322,7 @@ export default function LoginPage() {
                   height={20}
                   className="flex-shrink-0"
                 />
-                <span>Continuar con Google</span>
+                <span className="font-medium">Continuar con Google</span>
               </div>
             )}
           </Button>

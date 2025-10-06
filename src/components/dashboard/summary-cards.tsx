@@ -128,51 +128,70 @@ export default function SummaryCards({ income, expense, selectedYear, selectedMo
   }, [allTransactions, categories, selectedYear, selectedMonth]);
 
   return (
-    <div className="grid gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">{t('dashboard.summary.balance')}</CardTitle>
-          <DollarSign className="h-5 w-5 text-muted-foreground" />
+    <div className="grid gap-6 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+      <Card className={`glass-card depth-2 hover-lift interactive-scale ${balance >= 0 ? 'glow-primary' : 'glow-accent'}`}>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+          <CardTitle className="text-sm font-medium text-foreground/90">{t('dashboard.summary.balance')}</CardTitle>
+          <div className={`p-2 rounded-lg ${balance >= 0 ? 'bg-success/20' : 'bg-warning/20'}`}>
+            <DollarSign className={`h-5 w-5 ${balance >= 0 ? 'text-success' : 'text-warning'}`} />
+          </div>
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{formatCurrency(balance)}</div>
-          <p className="text-xs text-muted-foreground">{t('dashboard.summary.remaining_funds')}</p>
+          <div className={`text-3xl font-bold mb-1 ${balance >= 0 ? 'text-success' : 'text-warning'}`}>
+            {formatCurrency(balance)}
+          </div>
+          <p className="text-xs text-muted-foreground/80">{t('dashboard.summary.remaining_funds')}</p>
         </CardContent>
       </Card>
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">{t('dashboard.summary.total_income')}</CardTitle>
-          <ArrowUp className="h-5 w-5 text-primary" />
+
+      <Card className="glass-card depth-2 hover-lift interactive-scale glow-primary">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+          <CardTitle className="text-sm font-medium text-foreground/90">{t('dashboard.summary.total_income')}</CardTitle>
+          <div className="p-2 rounded-lg bg-success/20">
+            <ArrowUp className="h-5 w-5 text-success" />
+          </div>
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{formatCurrency(income)}</div>
-          <p className="text-xs text-muted-foreground">{getMonthName(selectedMonth)}</p>
+          <div className="text-3xl font-bold mb-1 text-success">
+            {formatCurrency(income)}
+          </div>
+          <p className="text-xs text-muted-foreground/80">{getMonthName(selectedMonth)}</p>
         </CardContent>
       </Card>
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">{t('dashboard.summary.total_expenses')}</CardTitle>
-          <ArrowDown className="h-5 w-5 text-destructive" />
+
+      <Card className="glass-card depth-2 hover-lift interactive-scale glow-accent">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+          <CardTitle className="text-sm font-medium text-foreground/90">{t('dashboard.summary.total_expenses')}</CardTitle>
+          <div className="p-2 rounded-lg bg-error/20">
+            <ArrowDown className="h-5 w-5 text-error" />
+          </div>
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{formatCurrency(expense)}</div>
-          <p className="text-xs text-muted-foreground">{getMonthName(selectedMonth)}</p>
+          <div className="text-3xl font-bold mb-1 text-error">
+            {formatCurrency(expense)}
+          </div>
+          <p className="text-xs text-muted-foreground/80">{getMonthName(selectedMonth)}</p>
         </CardContent>
       </Card>
+
       {dailyInsight && (
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t('dashboard.summary.daily_insight')}</CardTitle>
-            {dailyInsight.isIncrease ? (
-              <TrendingUp className="h-5 w-5 text-destructive" />
-            ) : (
-              <TrendingDown className="h-5 w-5 text-primary" />
-            )}
+        <Card className={`glass-card depth-2 hover-lift interactive-scale ${dailyInsight.isIncrease ? 'glow-accent' : 'glow-primary'}`}>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+            <CardTitle className="text-sm font-medium text-foreground/90">{t('dashboard.summary.daily_insight')}</CardTitle>
+            <div className={`p-2 rounded-lg ${dailyInsight.isIncrease ? 'bg-error/20' : 'bg-success/20'}`}>
+              {dailyInsight.isIncrease ? (
+                <TrendingUp className="h-5 w-5 text-error" />
+              ) : (
+                <TrendingDown className="h-5 w-5 text-success" />
+              )}
+            </div>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-muted-foreground">
-              {dailyInsight.message}
-            </p>
+            <div className={`p-3 rounded-lg ${dailyInsight.isIncrease ? 'bg-error/10 border border-error/30' : 'bg-success/10 border border-success/30'}`}>
+              <p className={`text-sm font-medium ${dailyInsight.isIncrease ? 'text-error' : 'text-success'}`}>
+                {dailyInsight.message}
+              </p>
+            </div>
           </CardContent>
         </Card>
       )}

@@ -81,10 +81,14 @@ export default function DebtStatus({ debts, userId }: DebtStatusProps) {
 
   if (debts.length === 0) {
     return (
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle>{t('dashboard.debt_status.title')}</CardTitle>
-          <CreditCard className="h-4 w-4 text-muted-foreground" />
+      <Card className="glass-card depth-3 hover-lift">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+          <CardTitle className="font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+            {t('dashboard.debt_status.title')}
+          </CardTitle>
+          <div className="p-2 rounded-lg bg-primary/20">
+            <CreditCard className="h-5 w-5 text-primary" />
+          </div>
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold mb-2">{t('dashboard.debt_status.no_debts')}</div>
@@ -102,17 +106,21 @@ export default function DebtStatus({ debts, userId }: DebtStatusProps) {
   }
 
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium">{t('dashboard.debt_status.title')}</CardTitle>
-        <CreditCard className="h-4 w-4 text-muted-foreground" />
+    <Card className="glass-card depth-3 hover-lift">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+        <CardTitle className="text-lg font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+          {t('dashboard.debt_status.title')}
+        </CardTitle>
+        <div className="p-2 rounded-lg bg-primary/20">
+          <CreditCard className="h-5 w-5 text-primary" />
+        </div>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Outgoing Debts */}
           <div className="space-y-3">
-            <div className="text-red-600 text-sm font-medium">Total Deudas</div>
-            <div className="text-2xl font-bold text-red-600">{formatCurrency(debtSummary.outgoing.totalCurrentDebt)}</div>
+            <div className="text-error text-sm font-medium">Total Deudas</div>
+            <div className="text-3xl font-bold text-error">{formatCurrency(debtSummary.outgoing.totalCurrentDebt)}</div>
             <p className="text-xs text-muted-foreground">
               {debtSummary.outgoing.totalDebts === 1
                 ? debtSummary.outgoing.totalDebts + ' ' + t('dashboard.debt_status.debts_count').replace('{{count}} ', '')
@@ -149,11 +157,11 @@ export default function DebtStatus({ debts, userId }: DebtStatusProps) {
 
               {debtSummary.outgoing.upcomingPayments > 0 && (
                 <div className="flex items-center justify-between text-sm">
-                  <span className="flex items-center gap-1 text-amber-600">
+                  <span className="flex items-center gap-1 text-warning">
                     <AlertTriangle className="h-3 w-3" />
                     Próximos Pagos
                   </span>
-                  <span className="font-medium text-amber-600">{debtSummary.outgoing.upcomingPayments}</span>
+                  <span className="font-medium text-warning">{debtSummary.outgoing.upcomingPayments}</span>
                 </div>
               )}
             </div>
@@ -161,8 +169,8 @@ export default function DebtStatus({ debts, userId }: DebtStatusProps) {
 
           {/* Incoming Debts */}
           <div className="space-y-3">
-            <div className="text-green-600 text-sm font-medium">Total Por Cobrar</div>
-            <div className="text-2xl font-bold text-green-600">{formatCurrency(debtSummary.incoming.totalPorCobrar)}</div>
+            <div className="text-success text-sm font-medium">Total Por Cobrar</div>
+            <div className="text-3xl font-bold text-success">{formatCurrency(debtSummary.incoming.totalPorCobrar)}</div>
             <p className="text-xs text-muted-foreground">
               {debtSummary.incoming.totalDebts === 1
                 ? debtSummary.incoming.totalDebts + ' ' + t('dashboard.debt_status.debts_count').replace('{{count}} ', '')
@@ -190,25 +198,25 @@ export default function DebtStatus({ debts, userId }: DebtStatusProps) {
 
               {debtSummary.incoming.upcomingCobros > 0 && (
                 <div className="flex items-center justify-between text-sm">
-                  <span className="flex items-center gap-1 text-amber-600">
+                  <span className="flex items-center gap-1 text-warning">
                     <AlertTriangle className="h-3 w-3" />
                     Próximos Cobros
                   </span>
-                  <span className="font-medium text-amber-600">{debtSummary.incoming.upcomingCobros}</span>
+                  <span className="font-medium text-warning">{debtSummary.incoming.upcomingCobros}</span>
                 </div>
               )}
             </div>
           </div>
         </div>
 
-        <div className="space-y-2 pt-1">
+        <div className="space-y-3 pt-4">
           <Link href="/debts/projections" className="block">
-            <Button size="sm" className="w-full text-xs sm:text-sm">
+            <Button size="sm" className="w-full text-sm hover-lift interactive-scale">
               {t('dashboard.debt_status.view_projections')}
             </Button>
           </Link>
           <Link href="/debts" className="block">
-            <Button size="sm" variant="outline" className="w-full text-xs sm:text-sm">
+            <Button size="sm" variant="outline" className="w-full text-sm glass-effect hover-lift interactive-scale">
               {t('dashboard.debt_status.view_details')}
             </Button>
           </Link>

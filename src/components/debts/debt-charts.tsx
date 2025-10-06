@@ -12,18 +12,18 @@ type DebtChartsProps = {
 };
 
 const COLORS = [
-  '#FF6B6B', // Rojo coral
-  '#4ECDC4', // Turquesa
-  '#45B7D1', // Azul cielo
-  '#96CEB4', // Verde menta
-  '#FFEAA7', // Amarillo crema
-  '#DDA0DD', // Ciruela
-  '#98D8C8', // Verde agua
-  '#F7DC6F', // Amarillo mostaza
-  '#BB8FCE', // Lavanda
-  '#85C1E9', // Azul claro
-  '#F8C471', // Naranja claro
-  '#82E0AA', // Verde lima
+  'hsl(var(--chart-1))', // Azul principal
+  'hsl(var(--chart-2))', // Rosa/Magenta
+  'hsl(var(--chart-3))', // Verde para positivos
+  'hsl(var(--chart-4))', // Rojo para negativos
+  'hsl(var(--chart-5))', // Gris neutro
+  'hsl(var(--success))', // Verde esmeralda
+  'hsl(var(--warning))', // Amarillo dorado
+  'hsl(var(--error))', // Rojo coral
+  'hsl(var(--info))', // Azul información
+  'hsl(var(--accent))', // Rosa/Magenta vibrante
+  'hsl(var(--primary))', // Azul brillante
+  'hsl(var(--destructive))', // Rojo para negativos
 ];
 
 const formatCurrency = (value: number) => {
@@ -112,7 +112,7 @@ export default function DebtCharts({ debts }: DebtChartsProps) {
                     cy="50%"
                     outerRadius={80}
                     innerRadius={30}
-                    fill="#8884d8"
+                    fill="hsl(var(--chart-1))"
                     dataKey="value"
                     label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                   >

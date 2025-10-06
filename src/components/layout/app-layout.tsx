@@ -32,31 +32,41 @@ export default function AppLayout({ children }: AppLayoutProps) {
   return (
     <>
       <div className="flex min-h-screen w-full flex-col">
-        {/* Header with title */}
+        {/* Header with title - Tema oscuro elegante mejorado */}
         {user && (
-          <header className="flex items-center justify-between border-b bg-background px-3 py-3 sm:px-6">
+          <header className="flex items-center justify-between border-b border-border/50 bg-gradient-to-r from-background via-card/50 to-background px-3 py-3 sm:px-6 backdrop-blur-sm">
             <div className="flex items-center gap-2 min-w-0 flex-1">
-              <Wallet className="h-6 w-6 text-primary flex-shrink-0 sm:h-7 sm:w-7" />
-              <h1 className="text-lg font-bold tracking-tight text-foreground truncate sm:text-xl">
+              <div className="p-2 rounded-lg bg-primary/10 border border-primary/20">
+                <Wallet className="h-6 w-6 text-primary flex-shrink-0 sm:h-7 sm:w-7" />
+              </div>
+              <h1 className="text-lg font-bold tracking-tight text-foreground truncate sm:text-xl bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text">
                 {t('app.title')}
               </h1>
             </div>
           </header>
         )}
 
-        <div className="pb-20 sm:pb-24 md:pb-20">{children}</div>
+        <div className="pb-20 sm:pb-24 md:pb-20 relative">
+          {/* Línea de separación visual elegante */}
+          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-border/50 to-transparent"></div>
+          {children}
+        </div>
 
-        {/* Botón flotante para añadir transacción - justo encima de la navbar */}
+        {/* Botón flotante para añadir transacción - con efectos elegantes mejorados */}
         <div className="fixed bottom-24 right-4 z-50 sm:bottom-28 sm:right-6">
-          <Button
-            onClick={() => setAddTransactionOpen(true)}
-            size="icon"
-            className="h-16 w-16 sm:h-18 sm:w-18 rounded-full bg-primary shadow-lg hover:bg-primary/90"
-            disabled={!user}
-          >
-            <Plus className="h-8 w-8 sm:h-9 sm:w-9" />
-            <span className="sr-only">{t('header.add_transaction')}</span>
-          </Button>
+          <div className="relative group">
+            {/* Efectos de brillo sutil */}
+            <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 via-accent/20 to-primary/20 rounded-full blur opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <Button
+              onClick={() => setAddTransactionOpen(true)}
+              size="icon"
+              className="relative h-16 w-16 sm:h-18 sm:w-18 rounded-full bg-gradient-to-br from-primary via-primary to-accent shadow-2xl hover:shadow-primary/25 hover:scale-105 active:scale-95 transition-all duration-300 border border-primary/20 backdrop-blur-sm"
+              disabled={!user}
+            >
+              <Plus className="h-8 w-8 sm:h-9 sm:w-9 text-primary-foreground drop-shadow-sm" />
+              <span className="sr-only">{t('header.add_transaction')}</span>
+            </Button>
+          </div>
         </div>
 
         <BottomNav />

@@ -52,20 +52,20 @@ export default function SpendingChart({ transactions, categories, selectedYear, 
       .sort((a, b) => b.total - a.total);
   }, [transactions, categories, t, selectedYear, selectedMonth]);
 
-  // Colores únicos y contrastantes para el pie chart
+  // Nueva paleta de colores usando variables del tema oscuro elegante
   const COLORS = [
-    '#FF6B6B', // Rojo coral
-    '#4ECDC4', // Turquesa
-    '#45B7D1', // Azul cielo
-    '#96CEB4', // Verde menta
-    '#FFEAA7', // Amarillo crema
-    '#DDA0DD', // Ciruela
-    '#98D8C8', // Verde agua
-    '#F7DC6F', // Amarillo mostaza
-    '#BB8FCE', // Lavanda
-    '#85C1E9', // Azul claro
-    '#F8C471', // Naranja claro
-    '#82E0AA', // Verde lima
+    'hsl(var(--chart-1))', // Azul principal
+    'hsl(var(--chart-2))', // Rosa/Magenta
+    'hsl(var(--chart-3))', // Verde para positivos
+    'hsl(var(--chart-4))', // Rojo para negativos
+    'hsl(var(--chart-5))', // Gris neutro
+    'hsl(var(--success))', // Verde esmeralda
+    'hsl(var(--warning))', // Amarillo dorado
+    'hsl(var(--error))', // Rojo coral
+    'hsl(var(--info))', // Azul información
+    'hsl(var(--accent))', // Rosa/Magenta vibrante
+    'hsl(var(--primary))', // Azul brillante
+    'hsl(var(--success))', // Verde esmeralda (complementario)
   ];
 
   const chartDataConfig = useMemo(() => {
@@ -90,11 +90,13 @@ export default function SpendingChart({ transactions, categories, selectedYear, 
     if (active && payload && payload.length) {
       const data = payload[0];
       return (
-        <div className={`bg-background border border-border rounded-lg shadow-lg ${
-          isMobile ? 'p-2' : 'p-3'
+        <div className={`glass-effect border border-border/50 rounded-xl shadow-xl depth-2 ${
+          isMobile ? 'p-3' : 'p-4'
         }`}>
-          <p className={`font-medium ${isMobile ? 'text-sm' : ''}`}>{data.payload.name}</p>
-          <p className={`text-primary font-semibold ${isMobile ? 'text-sm' : ''}`}>
+          <p className={`font-semibold text-foreground mb-1 ${isMobile ? 'text-sm' : ''}`}>
+            {data.payload.name}
+          </p>
+          <p className={`font-bold text-primary ${isMobile ? 'text-base' : 'text-lg'}`}>
             {formatCurrency(data.value)}
           </p>
         </div>
@@ -107,12 +109,12 @@ export default function SpendingChart({ transactions, categories, selectedYear, 
   const responsiveConfig = useMemo(() => {
     if (isMobile) {
       return {
-        height: 250,
-        outerRadius: 80,
-        innerRadius: 40,
-        legendHeight: 80,
-        fontSize: 12,
-        showLegend: chartData.length <= 6, // Mostrar legend solo si no hay muchas categorías
+        height: 320, // Ajustado para eliminar espacio vacío
+        outerRadius: 70, // Reducido para dejar espacio a la leyenda
+        innerRadius: 35,
+        legendHeight: 100, // Ajustado para eliminar espacio vacío
+        fontSize: 11, // Reducido ligeramente para que quepa mejor
+        showLegend: true, // Siempre mostrar la leyenda
       };
     } else {
       return {
@@ -124,35 +126,44 @@ export default function SpendingChart({ transactions, categories, selectedYear, 
         showLegend: true,
       };
     }
-  }, [isMobile, chartData.length]);
+  }, [isMobile]);
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className={isMobile ? 'text-lg' : 'text-xl'}>
+    <Card className="glass-card depth-3 hover-lift">
+      <CardHeader className="pb-4">
+        <CardTitle className={`font-bold ${isMobile ? 'text-lg' : 'text-xl'} bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent`}>
           {t('dashboard.spending_overview.title')}
         </CardTitle>
-        <CardDescription className={isMobile ? 'text-sm' : ''}>
+        <CardDescription className={`${isMobile ? 'text-sm' : ''} text-muted-foreground/80`}>
           {t('dashboard.spending_overview.description')}
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className={isMobile ? "pt-1 -mt-1" : "pt-2"}>
         {chartData.length > 0 ? (
-          <ChartContainer config={chartDataConfig} className={`w-full ${isMobile ? 'min-h-[200px]' : 'min-h-[350px]'}`}>
+          <ChartContainer config={chartDataConfig} className={`w-full ${isMobile ? 'min-h-[350px]' : 'min-h-[400px]'} chart-container`}>
             <ResponsiveContainer width="100%" height={responsiveConfig.height}>
               <PieChart>
                 <Pie
                   data={chartData}
                   cx="50%"
-                  cy={isMobile ? "75%" : "48%"}
+                  cy={isMobile ? "35%" : "48%"} // Movido hacia arriba para dejar espacio a la leyenda
                   outerRadius={responsiveConfig.outerRadius}
                   innerRadius={responsiveConfig.innerRadius}
-                  fill="#8884d8"
+                  fill="hsl(var(--chart-1))"
                   dataKey="total"
-                  paddingAngle={2}
+                  paddingAngle={3}
+                  stroke="hsl(var(--border))"
+                  strokeWidth={1}
                 >
                   {chartData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={COLORS[index % COLORS.length]}
+                      style={{
+                        filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))',
+                        cursor: 'pointer'
+                      }}
+                    />
                   ))}
                 </Pie>
                 <Tooltip
@@ -161,20 +172,22 @@ export default function SpendingChart({ transactions, categories, selectedYear, 
                 />
                 {responsiveConfig.showLegend && (
                   <Legend
-                    verticalAlign="bottom"
+                    verticalAlign={isMobile ? "bottom" : "bottom"}
                     height={responsiveConfig.legendHeight}
                     wrapperStyle={{
-                      paddingTop: isMobile ? '70px' : '8px',
+                      paddingTop: isMobile ? '0px' : '8px',
+                      paddingBottom: isMobile ? '0px' : '8px',
                       fontSize: responsiveConfig.fontSize
                     }}
                     formatter={(value, entry) => (
                       <span style={{
                         color: entry.color,
                         fontSize: responsiveConfig.fontSize,
-                        maxWidth: isMobile ? '80px' : 'none',
+                        maxWidth: isMobile ? '120px' : 'none',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap'
+                        whiteSpace: 'nowrap',
+                        textShadow: '0 1px 2px rgba(0, 0, 0, 0.3)'
                       }}>
                         {value}
                       </span>
@@ -185,12 +198,15 @@ export default function SpendingChart({ transactions, categories, selectedYear, 
             </ResponsiveContainer>
           </ChartContainer>
         ) : (
-          <div className={`flex w-full items-center justify-center rounded-md border-2 border-dashed ${
-            isMobile ? 'h-[200px]' : 'h-[400px]'
+          <div className={`flex w-full items-center justify-center rounded-xl border-2 border-dashed border-border/50 glass-effect ${
+            isMobile ? 'h-[350px]' : 'h-[400px]'
           }`}>
-            <p className={`text-muted-foreground ${isMobile ? 'text-sm' : ''}`}>
-              {t('dashboard.spending_overview.no_data')}
-            </p>
+            <div className="text-center">
+              <p className={`text-muted-foreground/80 mb-2 ${isMobile ? 'text-sm' : ''}`}>
+                {t('dashboard.spending_overview.no_data')}
+              </p>
+              <div className="text-4xl opacity-50">📊</div>
+            </div>
           </div>
         )}
       </CardContent>

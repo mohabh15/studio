@@ -151,12 +151,15 @@ export default function DebtDialog({ isOpen, onOpenChange, onSave, debt }: DebtD
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>
-            {debt ? t('debt_dialog.edit_title') : t('debt_dialog.add_title')}
-          </DialogTitle>
-          <DialogDescription>
+      <DialogContent className="sm:max-w-[425px] glass-card depth-3">
+        <DialogHeader className="space-y-3 pb-4 border-b border-border/30">
+          <div className="relative">
+            <DialogTitle className="text-xl font-semibold bg-gradient-to-r from-primary via-primary/90 to-accent bg-clip-text text-transparent">
+              {debt ? t('debt_dialog.edit_title') : t('debt_dialog.add_title')}
+            </DialogTitle>
+            <div className="absolute -bottom-2 left-0 w-12 h-0.5 bg-gradient-to-r from-primary to-accent rounded-full"></div>
+          </div>
+          <DialogDescription className="text-muted-foreground/80 leading-relaxed">
             {debt
               ? t('debt_dialog.edit_description')
               : t('debt_dialog.add_description')
@@ -173,29 +176,59 @@ export default function DebtDialog({ isOpen, onOpenChange, onSave, debt }: DebtD
                  <FormItem className="space-y-3">
                    <FormLabel>{t('debt_dialog.debt_direction')}</FormLabel>
                    <FormControl>
-                     <div className="flex gap-4">
+                     <div className="grid grid-cols-1 gap-3">
                        <Card
                          className={cn(
-                           "cursor-pointer p-4 transition-colors hover:bg-accent bg-background",
-                           field.value === 'outgoing' ? "bg-accent" : ""
+                           "cursor-pointer p-4 transition-all duration-300 hover-lift interactive-scale glass-effect border-border/40",
+                           field.value === 'outgoing'
+                             ? "bg-gradient-to-br from-error/20 to-error/10 border-error/40 shadow-lg shadow-error/20"
+                             : "hover:bg-error/5 hover:border-error/30"
                          )}
                          onClick={() => field.onChange('outgoing')}
                        >
-                         <div className="flex items-center gap-2">
-                           <ArrowUp className="h-5 w-5 text-red-500" />
-                           <span className="text-sm font-medium">Outgoing (Debo dinero)</span>
+                         <div className="flex items-center gap-3">
+                           <div className={cn(
+                             "p-2 rounded-lg transition-colors",
+                             field.value === 'outgoing' ? "bg-error/20" : "bg-error/10"
+                           )}>
+                             <ArrowUp className={cn(
+                               "h-5 w-5 transition-colors",
+                               field.value === 'outgoing' ? "text-error" : "text-error/70"
+                             )} />
+                           </div>
+                           <span className={cn(
+                             "text-sm font-medium transition-colors",
+                             field.value === 'outgoing' ? "text-error" : "text-foreground"
+                           )}>
+                             Outgoing (Debo dinero)
+                           </span>
                          </div>
                        </Card>
                        <Card
                          className={cn(
-                           "cursor-pointer p-4 transition-colors hover:bg-accent bg-background",
-                           field.value === 'incoming' ? "bg-accent" : ""
+                           "cursor-pointer p-4 transition-all duration-300 hover-lift interactive-scale glass-effect border-border/40",
+                           field.value === 'incoming'
+                             ? "bg-gradient-to-br from-success/20 to-success/10 border-success/40 shadow-lg shadow-success/20"
+                             : "hover:bg-success/5 hover:border-success/30"
                          )}
                          onClick={() => field.onChange('incoming')}
                        >
-                         <div className="flex items-center gap-2">
-                           <ArrowDown className="h-5 w-5 text-green-500" />
-                           <span className="text-sm font-medium">Incoming (Me deben dinero)</span>
+                         <div className="flex items-center gap-3">
+                           <div className={cn(
+                             "p-2 rounded-lg transition-colors",
+                             field.value === 'incoming' ? "bg-success/20" : "bg-success/10"
+                           )}>
+                             <ArrowDown className={cn(
+                               "h-5 w-5 transition-colors",
+                               field.value === 'incoming' ? "text-success" : "text-success/70"
+                             )} />
+                           </div>
+                           <span className={cn(
+                             "text-sm font-medium transition-colors",
+                             field.value === 'incoming' ? "text-success" : "text-foreground"
+                           )}>
+                             Incoming (Me deben dinero)
+                           </span>
                          </div>
                        </Card>
                      </div>
@@ -210,17 +243,21 @@ export default function DebtDialog({ isOpen, onOpenChange, onSave, debt }: DebtD
                name="tipo"
                render={({ field }) => (
                  <FormItem>
-                   <FormLabel>{t('debt_dialog.debt_type')}</FormLabel>
+                   <FormLabel className="text-sm font-medium text-foreground/90">{t('debt_dialog.debt_type')}</FormLabel>
                    <Select onValueChange={field.onChange} defaultValue={field.value}>
                      <FormControl>
-                       <SelectTrigger>
+                       <SelectTrigger className="glass-effect hover-lift transition-all duration-300 hover:bg-background/80 hover:border-primary/50 focus:border-primary/60 focus:ring-2 focus:ring-primary/20">
                          <SelectValue placeholder={t('debt_dialog.select_debt_type')} />
                        </SelectTrigger>
                      </FormControl>
-                     <SelectContent>
+                     <SelectContent className="glass-card depth-2 border-border/40">
                        {Object.entries(debtTypeLabels).map(([value, label]) => (
-                         <SelectItem key={value} value={value}>
-                           {label}
+                         <SelectItem
+                           key={value}
+                           value={value}
+                           className="hover:bg-primary/10 focus:bg-primary/10 transition-colors duration-200"
+                         >
+                           <span className="font-medium">{label}</span>
                          </SelectItem>
                        ))}
                      </SelectContent>
@@ -236,12 +273,13 @@ export default function DebtDialog({ isOpen, onOpenChange, onSave, debt }: DebtD
                 name="monto"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('debt_dialog.original_amount')}</FormLabel>
+                    <FormLabel className="text-sm font-medium text-foreground/90">{t('debt_dialog.original_amount')}</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
                         step="0.01"
                         placeholder="0.00"
+                        className="glass-effect hover-lift transition-all duration-300 focus:bg-background/80 focus:border-primary/60 focus:ring-2 focus:ring-primary/20"
                         {...field}
                         onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                       />
@@ -256,12 +294,13 @@ export default function DebtDialog({ isOpen, onOpenChange, onSave, debt }: DebtD
                 name="monto_actual"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('debt_dialog.current_amount')}</FormLabel>
+                    <FormLabel className="text-sm font-medium text-foreground/90">{t('debt_dialog.current_amount')}</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
                         step="0.01"
                         placeholder="0.00"
+                        className="glass-effect hover-lift transition-all duration-300 focus:bg-background/80 focus:border-primary/60 focus:ring-2 focus:ring-primary/20"
                         {...field}
                         onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                       />
@@ -279,12 +318,13 @@ export default function DebtDialog({ isOpen, onOpenChange, onSave, debt }: DebtD
                   name="tasa_interes"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('debt_dialog.interest_rate')}</FormLabel>
+                      <FormLabel className="text-sm font-medium text-foreground/90">{t('debt_dialog.interest_rate')}</FormLabel>
                       <FormControl>
                         <Input
                           type="number"
                           step="0.01"
                           placeholder="0.00"
+                          className="glass-effect hover-lift transition-all duration-300 focus:bg-background/80 focus:border-primary/60 focus:ring-2 focus:ring-primary/20"
                           {...field}
                           onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                         />
@@ -300,12 +340,15 @@ export default function DebtDialog({ isOpen, onOpenChange, onSave, debt }: DebtD
                 name="pagos_minimos"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{direction === 'incoming' ? 'Cobros esperados' : t('debt_dialog.minimum_payments')}</FormLabel>
+                    <FormLabel className="text-sm font-medium text-foreground/90">
+                      {direction === 'incoming' ? 'Cobros esperados' : t('debt_dialog.minimum_payments')}
+                    </FormLabel>
                     <FormControl>
                       <Input
                         type="number"
                         step="0.01"
                         placeholder="0.00"
+                        className="glass-effect hover-lift transition-all duration-300 focus:bg-background/80 focus:border-primary/60 focus:ring-2 focus:ring-primary/20"
                         {...field}
                         onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                       />
@@ -321,10 +364,11 @@ export default function DebtDialog({ isOpen, onOpenChange, onSave, debt }: DebtD
               name="fecha_vencimiento"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('debt_dialog.due_date')}</FormLabel>
+                  <FormLabel className="text-sm font-medium text-foreground/90">{t('debt_dialog.due_date')}</FormLabel>
                   <FormControl>
                     <Input
                       type="date"
+                      className="glass-effect hover-lift transition-all duration-300 focus:bg-background/80 focus:border-primary/60 focus:ring-2 focus:ring-primary/20"
                       {...field}
                     />
                   </FormControl>
@@ -338,10 +382,11 @@ export default function DebtDialog({ isOpen, onOpenChange, onSave, debt }: DebtD
               name="descripcion"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('debt_dialog.description_optional')}</FormLabel>
+                  <FormLabel className="text-sm font-medium text-foreground/90">{t('debt_dialog.description_optional')}</FormLabel>
                   <FormControl>
                     <Textarea
                       placeholder={t('debt_dialog.description_placeholder')}
+                      className="glass-effect hover-lift transition-all duration-300 focus:bg-background/80 focus:border-primary/60 focus:ring-2 focus:ring-primary/20 min-h-[80px] resize-none"
                       {...field}
                     />
                   </FormControl>
@@ -350,16 +395,21 @@ export default function DebtDialog({ isOpen, onOpenChange, onSave, debt }: DebtD
               )}
             />
 
-            <DialogFooter>
+            <DialogFooter className="pt-4 border-t border-border/30">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => onOpenChange(false)}
                 disabled={isSubmitting}
+                className="glass-effect hover-lift transition-all duration-300 hover:bg-background/80 hover:border-border/60"
               >
                 {t('common.cancel')}
               </Button>
-              <Button type="submit" disabled={isSubmitting}>
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white font-medium px-6 py-2 h-10 shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300 hover-lift"
+              >
                 {isSubmitting ? t('debt_dialog.saving') : (debt ? t('debt_dialog.update') : t('common.save'))}
               </Button>
             </DialogFooter>
