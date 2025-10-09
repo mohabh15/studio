@@ -16,14 +16,46 @@ import AppLayout from '@/components/layout/app-layout';
 import { Wallet, AlertCircle } from 'lucide-react';
 import { useI18n } from '@/hooks/use-i18n';
 import { useSelectedMonth } from '@/hooks/use-selected-month';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Settings, LogOut } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { useRouter } from 'next/navigation';
 
 export default function DashboardPage() {
     const { t } = useI18n();
-    const { user, loading: authLoading } = useAuth();
+    const { user, loading: authLoading, logout } = useAuth();
     const { selectedYear, selectedMonth, updateSelectedMonth } = useSelectedMonth();
+    const isMobile = useIsMobile();
+    const { toast } = useToast();
+    const router = useRouter();
     const [isClient, setIsClient] = useState(false);
     const userId = user?.uid;
+
+    const handleLogout = async () => {
+        try {
+            await logout();
+            router.push('/login');
+            toast({
+                title: t('auth.logout_success') || 'Sesión cerrada exitosamente',
+            });
+        } catch (error) {
+            toast({
+                variant: 'destructive',
+                title: t('auth.logout_error') || 'Error al cerrar sesión',
+            });
+        }
+    };
 
    const {
      transactions: allTransactions,
@@ -108,14 +140,56 @@ export default function DashboardPage() {
   return (
     <>
       <AppLayout>
-        <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-6 lg:p-8">
-          <div className="flex items-center justify-end">
+        {isMobile && (
+          <header className="flex items-center justify-between px-4 py-3 bg-background/95 backdrop-blur-sm">
             <MonthSelector
               selectedYear={selectedYear}
               selectedMonth={selectedMonth}
               updateSelectedMonth={updateSelectedMonth}
             />
-          </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                  <Avatar className="h-8 w-8">
+                    <AvatarFallback>{user?.email?.charAt(0).toUpperCase()}</AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56" align="end" forceMount>
+                <DropdownMenuLabel className="font-normal">
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium leading-none">
+                      {user?.displayName || user?.email?.split('@')[0] || 'Usuario'}
+                    </p>
+                    <p className="text-xs leading-none text-muted-foreground">
+                      {user?.email}
+                    </p>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => router.push('/settings')}>
+                  <Settings className="mr-2 h-4 w-4" />
+                  <span>{t('nav.settings') || 'Configuración'}</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>{t('logout') || 'Cerrar sesión'}</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </header>
+        )}
+        <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-6 lg:p-8">
+          {!isMobile && (
+            <div className="flex items-center justify-end">
+              <MonthSelector
+                selectedYear={selectedYear}
+                selectedMonth={selectedMonth}
+                updateSelectedMonth={updateSelectedMonth}
+              />
+            </div>
+          )}
           <SummaryCards
             income={summary.income}
             expense={summary.expense}

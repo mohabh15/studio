@@ -81,7 +81,7 @@ export default function BottomNav({ isSidebarOpen: externalSidebarOpen, onSideba
         href={item.href}
         prefetch={true}
         className={cn(
-          'relative flex flex-col items-center justify-center flex-1 gap-1 py-2.5 px-1 transition-all duration-300 rounded-xl mx-0.5 sm:py-3 sm:gap-1.5 sm:px-2 sm:mx-1 group interactive-scale',
+          'relative flex flex-col items-center justify-center flex-1 gap-1 py-2.5 px-1 rounded-xl mx-0.5 sm:py-3 sm:gap-1.5 sm:px-2 sm:mx-1 group',
           isActive
             ? 'text-primary'
             : 'text-muted-foreground hover:text-primary'
