@@ -1,4 +1,4 @@
-# BudgetWise
+# Budget3M
 
 Una aplicación completa de gestión financiera personal construida con Next.js, Firebase y IA. Permite a los usuarios gestionar presupuestos, deudas, transacciones, ahorros e inversiones de manera intuitiva y eficiente.
 
