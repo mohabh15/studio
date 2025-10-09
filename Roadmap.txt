@@ -5,9 +5,10 @@
 - corregir traducciones en pagina deuda
 - comprobar que al eliminar una deuda se eliminen las transacciones asociadas a esta
 - al eliminar una transaccion de una deuda inactiva que se mire si vuelve a tener saldo aun por pagar y cambiar a activa
+- arreglar card de añadir deuda 
 
-
-
+- SCREEN AHORRO CON METAS Y OBJETIVOS, SEGUIMIENTO DEL AHORRO E INVERSION
+   - kpis tasa ahorro, ahorro total...etc
 
 
 

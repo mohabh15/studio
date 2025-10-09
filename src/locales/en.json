@@ -44,6 +44,7 @@
     "overview": "Overview",
     "transactions": "Transactions",
     "debts": "Debts",
+    "savings": "Savings",
     "settings": "Settings",
     "budgets": "Budgets"
   },
@@ -393,5 +394,9 @@
     "avalanche_benefit": "The Avalanche strategy minimizes total interest paid",
     "snowball_benefit": "The Snowball strategy provides psychological motivation",
     "personal_situation": "Consider your personal financial situation to choose the best option"
+  },
+  "savings": {
+    "title": "Savings",
+    "description": "Savings and investment management"
   }
 }

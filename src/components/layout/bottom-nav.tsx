@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, List, Settings, Wallet, CreditCard } from 'lucide-react';
+import { Home, List, Settings, Wallet, CreditCard, PiggyBank } from 'lucide-react';
 import { useI18n } from '@/hooks/use-i18n';
 import { useShowDebts } from '@/hooks/use-show-debts';
 import { cn } from '@/lib/utils';
@@ -16,8 +16,8 @@ export default function BottomNav() {
     { href: '/', label: t('nav.overview'), icon: Home },
     { href: '/transactions', label: t('nav.transactions'), icon: List },
     { href: '/debts', label: t('nav.debts'), icon: CreditCard, show: showDebts },
+    { href: '/savings', label: t('nav.savings'), icon: PiggyBank },
     { href: '/budgets', label: t('nav.budgets'), icon: Wallet },
-    { href: '/settings', label: t('nav.settings'), icon: Settings },
   ];
 
   const navItems = allNavItems.filter(item => item.show !== false);

@@ -44,6 +44,7 @@
     "overview": "Visión\nGeneral",
     "transactions": "Transacciones",
     "debts": "Deudas",
+    "savings": "Ahorros",
     "settings": "Ajustes",
     "budgets": "Presupuestos"
   },
@@ -406,5 +407,9 @@
     "avalanche_benefit": "La estrategia Avalancha minimiza los intereses totales pagados",
     "snowball_benefit": "La estrategia Bola de Nieve proporciona motivación psicológica",
     "personal_situation": "Considera tu situación financiera personal para elegir la mejor opción"
+  },
+  "savings": {
+    "title": "Ahorro",
+    "description": "Gestión de ahorros e inversiones"
   }
 }
