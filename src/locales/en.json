@@ -46,7 +46,8 @@
     "debts": "Debts",
     "savings": "Savings",
     "settings": "Settings",
-    "budgets": "Budgets"
+    "budgets": "Budgets",
+    "profile": "Profile"
   },
   "header": {
     "add_transaction": "Add Transaction",

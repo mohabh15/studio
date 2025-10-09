@@ -46,7 +46,8 @@
     "debts": "Deudas",
     "savings": "Ahorros",
     "settings": "Ajustes",
-    "budgets": "Presupuestos"
+    "budgets": "Presupuestos",
+    "profile": "Perfil"
   },
   "header": {
     "add_transaction": "Añadir Transacción",

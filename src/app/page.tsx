@@ -13,31 +13,17 @@ import DebtStatus from '@/components/dashboard/debt-status';
 import DashboardSkeleton from '@/components/dashboard/dashboard-skeleton';
 import MonthSelector from '@/components/dashboard/month-selector';
 import AppLayout from '@/components/layout/app-layout';
-import { Wallet, AlertCircle, LogOut, Settings } from 'lucide-react';
+import { Wallet, AlertCircle } from 'lucide-react';
 import { useI18n } from '@/hooks/use-i18n';
 import { useSelectedMonth } from '@/hooks/use-selected-month';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { useToast } from '@/hooks/use-toast';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
-import { useRouter } from 'next/navigation';
 
 export default function DashboardPage() {
     const { t } = useI18n();
-    const { user, loading: authLoading, logout } = useAuth();
+    const { user, loading: authLoading } = useAuth();
     const { selectedYear, selectedMonth, updateSelectedMonth } = useSelectedMonth();
     const [isClient, setIsClient] = useState(false);
     const userId = user?.uid;
-    const { toast } = useToast();
-    const router = useRouter();
 
    const {
      transactions: allTransactions,
@@ -60,30 +46,7 @@ export default function DashboardPage() {
 
   const hasError = transactionsError || budgetsError || categoriesError || debtsError;
 
-  useEffect(() => {
-    if (hasError) {
-      toast({
-        title: "Error al cargar datos",
-        description: "Algunos datos no pudieron cargarse. La aplicación sigue siendo funcional.",
-        variant: "destructive",
-      });
-    }
-  }, [hasError, toast]);
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-      router.push('/login');
-      toast({
-        title: t('auth.logout_success') || 'Sesión cerrada exitosamente',
-      });
-    } catch (error) {
-      toast({
-        variant: 'destructive',
-        title: t('auth.logout_error') || 'Error al cerrar sesión',
-      });
-    }
-  };
 
   const transactions = useMemo(() => {
     return allTransactions.filter(tx => {
@@ -146,43 +109,12 @@ export default function DashboardPage() {
     <>
       <AppLayout>
         <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-6 lg:p-8">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-end">
             <MonthSelector
               selectedYear={selectedYear}
               selectedMonth={selectedMonth}
               updateSelectedMonth={updateSelectedMonth}
             />
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                  <Avatar className="h-8 w-8">
-                    <AvatarFallback>{user?.email?.charAt(0).toUpperCase()}</AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="end" forceMount>
-                <DropdownMenuLabel className="font-normal">
-                  <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none">
-                      {user?.displayName || user?.email?.split('@')[0] || 'Usuario'}
-                    </p>
-                    <p className="text-xs leading-none text-muted-foreground">
-                      {user?.email}
-                    </p>
-                  </div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => router.push('/settings')}>
-                  <Settings className="mr-2 h-4 w-4" />
-                  <span>{t('nav.settings') || 'Configuración'}</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout}>
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>{t('logout') || 'Cerrar sesión'}</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
           </div>
           <SummaryCards
             income={summary.income}
