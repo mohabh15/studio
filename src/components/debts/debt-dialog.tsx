@@ -152,7 +152,7 @@ export default function DebtDialog({ isOpen, onOpenChange, onSave, debt }: DebtD
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px] glass-card depth-3">
-        <DialogHeader className="space-y-3 pb-4 border-b border-border/30">
+        <DialogHeader className="space-y-2 pb-3 border-b border-border/30">
           <div className="relative">
             <DialogTitle className="text-xl font-semibold bg-gradient-to-r from-primary via-primary/90 to-accent bg-clip-text text-transparent">
               {debt ? t('debt_dialog.edit_title') : t('debt_dialog.add_title')}
@@ -168,7 +168,7 @@ export default function DebtDialog({ isOpen, onOpenChange, onSave, debt }: DebtD
         </DialogHeader>
 
         <Form {...form}>
-           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
              <FormField
                control={form.control}
                name="direction"
@@ -176,7 +176,7 @@ export default function DebtDialog({ isOpen, onOpenChange, onSave, debt }: DebtD
                  <FormItem className="space-y-3">
                    <FormLabel>{t('debt_dialog.debt_direction')}</FormLabel>
                    <FormControl>
-                     <div className="grid grid-cols-1 gap-3">
+                     <div className="grid grid-cols-2 gap-2">
                        <Card
                          className={cn(
                            "cursor-pointer p-4 transition-all duration-300 hover-lift interactive-scale glass-effect border-border/40",
@@ -267,7 +267,7 @@ export default function DebtDialog({ isOpen, onOpenChange, onSave, debt }: DebtD
                )}
              />
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-3">
               <FormField
                 control={form.control}
                 name="monto"
@@ -311,7 +311,7 @@ export default function DebtDialog({ isOpen, onOpenChange, onSave, debt }: DebtD
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-3">
               {direction === 'outgoing' && (
                 <FormField
                   control={form.control}
@@ -395,7 +395,7 @@ export default function DebtDialog({ isOpen, onOpenChange, onSave, debt }: DebtD
               )}
             />
 
-            <DialogFooter className="pt-4 border-t border-border/30">
+            <DialogFooter className="pt-3 border-t border-border/30">
               <Button
                 type="button"
                 variant="outline"
