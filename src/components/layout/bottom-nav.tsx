@@ -117,7 +117,7 @@ export default function BottomNav({ isSidebarOpen: externalSidebarOpen, onSideba
   // Componente para navegación móvil (igual que antes)
   if (isMobile) {
     return (
-      <div className="fixed bottom-0 left-0 right-0 z-40 md:hidden">
+      <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden" style={{ position: 'fixed', bottom: 0, left: 0, right: 0 }}>
         {/* Fondo glass elegante mejorado */}
         <div className="absolute inset-0 glass-effect border-t border-border/30">
           <div className="h-full bg-gradient-to-t from-background/95 via-background/90 to-background/80 backdrop-blur-xl"></div>
@@ -136,87 +136,8 @@ export default function BottomNav({ isSidebarOpen: externalSidebarOpen, onSideba
     );
   }
 
-  // Componente para navegación desktop (barra lateral)
-  return (
-    <>
-      {/* Barra lateral para desktop */}
-      <div className={cn(
-        "fixed left-0 top-0 h-full z-40 transition-all duration-300 ease-in-out hidden md:block",
-        isSidebarOpen ? "w-64" : "w-16"
-      )}>
-        {/* Fondo glass elegante mejorado */}
-        <div className="absolute inset-0 glass-effect border-r border-border/30">
-          <div className="h-full bg-gradient-to-r from-background/95 via-background/90 to-background/80 backdrop-blur-xl"></div>
-        </div>
-
-        {/* Navegación lateral */}
-        <nav className="relative h-full flex flex-col pl-2 pr-4 pt-4">
-          {/* Botón para mostrar/esconder la barra lateral - arriba dentro de la barra */}
-          {!isMobile && (
-            <button
-              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              className="self-start p-2 mb-8 rounded-lg bg-background/50 backdrop-blur-sm border border-border/50 hover:bg-background transition-all duration-200"
-            >
-              {isSidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-            </button>
-          )}
-
-          <div className="space-y-2 flex-1">
-            {navItems.map(item => (
-              <SidebarNavLink key={item.href} item={item} isOpen={isSidebarOpen} />
-            ))}
-          </div>
-
-          {/* Dropdown de perfil de usuario - abajo del todo */}
-          <div className="mt-8 mb-4 pt-3 border-t border-border/30">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className={cn(
-                  "relative w-full py-2 pl-0 pr-3 rounded-xl transition-all duration-300 group cursor-pointer justify-start"
-                )}>
-                  <Avatar className="h-8 w-8 flex-shrink-0">
-                    <AvatarFallback>{user?.email?.charAt(0).toUpperCase()}</AvatarFallback>
-                  </Avatar>
-                  <span className={cn(
-                    "ml-3 font-medium text-sm transition-all duration-300 whitespace-nowrap overflow-hidden",
-                    isSidebarOpen ? "opacity-100 w-auto" : "opacity-0 w-0"
-                  )}>
-                    {user?.displayName || user?.email?.split('@')[0] || 'Usuario'}
-                  </span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="end" forceMount>
-                <DropdownMenuLabel className="font-normal">
-                  <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none">
-                      {user?.displayName || user?.email?.split('@')[0] || 'Usuario'}
-                    </p>
-                    <p className="text-xs leading-none text-muted-foreground">
-                      {user?.email}
-                    </p>
-                  </div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => router.push('/settings')}>
-                  <Settings className="mr-2 h-4 w-4" />
-                  <span>{t('nav.settings') || 'Configuración'}</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout}>
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>{t('logout') || 'Cerrar sesión'}</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </nav>
-
-        {/* Línea de separación derecha elegante */}
-        <div className="absolute right-0 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-border/50 to-transparent"></div>
-      </div>
-
-    </>
-  );
+  // Para desktop, no renderizar nada (elementos movidos al header)
+  return null;
 }
 
 // Componente para enlaces de navegación lateral

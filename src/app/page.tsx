@@ -140,47 +140,16 @@ export default function DashboardPage() {
   return (
     <>
       <AppLayout>
-        {isMobile && (
-          <header className="flex items-center justify-between px-4 py-3 bg-background/95 backdrop-blur-sm">
-            <MonthSelector
-              selectedYear={selectedYear}
-              selectedMonth={selectedMonth}
-              updateSelectedMonth={updateSelectedMonth}
-            />
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                  <Avatar className="h-8 w-8">
-                    <AvatarFallback>{user?.email?.charAt(0).toUpperCase()}</AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="end" forceMount>
-                <DropdownMenuLabel className="font-normal">
-                  <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none">
-                      {user?.displayName || user?.email?.split('@')[0] || 'Usuario'}
-                    </p>
-                    <p className="text-xs leading-none text-muted-foreground">
-                      {user?.email}
-                    </p>
-                  </div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => router.push('/settings')}>
-                  <Settings className="mr-2 h-4 w-4" />
-                  <span>{t('nav.settings') || 'Configuración'}</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout}>
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>{t('logout') || 'Cerrar sesión'}</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </header>
-        )}
         <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-6 lg:p-8">
+          {isMobile && (
+            <div className="flex justify-end mb-2">
+              <MonthSelector
+                selectedYear={selectedYear}
+                selectedMonth={selectedMonth}
+                updateSelectedMonth={updateSelectedMonth}
+              />
+            </div>
+          )}
           {!isMobile && (
             <div className="flex items-center justify-end">
               <MonthSelector

@@ -1,4 +1,5 @@
 
+ PASAR NAVBAR A LA PARTE SUPERIOR
 
 - cambios fluidos entre screens con prefecth
 - arreglar errores de logo no se ve siempre, quitar el de firestore
@@ -6,9 +7,26 @@
 - comprobar que al eliminar una deuda se eliminen las transacciones asociadas a esta
 - al eliminar una transaccion de una deuda inactiva que se mire si vuelve a tener saldo aun por pagar y cambiar a activa
 - arreglar card de añadir deuda 
+- arreglar animacion carga screen modo movil
 
 - SCREEN AHORRO CON METAS Y OBJETIVOS, SEGUIMIENTO DEL AHORRO E INVERSION
    - kpis tasa ahorro, ahorro total...etc
+   - parecido a deudas la estructura
+   - card objetivo libertad financiera
+   - card fondo emergencia que te vaya diciendo cuantos meses puedes cubrir con objetivo de minimo 3 
+
+-Screen presupuesto
+   - total del presupuesto
+   - total del ahorro teniendo en cuenta lo presupuestado
+   - card presupuesto vs gastado real 
+
+
+Entrada datos
+   - carga csv 
+   - carga datos no organizados -> conectar api ia para organizarlos, paso intermedio con edicion user 
+
+Descarga datos
+   - formato csv para la descarga de los datos: transacciones
 
 
 
@@ -175,29 +193,6 @@ faltantes, priorizadas por impacto en UX, escalabilidad y funcionalidades core.
    • Restauración selectiva
    • Historial de cambios
 
-================================================================================
-🎨                           PRIORIDAD BAJA
-================================================================================
-                         MEJORAS DE UX/UI
-
---------------------------------------------------------------------------------
-12. PERSONALIZACIÓN AVANZADA
---------------------------------------------------------------------------------
-📝 DESCRIPCIÓN:
-   Temas personalizados, widgets del dashboard configurables.
-
-🎯 IMPACTO:
-   Experiencia más personalizada.
-
-⏱️  ESFUERZO:
-   Medio (1 semana)
-
-🛠️  PASOS:
-   • Constructor de temas
-   • Dashboard widgets arrastrables
-   • Shortcuts personalizables
-   • Preferencias de visualización
-
 --------------------------------------------------------------------------------
 13. MODO COLABORATIVO
 --------------------------------------------------------------------------------
@@ -292,122 +287,6 @@ faltantes, priorizadas por impacto en UX, escalabilidad y funcionalidades core.
    • Análisis de patrones históricos
    • Predicciones de presupuesto
    • Recomendaciones automáticas
-
-================================================================================
-📊                       GRÁFICOS PROPUESTOS
-================================================================================
-                        PARA EL DASHBOARD
-
---------------------------------------------------------------------------------
-2b. GRÁFICO DETALLADO DE GASTOS POR CATEGORÍA (BAR CHART)
---------------------------------------------------------------------------------
-📍 UBICACIÓN:
-   Sección expandible o modal para vista detallada
-
-✨ BENEFICIOS:
-   • Vista detallada cuando se necesita precisión
-   • Comparación exacta de montos
-   • Análisis profundo de categorías específicas
-
---------------------------------------------------------------------------------
-3. GRÁFICO DE FLUJO DE EFECTIVO (AREA CHART)
---------------------------------------------------------------------------------
-📍 UBICACIÓN:
-   Nueva fila en el dashboard
-
-✨ BENEFICIOS:
-   • Ver la salud financiera general
-   • Identificar períodos de ahorro/gasto excesivo
-   • Proyección de tendencias futuras
-
---------------------------------------------------------------------------------
-4. GRÁFICO DE PRESUPUESTOS VS REALIDAD (PROGRESS BARS)
---------------------------------------------------------------------------------
-📍 UBICACIÓN:
-   Mejorar el componente BudgetStatus existente
-
-✨ BENEFICIOS:
-   • Visión clara del cumplimiento de presupuestos
-   • Alertas visuales cuando se acerca al límite
-   • Motivación para mantener disciplina
-
---------------------------------------------------------------------------------
-5. GRÁFICO DE INGRESOS POR CATEGORÍA (DONUT CHART)
---------------------------------------------------------------------------------
-📍 UBICACIÓN:
-   Complemento al gráfico de gastos
-
-✨ BENEFICIOS:
-   • Diversificación de ingresos
-   • Identificación de fuentes principales
-   • Planificación de ingresos futuros
-
---------------------------------------------------------------------------------
-6. GRÁFICO DE COMPARACIÓN AÑO ANTERIOR (DUAL AXIS CHART)
---------------------------------------------------------------------------------
-📍 UBICACIÓN:
-   Nueva sección de análisis
-
-✨ BENEFICIOS:
-   • Contexto histórico
-   • Medición de progreso anual
-   • Identificación de mejoras/deterioros
-
---------------------------------------------------------------------------------
-7. GRÁFICO DE GASTOS DIARIOS (HEATMAP CALENDAR)
---------------------------------------------------------------------------------
-📍 UBICACIÓN:
-   Widget compacto en el dashboard
-
-✨ BENEFICIOS:
-   • Identificar patrones diarios
-   • Días de alto gasto
-   • Hábitos de consumo
-
---------------------------------------------------------------------------------
-8. GRÁFICO DE PROYECCIÓN DE AHORRO (PROJECTION CHART)
---------------------------------------------------------------------------------
-📍 UBICACIÓN:
-   Sección de objetivos financieros
-
-✨ BENEFICIOS:
-   • Motivación a largo plazo
-   • Planificación financiera
-   • Metas realistas
-
---------------------------------------------------------------------------------
-9. GRÁFICO DE ROI POR CATEGORÍA (BUBBLE CHART)
---------------------------------------------------------------------------------
-📍 UBICACIÓN:
-   Análisis avanzado (opcional)
-
-✨ BENEFICIOS:
-   • Optimización de gastos
-   • Identificar gastos de "alto valor"
-   • Decisiones informadas
-
---------------------------------------------------------------------------------
-11. GRÁFICO DE PROGRESO DE DEUDAS (AREA CHART)
---------------------------------------------------------------------------------
-📍 UBICACIÓN:
-   Dashboard de deudas (/debts)
-
-✨ BENEFICIOS:
-   • Visualización clara de reducción de deuda a lo largo del tiempo
-   • Motivación para continuar pagando deudas
-   • Proyección de fecha estimada de libertad financiera
-   • Comparación de diferentes estrategias de pago
-
---------------------------------------------------------------------------------
-12. GRÁFICO DE FLUJO DE FONDOS (SANKEY DIAGRAM)
---------------------------------------------------------------------------------
-📍 UBICACIÓN:
-   Vista general financiera
-
-✨ BENEFICIOS:
-   • Entendimiento holístico del flujo de dinero
-   • Identificación de fugas financieras
-   • Optimización del flujo de efectivo
 
 ================================================================================
 ⚠️                        CONSIDERACIONES IMPORTANTES
