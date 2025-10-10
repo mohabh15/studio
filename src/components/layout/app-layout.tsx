@@ -131,7 +131,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
           </header>
         )}
 
-       <div className="relative overflow-y-auto flex-1 pb-20 md:overflow-visible md:flex-none md:pb-0">
+       <div className="relative overflow-y-auto flex-1 pb-20 md:overflow-y-auto md:flex-1 md:pb-0">
           {/* Línea de separación visual elegante */}
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-border/50 to-transparent"></div>
           {children}
