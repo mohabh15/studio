@@ -142,7 +142,7 @@ export default function DashboardPage() {
       <AppLayout>
         <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-6 lg:p-8">
           {isMobile && (
-            <div className="flex justify-end mb-2">
+            <div className="flex justify-end">
               <MonthSelector
                 selectedYear={selectedYear}
                 selectedMonth={selectedMonth}

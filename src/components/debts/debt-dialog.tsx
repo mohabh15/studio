@@ -151,8 +151,8 @@ export default function DebtDialog({ isOpen, onOpenChange, onSave, debt }: DebtD
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px] glass-card depth-3">
-        <DialogHeader className="space-y-2 pb-3 border-b border-border/30">
+      <DialogContent className="sm:max-w-[425px] p-4 sm:p-6 glass-card depth-3">
+        <DialogHeader className="space-y-1 pb-2 border-b border-border/30">
           <div className="relative">
             <DialogTitle className="text-xl font-semibold bg-gradient-to-r from-primary via-primary/90 to-accent bg-clip-text text-transparent">
               {debt ? t('debt_dialog.edit_title') : t('debt_dialog.add_title')}
@@ -168,18 +168,18 @@ export default function DebtDialog({ isOpen, onOpenChange, onSave, debt }: DebtD
         </DialogHeader>
 
         <Form {...form}>
-           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
+           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
              <FormField
                control={form.control}
                name="direction"
                render={({ field }) => (
-                 <FormItem className="space-y-3">
+                 <FormItem className="space-y-2">
                    <FormLabel>{t('debt_dialog.debt_direction')}</FormLabel>
                    <FormControl>
-                     <div className="grid grid-cols-2 gap-2">
+                     <div className="grid grid-cols-2 gap-1">
                        <Card
                          className={cn(
-                           "cursor-pointer p-4 transition-all duration-300 hover-lift interactive-scale glass-effect border-border/40",
+                           "cursor-pointer p-3 transition-all duration-300 hover-lift interactive-scale glass-effect border-border/40",
                            field.value === 'outgoing'
                              ? "bg-gradient-to-br from-error/20 to-error/10 border-error/40 shadow-lg shadow-error/20"
                              : "hover:bg-error/5 hover:border-error/30"
@@ -206,7 +206,7 @@ export default function DebtDialog({ isOpen, onOpenChange, onSave, debt }: DebtD
                        </Card>
                        <Card
                          className={cn(
-                           "cursor-pointer p-4 transition-all duration-300 hover-lift interactive-scale glass-effect border-border/40",
+                           "cursor-pointer p-3 transition-all duration-300 hover-lift interactive-scale glass-effect border-border/40",
                            field.value === 'incoming'
                              ? "bg-gradient-to-br from-success/20 to-success/10 border-success/40 shadow-lg shadow-success/20"
                              : "hover:bg-success/5 hover:border-success/30"
@@ -267,7 +267,7 @@ export default function DebtDialog({ isOpen, onOpenChange, onSave, debt }: DebtD
                )}
              />
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-2">
               <FormField
                 control={form.control}
                 name="monto"
@@ -311,7 +311,7 @@ export default function DebtDialog({ isOpen, onOpenChange, onSave, debt }: DebtD
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-2">
               {direction === 'outgoing' && (
                 <FormField
                   control={form.control}
@@ -386,7 +386,7 @@ export default function DebtDialog({ isOpen, onOpenChange, onSave, debt }: DebtD
                   <FormControl>
                     <Textarea
                       placeholder={t('debt_dialog.description_placeholder')}
-                      className="glass-effect hover-lift transition-all duration-300 focus:bg-background/80 focus:border-primary/60 focus:ring-2 focus:ring-primary/20 min-h-[80px] resize-none"
+                      className="glass-effect hover-lift transition-all duration-300 focus:bg-background/80 focus:border-primary/60 focus:ring-2 focus:ring-primary/20 min-h-[60px] resize-none"
                       {...field}
                     />
                   </FormControl>
@@ -395,7 +395,7 @@ export default function DebtDialog({ isOpen, onOpenChange, onSave, debt }: DebtD
               )}
             />
 
-            <DialogFooter className="pt-3 border-t border-border/30">
+            <DialogFooter className="pt-2 border-t border-border/30">
               <Button
                 type="button"
                 variant="outline"
@@ -408,7 +408,7 @@ export default function DebtDialog({ isOpen, onOpenChange, onSave, debt }: DebtD
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white font-medium px-6 py-2 h-10 shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300 hover-lift"
+                className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white font-medium px-4 py-2 h-9 shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300 hover-lift"
               >
                 {isSubmitting ? t('debt_dialog.saving') : (debt ? t('debt_dialog.update') : t('common.save'))}
               </Button>

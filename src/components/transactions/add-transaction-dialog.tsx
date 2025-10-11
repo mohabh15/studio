@@ -154,8 +154,8 @@ export default function AddTransactionDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[480px] p-6 glass-card depth-3">
-        <DialogHeader className="space-y-3 pb-4 border-b border-border/30">
+      <DialogContent className="sm:max-w-[480px] p-4 sm:p-6 glass-card depth-3">
+        <DialogHeader className="space-y-2 pb-2 border-b border-border/30">
           <div className="relative">
             <DialogTitle className="text-xl font-semibold bg-gradient-to-r from-primary via-primary/90 to-accent bg-clip-text text-transparent">
               {t('add_transaction_dialog.title')}
@@ -166,10 +166,10 @@ export default function AddTransactionDialog({
             {t('add_transaction_dialog.description')}
           </DialogDescription>
         </DialogHeader>
-        <div className="relative mt-3">
+        <div className="relative mt-2">
           <Button
             variant="outline"
-            className="w-full h-12 glass-effect hover-lift interactive-scale border-primary/30 hover:border-primary/60 hover:bg-primary/5 transition-all duration-300"
+            className="w-full h-10 glass-effect hover-lift interactive-scale border-primary/30 hover:border-primary/60 hover:bg-primary/5 transition-all duration-300"
             onClick={() => document.getElementById('receipt-upload')?.click()}
             disabled={isScanning}
           >
@@ -194,7 +194,7 @@ export default function AddTransactionDialog({
           />
         </div>
 
-        <div className="relative my-4 flex items-center justify-center">
+        <div className="relative my-2 flex items-center justify-center">
           <div className="absolute inset-0 flex items-center">
             <span className="w-full border-t border-border/40" />
           </div>
@@ -204,13 +204,13 @@ export default function AddTransactionDialog({
         </div>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
-            <div className="grid grid-cols-2 gap-3">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
+            <div className="grid grid-cols-2 gap-2">
               <Button
                 type="button"
                 variant={activeType === 'expense' ? 'default' : 'outline'}
                 className={cn(
-                  "h-11 transition-all duration-300 hover-lift interactive-scale font-medium",
+                  "h-9 transition-all duration-300 hover-lift interactive-scale font-medium",
                   activeType === 'expense'
                     ? 'bg-gradient-to-r from-error to-error/80 hover:from-error/90 hover:to-error/70 text-white shadow-lg shadow-error/25 border-0'
                     : 'glass-effect border-error/30 hover:border-error/50 hover:bg-error/5 text-error hover:text-error'
@@ -223,7 +223,7 @@ export default function AddTransactionDialog({
                 type="button"
                 variant={activeType === 'income' ? 'default' : 'outline'}
                 className={cn(
-                  "h-11 transition-all duration-300 hover-lift interactive-scale font-medium",
+                  "h-9 transition-all duration-300 hover-lift interactive-scale font-medium",
                   activeType === 'income'
                     ? 'bg-gradient-to-r from-success to-success/80 hover:from-success/90 hover:to-success/70 text-white shadow-lg shadow-success/25 border-0'
                     : 'glass-effect border-success/30 hover:border-success/50 hover:bg-success/5 text-success hover:text-success'
@@ -252,7 +252,7 @@ export default function AddTransactionDialog({
                 </FormItem>
               )}
             />
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-2 sm:gap-4 sm:grid-cols-2">
               <FormField
                 control={form.control}
                 name="date"
@@ -353,7 +353,7 @@ export default function AddTransactionDialog({
                   <FormControl>
                     <Textarea
                       placeholder={t('add_transaction_dialog.notes_placeholder')}
-                      className="glass-effect hover-lift transition-all duration-300 focus:bg-background/80 focus:border-primary/60 focus:ring-2 focus:ring-primary/20 min-h-[80px] resize-none"
+                      className="glass-effect hover-lift transition-all duration-300 focus:bg-background/80 focus:border-primary/60 focus:ring-2 focus:ring-primary/20 min-h-[60px] resize-none"
                       {...field}
                     />
                   </FormControl>
@@ -362,10 +362,10 @@ export default function AddTransactionDialog({
               )}
             />
 
-            <DialogFooter className="pt-4 border-t border-border/30">
+            <DialogFooter className="pt-2 border-t border-border/30">
               <Button
                 type="submit"
-                className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white font-medium px-6 py-2 h-10 shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300 hover-lift"
+                className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white font-medium px-4 py-2 h-9 shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300 hover-lift"
               >
                 {t('add_transaction_dialog.save_transaction')}
               </Button>

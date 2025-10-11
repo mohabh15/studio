@@ -1,5 +1,5 @@
 
- PASAR NAVBAR A LA PARTE SUPERIOR
+ !! ARREGLAR MODALES AÑADIR DEUDA Y AÑADIR TRANSACTIONS. !!
 
 - cambios fluidos entre screens con prefecth
 - arreglar errores de logo no se ve siempre, quitar el de firestore
