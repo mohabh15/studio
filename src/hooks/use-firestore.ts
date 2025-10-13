@@ -11,6 +11,7 @@ import {
   query,
   orderBy,
   where,
+  onSnapshot,
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Transaction, Category, Budget, Debt, DebtPayment, DebtGoal, Savings, SavingsContribution, EmergencyFund, FinancialFreedomGoal } from '@/lib/types';
@@ -41,7 +42,7 @@ export function useFirestoreTransactions(userId: string) {
   const addTransaction = async (transaction: Omit<Transaction, 'id' | 'userId'>) => {
     try {
       await addDoc(collection(db, 'transactions'), { ...transaction, userId });
-      await fetchTransactions(); // Refresh data
+      // No need to refetch, real-time listener will update
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error adding transaction');
     }
@@ -51,7 +52,7 @@ export function useFirestoreTransactions(userId: string) {
     try {
       const docRef = doc(db, 'transactions', id);
       await updateDoc(docRef, updates);
-      await fetchTransactions();
+      // No need to refetch, real-time listener will update
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error updating transaction');
     }
@@ -111,14 +112,29 @@ export function useFirestoreTransactions(userId: string) {
         throw new Error(`Transaction with id ${id} does not exist`);
       }
 
-      await fetchTransactions();
+      // No need to refetch, real-time listener will update
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error deleting transaction');
     }
   };
 
   useEffect(() => {
-    fetchTransactions();
+    if (!userId) return;
+
+    const q = query(collection(db, 'transactions'), where('userId', '==', userId));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const data = snapshot.docs
+        .map(doc => ({ id: doc.id, ...doc.data() } as Transaction))
+        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      setTransactions(data);
+      setLoading(false);
+      setError(null);
+    }, (err) => {
+      setError(err instanceof Error ? err.message : 'Error fetching transactions');
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
   }, [userId]);
 
   return {
@@ -170,7 +186,7 @@ export function useFirestoreCategories(userId: string) {
     try {
       const docRef = doc(db, 'categories', category.id);
       await setDoc(docRef, category);
-      await fetchCategories();
+      // No need to refetch, real-time listener will update
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error adding category');
     }
@@ -180,7 +196,7 @@ export function useFirestoreCategories(userId: string) {
     try {
       const docRef = doc(db, 'categories', id);
       await updateDoc(docRef, updates);
-      await fetchCategories();
+      // No need to refetch, real-time listener will update
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error updating category');
     }
@@ -205,14 +221,39 @@ export function useFirestoreCategories(userId: string) {
         }
       }
 
-      await fetchCategories();
+      // No need to refetch, real-time listener will update
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error deleting category');
     }
   };
 
   useEffect(() => {
-    fetchCategories();
+    if (!userId) return;
+
+    const q = query(collection(db, 'categories'), where('userId', 'in', ['default', userId]));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const data = snapshot.docs
+        .map(doc => ({ id: doc.id, ...doc.data() } as Category))
+        // Remove duplicates by prioritizing user-specific categories over system ones
+        .reduce((acc, category) => {
+          const existingIndex = acc.findIndex(cat => cat.id === category.id);
+          if (existingIndex >= 0) {
+            // Replace system category with user-specific one if it exists
+            acc[existingIndex] = category;
+          } else {
+            acc.push(category);
+          }
+          return acc;
+        }, [] as Category[]);
+      setCategories(data);
+      setLoading(false);
+      setError(null);
+    }, (err) => {
+      setError(err instanceof Error ? err.message : 'Error fetching categories');
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
   }, [userId]);
 
   return {
@@ -251,7 +292,7 @@ export function useFirestoreBudgets(userId: string) {
   const addBudget = async (budget: Omit<Budget, 'id' | 'userId'>) => {
     try {
       await addDoc(collection(db, 'budgets'), { ...budget, userId });
-      await fetchBudgets();
+      // No need to refetch, real-time listener will update
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error adding budget');
     }
@@ -261,7 +302,7 @@ export function useFirestoreBudgets(userId: string) {
     try {
       const docRef = doc(db, 'budgets', id);
       await updateDoc(docRef, updates);
-      await fetchBudgets();
+      // No need to refetch, real-time listener will update
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error updating budget');
     }
@@ -270,14 +311,28 @@ export function useFirestoreBudgets(userId: string) {
   const deleteBudget = async (id: string) => {
     try {
       await deleteDoc(doc(db, 'budgets', id));
-      await fetchBudgets();
+      // No need to refetch, real-time listener will update
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error deleting budget');
     }
   };
 
   useEffect(() => {
-    fetchBudgets();
+    if (!userId) return;
+
+    const q = query(collection(db, 'budgets'), where('userId', '==', userId));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const data = snapshot.docs
+        .map(doc => ({ id: doc.id, ...doc.data() } as Budget));
+      setBudgets(data);
+      setLoading(false);
+      setError(null);
+    }, (err) => {
+      setError(err instanceof Error ? err.message : 'Error fetching budgets');
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
   }, [userId]);
 
   return {
@@ -316,7 +371,7 @@ export function useFirestoreDebts(userId: string) {
   const addDebt = async (debt: Omit<Debt, 'id' | 'userId'>) => {
     try {
       await addDoc(collection(db, 'debts'), { ...debt, userId });
-      await fetchDebts();
+      // No need to refetch, real-time listener will update
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error adding debt');
     }
@@ -326,7 +381,7 @@ export function useFirestoreDebts(userId: string) {
     try {
       const docRef = doc(db, 'debts', id);
       await updateDoc(docRef, updates);
-      await fetchDebts();
+      // No need to refetch, real-time listener will update
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error updating debt');
     }
@@ -335,14 +390,28 @@ export function useFirestoreDebts(userId: string) {
   const deleteDebt = async (id: string) => {
     try {
       await deleteDoc(doc(db, 'debts', id));
-      await fetchDebts();
+      // No need to refetch, real-time listener will update
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error deleting debt');
     }
   };
 
   useEffect(() => {
-    fetchDebts();
+    if (!userId) return;
+
+    const q = query(collection(db, 'debts'), where('userId', '==', userId));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const data = snapshot.docs
+        .map(doc => ({ id: doc.id, ...doc.data() } as Debt));
+      setDebts(data);
+      setLoading(false);
+      setError(null);
+    }, (err) => {
+      setError(err instanceof Error ? err.message : 'Error fetching debts');
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
   }, [userId]);
 
   return {
@@ -381,7 +450,7 @@ export function useFirestoreDebtPayments(userId: string) {
   const addDebtPayment = async (payment: Omit<DebtPayment, 'id' | 'userId'>) => {
     try {
       await addDoc(collection(db, 'debt_payments'), { ...payment, userId });
-      await fetchDebtPayments();
+      // No need to refetch, real-time listener will update
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error adding debt payment');
     }
@@ -391,7 +460,7 @@ export function useFirestoreDebtPayments(userId: string) {
     try {
       const docRef = doc(db, 'debt_payments', id);
       await updateDoc(docRef, updates);
-      await fetchDebtPayments();
+      // No need to refetch, real-time listener will update
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error updating debt payment');
     }
@@ -400,14 +469,28 @@ export function useFirestoreDebtPayments(userId: string) {
   const deleteDebtPayment = async (id: string) => {
     try {
       await deleteDoc(doc(db, 'debt_payments', id));
-      await fetchDebtPayments();
+      // No need to refetch, real-time listener will update
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error deleting debt payment');
     }
   };
 
   useEffect(() => {
-    fetchDebtPayments();
+    if (!userId) return;
+
+    const q = query(collection(db, 'debt_payments'), where('userId', '==', userId));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const data = snapshot.docs
+        .map(doc => ({ id: doc.id, ...doc.data() } as DebtPayment));
+      setDebtPayments(data);
+      setLoading(false);
+      setError(null);
+    }, (err) => {
+      setError(err instanceof Error ? err.message : 'Error fetching debt payments');
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
   }, [userId]);
 
   return {
@@ -512,7 +595,7 @@ export function useFirestoreSavings(userId: string) {
     try {
       setError(null); // Clear any previous errors
       await addDoc(collection(db, 'savings'), { ...savings, userId });
-      await fetchSavings(); // Refresh data after successful addition
+      // No need to refetch, real-time listener will update
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error adding savings';
       setError(errorMessage);
@@ -525,7 +608,7 @@ export function useFirestoreSavings(userId: string) {
       setError(null); // Clear any previous errors
       const docRef = doc(db, 'savings', id);
       await updateDoc(docRef, updates);
-      await fetchSavings(); // Refresh data after successful update
+      // No need to refetch, real-time listener will update
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error updating savings';
       setError(errorMessage);
@@ -536,14 +619,28 @@ export function useFirestoreSavings(userId: string) {
   const deleteSavings = async (id: string) => {
     try {
       await deleteDoc(doc(db, 'savings', id));
-      await fetchSavings();
+      // No need to refetch, real-time listener will update
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error deleting savings');
     }
   };
 
   useEffect(() => {
-    fetchSavings();
+    if (!userId) return;
+
+    const q = query(collection(db, 'savings'), where('userId', '==', userId));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const data = snapshot.docs
+        .map(doc => ({ id: doc.id, ...doc.data() } as Savings));
+      setSavings(data);
+      setLoading(false);
+      setError(null);
+    }, (err) => {
+      setError(err instanceof Error ? err.message : 'Error fetching savings');
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
   }, [userId]);
 
   return {
@@ -582,7 +679,7 @@ export function useFirestoreSavingsContributions(userId: string) {
   const addContribution = async (contribution: Omit<SavingsContribution, 'id' | 'userId'>) => {
     try {
       await addDoc(collection(db, 'savings_contributions'), { ...contribution, userId });
-      await fetchContributions();
+      // No need to refetch, real-time listener will update
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error adding savings contribution');
     }
@@ -592,7 +689,7 @@ export function useFirestoreSavingsContributions(userId: string) {
     try {
       const docRef = doc(db, 'savings_contributions', id);
       await updateDoc(docRef, updates);
-      await fetchContributions();
+      // No need to refetch, real-time listener will update
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error updating savings contribution');
     }
@@ -601,14 +698,28 @@ export function useFirestoreSavingsContributions(userId: string) {
   const deleteContribution = async (id: string) => {
     try {
       await deleteDoc(doc(db, 'savings_contributions', id));
-      await fetchContributions();
+      // No need to refetch, real-time listener will update
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error deleting savings contribution');
     }
   };
 
   useEffect(() => {
-    fetchContributions();
+    if (!userId) return;
+
+    const q = query(collection(db, 'savings_contributions'), where('userId', '==', userId));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const data = snapshot.docs
+        .map(doc => ({ id: doc.id, ...doc.data() } as SavingsContribution));
+      setContributions(data);
+      setLoading(false);
+      setError(null);
+    }, (err) => {
+      setError(err instanceof Error ? err.message : 'Error fetching savings contributions');
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
   }, [userId]);
 
   return {
@@ -647,7 +758,7 @@ export function useFirestoreEmergencyFund(userId: string) {
   const addEmergencyFund = async (fund: Omit<EmergencyFund, 'id' | 'userId'>) => {
     try {
       await addDoc(collection(db, 'emergency_fund'), { ...fund, userId });
-      await fetchEmergencyFund();
+      // No need to refetch, real-time listener will update
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error adding emergency fund');
     }
@@ -657,7 +768,7 @@ export function useFirestoreEmergencyFund(userId: string) {
     try {
       const docRef = doc(db, 'emergency_fund', id);
       await updateDoc(docRef, updates);
-      await fetchEmergencyFund();
+      // No need to refetch, real-time listener will update
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error updating emergency fund');
     }
@@ -666,14 +777,28 @@ export function useFirestoreEmergencyFund(userId: string) {
   const deleteEmergencyFund = async (id: string) => {
     try {
       await deleteDoc(doc(db, 'emergency_fund', id));
-      await fetchEmergencyFund();
+      // No need to refetch, real-time listener will update
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error deleting emergency fund');
     }
   };
 
   useEffect(() => {
-    fetchEmergencyFund();
+    if (!userId) return;
+
+    const q = query(collection(db, 'emergency_fund'), where('userId', '==', userId));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const data = snapshot.docs
+        .map(doc => ({ id: doc.id, ...doc.data() } as EmergencyFund));
+      setEmergencyFund(data);
+      setLoading(false);
+      setError(null);
+    }, (err) => {
+      setError(err instanceof Error ? err.message : 'Error fetching emergency fund');
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
   }, [userId]);
 
   return {
@@ -712,7 +837,7 @@ export function useFirestoreFinancialFreedomGoals(userId: string) {
   const addGoal = async (goal: Omit<FinancialFreedomGoal, 'id' | 'userId'>) => {
     try {
       await addDoc(collection(db, 'financial_freedom_goals'), { ...goal, userId });
-      await fetchGoals();
+      // No need to refetch, real-time listener will update
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error adding financial freedom goal');
     }
@@ -722,7 +847,7 @@ export function useFirestoreFinancialFreedomGoals(userId: string) {
     try {
       const docRef = doc(db, 'financial_freedom_goals', id);
       await updateDoc(docRef, updates);
-      await fetchGoals();
+      // No need to refetch, real-time listener will update
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error updating financial freedom goal');
     }
@@ -731,14 +856,28 @@ export function useFirestoreFinancialFreedomGoals(userId: string) {
   const deleteGoal = async (id: string) => {
     try {
       await deleteDoc(doc(db, 'financial_freedom_goals', id));
-      await fetchGoals();
+      // No need to refetch, real-time listener will update
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error deleting financial freedom goal');
     }
   };
 
   useEffect(() => {
-    fetchGoals();
+    if (!userId) return;
+
+    const q = query(collection(db, 'financial_freedom_goals'), where('userId', '==', userId));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const data = snapshot.docs
+        .map(doc => ({ id: doc.id, ...doc.data() } as FinancialFreedomGoal));
+      setGoals(data);
+      setLoading(false);
+      setError(null);
+    }, (err) => {
+      setError(err instanceof Error ? err.message : 'Error fetching financial freedom goals');
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
   }, [userId]);
 
   return {

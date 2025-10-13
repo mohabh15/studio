@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import type { Category, Transaction } from '@/lib/types';
-import { useFirestoreTransactions, useFirestoreCategories } from '@/hooks/use-firestore';
+import { useData } from '@/contexts/data-context';
 import { useAuth } from '@/hooks/use-auth';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useShowDebts } from '@/hooks/use-show-debts';
@@ -36,8 +36,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const isMobile = useIsMobile();
   const [isAddTransactionOpen, setAddTransactionOpen] = useState(false);
   const userId = user?.uid;
-  const { addTransaction } = useFirestoreTransactions(userId || '');
-  const { categories } = useFirestoreCategories(userId || '');
+  const { addTransaction, categories } = useData();
   const { showDebts } = useShowDebts();
   const pathname = usePathname();
   const { toast } = useToast();
@@ -70,8 +69,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
   const handleTransactionAdded = async (newTx: Omit<Transaction, 'id'>) => {
     if (!userId) return;
-    const transactionWithUserId = { ...newTx, userId };
-    await addTransaction(transactionWithUserId);
+    await addTransaction(newTx);
     setAddTransactionOpen(false);
   };
   
