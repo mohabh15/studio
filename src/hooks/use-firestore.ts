@@ -13,7 +13,7 @@ import {
   where,
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { Transaction, Category, Budget, Debt, DebtPayment, DebtGoal } from '@/lib/types';
+import { Transaction, Category, Budget, Debt, DebtPayment, DebtGoal, Savings, SavingsContribution, EmergencyFund, FinancialFreedomGoal } from '@/lib/types';
 
 // Hook for transactions
 export function useFirestoreTransactions(userId: string) {
@@ -483,5 +483,271 @@ export function useFirestoreDebtGoals(userId: string) {
     updateDebtGoal,
     deleteDebtGoal,
     refetch: fetchDebtGoals,
+  };
+}
+
+// Hook for savings
+export function useFirestoreSavings(userId: string) {
+  const [savings, setSavings] = useState<Savings[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchSavings = async () => {
+    try {
+      setLoading(true);
+      const q = query(collection(db, 'savings'), where('userId', '==', userId));
+      const snapshot = await getDocs(q);
+      const data = snapshot.docs
+        .map(doc => ({ id: doc.id, ...doc.data() } as Savings));
+      setSavings(data);
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error fetching savings');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const addSavings = async (savings: Omit<Savings, 'id' | 'userId'>) => {
+    try {
+      setError(null); // Clear any previous errors
+      await addDoc(collection(db, 'savings'), { ...savings, userId });
+      await fetchSavings(); // Refresh data after successful addition
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Error adding savings';
+      setError(errorMessage);
+      throw new Error(errorMessage); // Re-throw to allow component-level error handling
+    }
+  };
+
+  const updateSavings = async (id: string, updates: Partial<Savings>) => {
+    try {
+      setError(null); // Clear any previous errors
+      const docRef = doc(db, 'savings', id);
+      await updateDoc(docRef, updates);
+      await fetchSavings(); // Refresh data after successful update
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Error updating savings';
+      setError(errorMessage);
+      throw new Error(errorMessage); // Re-throw to allow component-level error handling
+    }
+  };
+
+  const deleteSavings = async (id: string) => {
+    try {
+      await deleteDoc(doc(db, 'savings', id));
+      await fetchSavings();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error deleting savings');
+    }
+  };
+
+  useEffect(() => {
+    fetchSavings();
+  }, [userId]);
+
+  return {
+    savings,
+    loading,
+    error,
+    addSavings,
+    updateSavings,
+    deleteSavings,
+    refetch: fetchSavings,
+  };
+}
+
+// Hook for savings contributions
+export function useFirestoreSavingsContributions(userId: string) {
+  const [contributions, setContributions] = useState<SavingsContribution[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchContributions = async () => {
+    try {
+      setLoading(true);
+      const q = query(collection(db, 'savings_contributions'), where('userId', '==', userId));
+      const snapshot = await getDocs(q);
+      const data = snapshot.docs
+        .map(doc => ({ id: doc.id, ...doc.data() } as SavingsContribution));
+      setContributions(data);
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error fetching savings contributions');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const addContribution = async (contribution: Omit<SavingsContribution, 'id' | 'userId'>) => {
+    try {
+      await addDoc(collection(db, 'savings_contributions'), { ...contribution, userId });
+      await fetchContributions();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error adding savings contribution');
+    }
+  };
+
+  const updateContribution = async (id: string, updates: Partial<SavingsContribution>) => {
+    try {
+      const docRef = doc(db, 'savings_contributions', id);
+      await updateDoc(docRef, updates);
+      await fetchContributions();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error updating savings contribution');
+    }
+  };
+
+  const deleteContribution = async (id: string) => {
+    try {
+      await deleteDoc(doc(db, 'savings_contributions', id));
+      await fetchContributions();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error deleting savings contribution');
+    }
+  };
+
+  useEffect(() => {
+    fetchContributions();
+  }, [userId]);
+
+  return {
+    contributions,
+    loading,
+    error,
+    addContribution,
+    updateContribution,
+    deleteContribution,
+    refetch: fetchContributions,
+  };
+}
+
+// Hook for emergency fund
+export function useFirestoreEmergencyFund(userId: string) {
+  const [emergencyFund, setEmergencyFund] = useState<EmergencyFund[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchEmergencyFund = async () => {
+    try {
+      setLoading(true);
+      const q = query(collection(db, 'emergency_fund'), where('userId', '==', userId));
+      const snapshot = await getDocs(q);
+      const data = snapshot.docs
+        .map(doc => ({ id: doc.id, ...doc.data() } as EmergencyFund));
+      setEmergencyFund(data);
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error fetching emergency fund');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const addEmergencyFund = async (fund: Omit<EmergencyFund, 'id' | 'userId'>) => {
+    try {
+      await addDoc(collection(db, 'emergency_fund'), { ...fund, userId });
+      await fetchEmergencyFund();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error adding emergency fund');
+    }
+  };
+
+  const updateEmergencyFund = async (id: string, updates: Partial<EmergencyFund>) => {
+    try {
+      const docRef = doc(db, 'emergency_fund', id);
+      await updateDoc(docRef, updates);
+      await fetchEmergencyFund();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error updating emergency fund');
+    }
+  };
+
+  const deleteEmergencyFund = async (id: string) => {
+    try {
+      await deleteDoc(doc(db, 'emergency_fund', id));
+      await fetchEmergencyFund();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error deleting emergency fund');
+    }
+  };
+
+  useEffect(() => {
+    fetchEmergencyFund();
+  }, [userId]);
+
+  return {
+    emergencyFund,
+    loading,
+    error,
+    addEmergencyFund,
+    updateEmergencyFund,
+    deleteEmergencyFund,
+    refetch: fetchEmergencyFund,
+  };
+}
+
+// Hook for financial freedom goals
+export function useFirestoreFinancialFreedomGoals(userId: string) {
+  const [goals, setGoals] = useState<FinancialFreedomGoal[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchGoals = async () => {
+    try {
+      setLoading(true);
+      const q = query(collection(db, 'financial_freedom_goals'), where('userId', '==', userId));
+      const snapshot = await getDocs(q);
+      const data = snapshot.docs
+        .map(doc => ({ id: doc.id, ...doc.data() } as FinancialFreedomGoal));
+      setGoals(data);
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error fetching financial freedom goals');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const addGoal = async (goal: Omit<FinancialFreedomGoal, 'id' | 'userId'>) => {
+    try {
+      await addDoc(collection(db, 'financial_freedom_goals'), { ...goal, userId });
+      await fetchGoals();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error adding financial freedom goal');
+    }
+  };
+
+  const updateGoal = async (id: string, updates: Partial<FinancialFreedomGoal>) => {
+    try {
+      const docRef = doc(db, 'financial_freedom_goals', id);
+      await updateDoc(docRef, updates);
+      await fetchGoals();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error updating financial freedom goal');
+    }
+  };
+
+  const deleteGoal = async (id: string) => {
+    try {
+      await deleteDoc(doc(db, 'financial_freedom_goals', id));
+      await fetchGoals();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error deleting financial freedom goal');
+    }
+  };
+
+  useEffect(() => {
+    fetchGoals();
+  }, [userId]);
+
+  return {
+    goals,
+    loading,
+    error,
+    addGoal,
+    updateGoal,
+    deleteGoal,
+    refetch: fetchGoals,
   };
 }

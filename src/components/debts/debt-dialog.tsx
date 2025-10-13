@@ -131,17 +131,32 @@ export default function DebtDialog({ isOpen, onOpenChange, onSave, debt }: DebtD
   }, [debt, form]);
 
   const onSubmit = async (values: DebtFormValues) => {
+    if (!user?.uid) {
+      console.error('Usuario no autenticado');
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      const { direction, ...rest } = values;
-      const debtData: Omit<Debt, 'id'> & { direction: string } = {
-         ...rest,
-         direction,
-         userId: user?.uid || '',
-         fecha_creacion: debt?.fecha_creacion || new Date().toISOString(),
-       };
-      await onSave(debtData as any);
+      const { direction, descripcion, ...rest } = values;
+
+      // Build the debt data object, filtering out undefined values
+      const debtData = {
+        ...rest,
+        direction,
+        descripcion: descripcion?.trim() || undefined,
+        userId: user.uid,
+        fecha_creacion: debt?.fecha_creacion || new Date().toISOString(),
+      };
+
+      // Filter out undefined values before sending to Firestore
+      const filteredData = Object.fromEntries(
+        Object.entries(debtData).filter(([_, value]) => value !== undefined)
+      ) as Omit<Debt, 'id'>;
+
+      await onSave(filteredData);
       onOpenChange(false);
+      form.reset(); // Clear form after successful save
     } catch (error) {
       console.error('Error saving debt:', error);
     } finally {

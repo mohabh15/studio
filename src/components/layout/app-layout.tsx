@@ -138,21 +138,23 @@ export default function AppLayout({ children }: AppLayoutProps) {
         </div>
 
         {/* Botón flotante para añadir transacción - con efectos elegantes mejorados */}
-        <div className="fixed bottom-24 right-4 z-40 sm:bottom-20 sm:right-6">
-          <div className="relative group">
-            {/* Efectos de brillo sutil */}
-            <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 via-accent/20 to-primary/20 rounded-full blur opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            <Button
-              onClick={() => setAddTransactionOpen(true)}
-              size="icon"
-              className="relative h-16 w-16 sm:h-18 sm:w-18 rounded-full bg-gradient-to-br from-primary via-primary to-accent shadow-2xl hover:shadow-primary/25 hover:scale-105 active:scale-95 transition-all duration-300 border border-primary/20 backdrop-blur-sm"
-              disabled={!user}
-            >
-              <Plus className="h-8 w-8 sm:h-9 sm:w-9 text-primary-foreground drop-shadow-sm" />
-              <span className="sr-only">{t('header.add_transaction')}</span>
-            </Button>
+        {pathname !== '/savings' && (
+          <div className="fixed bottom-24 right-4 z-40 sm:bottom-20 sm:right-6">
+            <div className="relative group">
+              {/* Efectos de brillo sutil */}
+              <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 via-accent/20 to-primary/20 rounded-full blur opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <Button
+                onClick={() => setAddTransactionOpen(true)}
+                size="icon"
+                className="relative h-16 w-16 sm:h-18 sm:w-18 rounded-full bg-gradient-to-br from-primary via-primary to-accent shadow-2xl hover:shadow-primary/25 hover:scale-105 active:scale-95 transition-all duration-300 border border-primary/20 backdrop-blur-sm"
+                disabled={!user}
+              >
+                <Plus className="h-8 w-8 sm:h-9 sm:w-9 text-primary-foreground drop-shadow-sm" />
+                <span className="sr-only">{t('header.add_transaction')}</span>
+              </Button>
+            </div>
           </div>
-        </div>
+        )}
 
         <BottomNav />
       </div>

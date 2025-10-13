@@ -64,3 +64,54 @@ export type DebtGoal = {
   completed: boolean;
   fecha_creacion: string;
 };
+
+export type SavingsType = 'emergency_fund' | 'investment' | 'purchase_goal' | 'vacation' | 'retirement' | 'other';
+
+export type Savings = {
+  id: string;
+  userId: string;
+  tipo: SavingsType;
+  nombre: string;
+  monto_actual: number; // monto actual ahorrado
+  monto_objetivo?: number; // monto objetivo (opcional)
+  fecha_objetivo?: string; // fecha objetivo (ISO string, opcional)
+  descripcion?: string;
+  fecha_creacion: string; // fecha cuando se creó el ahorro (ISO string)
+  status: 'active' | 'completed' | 'paused';
+  interes_anual?: number; // tasa de interés anual en porcentaje (opcional)
+};
+
+export type SavingsContribution = {
+  id: string;
+  userId: string;
+  savings_id: string;
+  amount: number;
+  date: string; // ISO string
+  description?: string;
+  tipo: 'regular' | 'extra'; // aporte regular vs aporte extra
+  transaction_id?: string; // referencia a la transacción creada
+};
+
+export type EmergencyFund = {
+  id: string;
+  userId: string;
+  monto_actual: number;
+  monto_objetivo: number; // objetivo mínimo 3 meses de gastos
+  gastos_mensuales: number; // gastos mensuales promedio
+  fecha_creacion: string;
+  meses_cobertura_actual: number; // meses que cubre actualmente
+};
+
+export type FinancialFreedomGoal = {
+  id: string;
+  userId: string;
+  nombre: string;
+  descripcion?: string;
+  ingresos_pasivos_objetivo: number; // ingresos pasivos mensuales objetivo
+  gastos_mensuales_actuales: number;
+  patrimonio_objetivo: number; // patrimonio necesario para generar los ingresos pasivos
+  patrimonio_actual: number;
+  fecha_objetivo: string; // fecha objetivo (ISO string)
+  fecha_creacion: string;
+  status: 'active' | 'achieved' | 'paused';
+};

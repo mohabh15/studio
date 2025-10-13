@@ -1,24 +1,25 @@
 
- !! ARREGLAR MODALES AÑADIR DEUDA Y AÑADIR TRANSACTIONS. !!
+
+-añadir transaccion al hacer una contribucion, configurar categorica contribucion de las transacciones
+
+- SEGURIDAD A LOS DATOS, PARA QUE SOLO SEAN VISIBLES POR EL USUARIO()
+
 
 - cambios fluidos entre screens con prefecth
 - arreglar errores de logo no se ve siempre, quitar el de firestore
 - corregir traducciones en pagina deuda
 - comprobar que al eliminar una deuda se eliminen las transacciones asociadas a esta
 - al eliminar una transaccion de una deuda inactiva que se mire si vuelve a tener saldo aun por pagar y cambiar a activa
-- arreglar card de añadir deuda 
 - arreglar animacion carga screen modo movil
 
 - SCREEN AHORRO CON METAS Y OBJETIVOS, SEGUIMIENTO DEL AHORRO E INVERSION
    - kpis tasa ahorro, ahorro total...etc
-   - parecido a deudas la estructura
    - card objetivo libertad financiera
-   - card fondo emergencia que te vaya diciendo cuantos meses puedes cubrir con objetivo de minimo 3 
 
 -Screen presupuesto
    - total del presupuesto
    - total del ahorro teniendo en cuenta lo presupuestado
-   - card presupuesto vs gastado real 
+   - card presupuesto vs gastado real  total
 
 
 Entrada datos
