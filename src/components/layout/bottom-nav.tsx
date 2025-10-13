@@ -81,7 +81,7 @@ export default function BottomNav({ isSidebarOpen: externalSidebarOpen, onSideba
         href={item.href}
         prefetch={true}
         className={cn(
-          'relative flex flex-col items-center justify-center flex-1 gap-1 py-2.5 px-1 rounded-xl mx-0.5 sm:py-3 sm:gap-1.5 sm:px-2 sm:mx-1 group',
+          'relative flex flex-col items-center justify-center flex-1 gap-1 py-3 px-1 rounded-xl mx-0.5 sm:py-4 sm:gap-1.5 sm:px-2 sm:mx-1 group',
           isActive
             ? 'text-primary'
             : 'text-muted-foreground hover:text-primary'
@@ -90,7 +90,7 @@ export default function BottomNav({ isSidebarOpen: externalSidebarOpen, onSideba
 
         {/* Icono con efectos mejorados */}
         <div className={cn(
-          "relative p-1.5 rounded-lg transition-all duration-300",
+          "relative p-2 rounded-lg transition-all duration-300",
           isActive
             ? "bg-primary/20 text-primary shadow-lg shadow-primary/30"
             : "group-hover:bg-primary/10 group-hover:text-primary"
@@ -124,7 +124,7 @@ export default function BottomNav({ isSidebarOpen: externalSidebarOpen, onSideba
         </div>
 
         {/* Navegación con efectos mejorados */}
-        <nav className="relative mx-auto flex h-20 sm:h-24 w-full max-w-md items-center px-2 sm:px-4">
+        <nav className="relative mx-auto flex h-24 sm:h-28 w-full max-w-md items-start pt-2 px-2 sm:px-4 pb-4">
           {navItems.map(item => (
             <NavLink key={item.href} item={item} />
           ))}
