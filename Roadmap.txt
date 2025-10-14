@@ -1,9 +1,5 @@
 
 
--añadir transaccion al hacer una contribucion, configurar categorica contribucion de las transacciones
-
-- SEGURIDAD A LOS DATOS, PARA QUE SOLO SEAN VISIBLES POR EL USUARIO()
-
 
 - cambios fluidos entre screens con prefecth
 - arreglar errores de logo no se ve siempre, quitar el de firestore
@@ -12,22 +8,16 @@
 - al eliminar una transaccion de una deuda inactiva que se mire si vuelve a tener saldo aun por pagar y cambiar a activa
 - arreglar animacion carga screen modo movil
 
-- SCREEN AHORRO CON METAS Y OBJETIVOS, SEGUIMIENTO DEL AHORRO E INVERSION
-   - kpis tasa ahorro, ahorro total...etc
-   - card objetivo libertad financiera
 
 -Screen presupuesto
    - total del presupuesto
    - total del ahorro teniendo en cuenta lo presupuestado
-   - card presupuesto vs gastado real  total
+   - card presupuesto vs gastado real total
 
 
-Entrada datos
-   - carga csv 
-   - carga datos no organizados -> conectar api ia para organizarlos, paso intermedio con edicion user 
 
-Descarga datos
-   - formato csv para la descarga de los datos: transacciones
+
+
 
 
 
@@ -99,23 +89,6 @@ faltantes, priorizadas por impacto en UX, escalabilidad y funcionalidades core.
    • Sugerencias automáticas en formulario de transacción
    • Opción de corrección manual
 
---------------------------------------------------------------------------------
-7. PRESUPUESTOS RECURRENTES Y META-PRESUPUESTOS
---------------------------------------------------------------------------------
-📝 DESCRIPCIÓN:
-   Presupuestos mensuales automáticos, objetivos de ahorro a largo plazo.
-
-🎯 IMPACTO:
-   Planificación financiera mejorada.
-
-⏱️  ESFUERZO:
-   Medio (1 semana)
-
-🛠️  PASOS:
-   • Sistema de plantillas de presupuesto
-   • Presupuestos recurrentes automáticos
-   • Metas de ahorro con visualización de progreso
-   • Alertas de progreso
 
 --------------------------------------------------------------------------------
 8. IMPORTACIÓN/EXPORTACIÓN DE DATOS
@@ -134,11 +107,6 @@ faltantes, priorizadas por impacto en UX, escalabilidad y funcionalidades core.
    • Validación de datos importados
    • Exportación completa de datos
    • Backup automático a cloud
-
-================================================================================
-🔧                       PRIORIDAD MEDIA-BAJA
-================================================================================
-                  MEJORAS TÉCNICAS Y ESCALABILIDAD
 
 --------------------------------------------------------------------------------
 9. OFFLINE-FIRST ARCHITECTURE
@@ -213,24 +181,6 @@ faltantes, priorizadas por impacto en UX, escalabilidad y funcionalidades core.
    • Notificaciones de cambios
 
 --------------------------------------------------------------------------------
-14. INTEGRACIONES EXTERNAS
---------------------------------------------------------------------------------
-📝 DESCRIPCIÓN:
-   Conectar con bancos, tarjetas de crédito, apps financieras.
-
-🎯 IMPACTO:
-   Reduce entrada manual de datos.
-
-⏱️  ESFUERZO:
-   Alto (3-4 semanas)
-
-🛠️  PASOS:
-   • APIs de bancos (Plaid, Stripe)
-   • Webhooks para transacciones automáticas
-   • Sincronización bidireccional
-   • Mapeo automático de categorías
-
---------------------------------------------------------------------------------
 15. GAMIFICACIÓN Y HÁBITOS FINANCIEROS
 --------------------------------------------------------------------------------
 📝 DESCRIPCIÓN:
@@ -289,53 +239,4 @@ faltantes, priorizadas por impacto en UX, escalabilidad y funcionalidades core.
    • Predicciones de presupuesto
    • Recomendaciones automáticas
 
-================================================================================
-⚠️                        CONSIDERACIONES IMPORTANTES
-================================================================================
 
-🔒 ESCALABILIDAD:
-   Todas las nuevas características deben considerar crecimiento de datos
-
-🔐 PRIVACIDAD:
-   Implementar encriptación para datos sensibles
-
-⚡ PERFORMANCE:
-   Monitorear y optimizar queries de Firestore
-
-🧪 TESTING:
-   Cobertura completa de tests para nuevas funcionalidades
-
-📚 DOCUMENTACIÓN:
-   Mantener documentación técnica actualizada
-
-================================================================================
-🎨                       UBICACIÓN PROPUESTA EN EL DASHBOARD
-================================================================================
-
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                          SUMMARY CARDS                                      │
-│                    (ingresos/gastos/balance)                               │
-├─────────────────────┬───────────────────────────────────────────────────────┤
-│    TENDENCIAS       │        RESUMEN DE GASTOS                             │
-│    MENSUALES        │        (PIE CHART - PRINCIPAL)                       │
-│    (LINE CHART)     ├───────────────────────────────────────────────────────┤
-│                     │        DETALLE POR CATEGORÍA                          │
-│                     │        (BARRAS - EXPANDIBLE)                         │
-├─────────────────────┼───────────────────────────────────────────────────────┤
-│   RECENT            │        BUDGET STATUS                                 │
-│   TRANSACTIONS      │      (PROGRESS BARS MEJORADAS)                      │
-├─────────────────────┬───────────────────────────────────────────────────────┤
-│   💳 DEBT STATUS    │        FLUJO DE EFECTIVO (AREA CHART)                │
-│   (Widget)          │                                                      │
-└─────────────────────┴───────────────────────────────────────────────────────┘
-
-================================================================================
-🏆                           CONCLUSIÓN
-================================================================================
-
-Este roadmap proporciona una visión clara de cómo evolucionar la aplicación
-desde una herramienta básica de presupuesto hacia una PLATAFORMA FINANCIERA
-COMPREHENSIVA Y COMPETITIVA con 17 características principales, insights
-valiosos y una experiencia de usuario excepcional.
-
-¡El futuro de las finanzas personales está aquí! 🚀💰💳

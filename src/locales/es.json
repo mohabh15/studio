@@ -208,7 +208,12 @@
     "no_budgets": "No hay presupuestos para mostrar. Crea uno para empezar.",
     "add_budget": "Añadir Presupuesto",
     "delete_dialog_title": "¿Estás seguro de que quieres eliminar este presupuesto?",
-    "delete_dialog_description": "Esta acción no se puede deshacer. Esto eliminará permanentemente el presupuesto."
+    "delete_dialog_description": "Esta acción no se puede deshacer. Esto eliminará permanentemente el presupuesto.",
+    "total_budget": "Total Presupuesto",
+    "total_savings": "Total Ahorro Promedio",
+    "budget_vs_actual": "Presupuesto vs Real",
+    "under_budget": "Por debajo del presupuesto",
+    "over_budget": "Por encima del presupuesto"
   },
   "budget_dialog": {
     "add_title": "Añadir Presupuesto",

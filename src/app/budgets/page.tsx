@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import type { Category, Budget } from '@/lib/types';
 import { useData } from '@/contexts/data-context';
 import { useAuth } from '@/hooks/use-auth';
@@ -49,6 +49,7 @@ export default function BudgetsPage() {
    const {
      budgets: allBudgets,
      categories,
+     transactions,
      budgetsLoading,
      categoriesLoading,
      budgetsError,
@@ -116,6 +117,43 @@ export default function BudgetsPage() {
     return categories.find(c => c.id === id);
   };
 
+  const filteredTransactions = useMemo(() => {
+    return transactions.filter(t => new Date(t.date).getFullYear() === selectedYear);
+  }, [transactions, selectedYear]);
+
+  const currentMonthTransactions = useMemo(() => {
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth();
+    return transactions.filter(t => {
+      const date = new Date(t.date);
+      return date.getFullYear() === currentYear && date.getMonth() === currentMonth;
+    });
+  }, [transactions]);
+
+  const totalBudget = useMemo(() => {
+    return budgets.reduce((sum, b) => sum + b.amount, 0);
+  }, [budgets]);
+
+  const totalIncome = useMemo(() => {
+    return filteredTransactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+  }, [filteredTransactions]);
+
+  const totalExpenses = useMemo(() => {
+    return filteredTransactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+  }, [filteredTransactions]);
+
+  const monthlySavings = useMemo(() => {
+    const monthlyIncome = totalIncome / 12;
+    return monthlyIncome - totalBudget;
+  }, [totalIncome, totalBudget]);
+
+  const currentMonthExpenses = useMemo(() => {
+    return currentMonthTransactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+  }, [currentMonthTransactions]);
+
+  const budgetVsActualDiff = totalBudget - currentMonthExpenses;
+
   if (authLoading || !isClient) {
     return <DashboardSkeleton />;
   }
@@ -136,6 +174,38 @@ export default function BudgetsPage() {
             <PlusCircle className="mr-1 h-4 w-4" />
             {t('budgets_page.add_budget')}
           </Button>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-3 mb-6">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">{t('budgets_page.total_budget')}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{formatCurrency(totalBudget)}</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">{t('budgets_page.total_savings')}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{formatCurrency(monthlySavings)}</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">{t('budgets_page.budget_vs_actual')}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className={`text-2xl font-bold ${budgetVsActualDiff >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                {formatCurrency(budgetVsActualDiff)}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {budgetVsActualDiff >= 0 ? t('budgets_page.under_budget') : t('budgets_page.over_budget')}
+              </p>
+            </CardContent>
+          </Card>
         </div>
 
         <Card>
