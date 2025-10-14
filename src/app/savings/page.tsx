@@ -220,7 +220,6 @@ export default function SavingsPage() {
 
       // Update the contribution with the transaction ID
       await updateSavingsContribution(savedContribution.id, {
-        ...savedContribution,
         transaction_id: savedTransaction.id,
       });
 

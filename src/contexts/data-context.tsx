@@ -50,7 +50,7 @@ interface DataContextType {
   financialFreedomGoalsError: string | null;
 
   // Actions
-  addTransaction: (transaction: Omit<Transaction, 'id' | 'userId'>) => Promise<void>;
+  addTransaction: (transaction: Omit<Transaction, 'id' | 'userId'>) => Promise<Transaction>;
   updateTransaction: (id: string, updates: Partial<Transaction>) => Promise<void>;
   deleteTransaction: (id: string) => Promise<void>;
   refetchTransactions: () => Promise<void>;
@@ -80,7 +80,7 @@ interface DataContextType {
   deleteSavings: (id: string) => Promise<void>;
   refetchSavings: () => Promise<void>;
 
-  addSavingsContribution: (contribution: Omit<SavingsContribution, 'id' | 'userId'>) => Promise<void>;
+  addSavingsContribution: (contribution: Omit<SavingsContribution, 'id' | 'userId'>) => Promise<SavingsContribution>;
   updateSavingsContribution: (id: string, updates: Partial<SavingsContribution>) => Promise<void>;
   deleteSavingsContribution: (id: string) => Promise<void>;
   refetchSavingsContributions: () => Promise<void>;
