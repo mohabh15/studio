@@ -52,14 +52,18 @@ export default function SavingsPage() {
    const { toast } = useToast();
    const {
      transactions,
+     categories,
      savings,
      savingsContributions,
      savingsLoading,
      savingsError,
+     addTransaction,
+     addCategory,
      addSavings,
      updateSavings,
      deleteSavings,
      addSavingsContribution,
+     updateSavingsContribution,
      emergencyFund,
      addEmergencyFund,
      updateEmergencyFund,
@@ -184,7 +188,41 @@ export default function SavingsPage() {
     }
 
     try {
-      await addSavingsContribution(contributionData);
+      // First, ensure the "contribuciones" category exists
+      let contribucionesCategory = categories.find(cat => cat.name === 'contribuciones' && cat.type === 'expense');
+      if (!contribucionesCategory) {
+        // Create the category if it doesn't exist
+        contribucionesCategory = {
+          id: 'contribuciones',
+          name: 'contribuciones',
+          icon: 'PiggyBank',
+          type: 'expense',
+          userId: 'default', // System category
+        };
+        await addCategory(contribucionesCategory);
+      }
+
+      // Add the contribution
+      const savedContribution = await addSavingsContribution(contributionData);
+
+      // Create a transaction for the contribution
+      const transactionData = {
+        type: 'expense' as const,
+        amount: contributionData.amount,
+        date: contributionData.date,
+        category: contribucionesCategory.id,
+        notes: `Contribución a ahorros: ${contributionData.description || 'Sin descripción'}`,
+        merchant: 'Contribución de Ahorros',
+        userId,
+      };
+
+      const savedTransaction = await addTransaction(transactionData);
+
+      // Update the contribution with the transaction ID
+      await updateSavingsContribution(savedContribution.id, {
+        ...savedContribution,
+        transaction_id: savedTransaction.id,
+      });
 
       // Update the corresponding savings or emergency fund
       if (contributionData.savings_id === 'emergency_fund') {

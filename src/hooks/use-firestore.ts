@@ -41,10 +41,12 @@ export function useFirestoreTransactions(userId: string) {
 
   const addTransaction = async (transaction: Omit<Transaction, 'id' | 'userId'>) => {
     try {
-      await addDoc(collection(db, 'transactions'), { ...transaction, userId });
-      // No need to refetch, real-time listener will update
+      const docRef = await addDoc(collection(db, 'transactions'), { ...transaction, userId });
+      // Return the created document reference for ID access
+      return { id: docRef.id, ...transaction, userId };
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error adding transaction');
+      throw err;
     }
   };
 
@@ -103,6 +105,54 @@ export function useFirestoreTransactions(userId: string) {
                 paymentToDelete = sortedDocs[0];
               }
               await deleteDoc(paymentToDelete.ref);
+            }
+          }
+        }
+
+        // If it's a savings contribution transaction, delete the contribution and deduct from savings
+        if (transactionData.category === 'contribuciones' && transactionData.notes) {
+          // Extract contribution ID from notes format: "Contribución a ahorros: ..."
+          // Since we have the transaction ID, we need to find the contribution that references this transaction
+          const contributionsQuery = query(
+            collection(db, 'savings_contributions'),
+            where('userId', '==', userId),
+            where('transaction_id', '==', id)
+          );
+          const contributionsSnapshot = await getDocs(contributionsQuery);
+          if (!contributionsSnapshot.empty) {
+            const contributionDoc = contributionsSnapshot.docs[0];
+            const contributionData = contributionDoc.data();
+
+            // Delete the contribution
+            await deleteDoc(contributionDoc.ref);
+
+            // Deduct the amount from the corresponding savings or emergency fund
+            if (contributionData.savings_id === 'emergency_fund') {
+              const emergencyFundQuery = query(
+                collection(db, 'emergency_fund'),
+                where('userId', '==', userId)
+              );
+              const emergencyFundSnapshot = await getDocs(emergencyFundQuery);
+              if (!emergencyFundSnapshot.empty) {
+                const emergencyFundDoc = emergencyFundSnapshot.docs[0];
+                const currentEmergencyFund = emergencyFundDoc.data();
+                const newAmount = Math.max(0, currentEmergencyFund.monto_actual - contributionData.amount);
+
+                await updateDoc(emergencyFundDoc.ref, {
+                  monto_actual: newAmount
+                });
+              }
+            } else {
+              // Update the savings
+              const savingsDoc = await getDoc(doc(db, 'savings', contributionData.savings_id));
+              if (savingsDoc.exists()) {
+                const currentSavings = savingsDoc.data();
+                const newAmount = Math.max(0, currentSavings.monto_actual - contributionData.amount);
+
+                await updateDoc(doc(db, 'savings', contributionData.savings_id), {
+                  monto_actual: newAmount
+                });
+              }
             }
           }
         }
@@ -678,10 +728,12 @@ export function useFirestoreSavingsContributions(userId: string) {
 
   const addContribution = async (contribution: Omit<SavingsContribution, 'id' | 'userId'>) => {
     try {
-      await addDoc(collection(db, 'savings_contributions'), { ...contribution, userId });
-      // No need to refetch, real-time listener will update
+      const docRef = await addDoc(collection(db, 'savings_contributions'), { ...contribution, userId });
+      // Return the created document reference for ID access
+      return { id: docRef.id, ...contribution, userId };
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error adding savings contribution');
+      throw err;
     }
   };
 
