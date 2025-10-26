@@ -136,8 +136,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
         </div>
 
         {/* Botón flotante para añadir transacción - con efectos elegantes mejorados */}
-        {pathname !== '/savings' && (
-          <div className="fixed bottom-24 right-4 z-40 sm:bottom-20 sm:right-6">
+        {pathname !== '/savings' && pathname !== '/debts' && (
+          <div className="fixed bottom-28 right-4 z-40 sm:bottom-24 sm:right-6">
             <div className="relative group">
               {/* Efectos de brillo sutil */}
               <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 via-accent/20 to-primary/20 rounded-full blur opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>

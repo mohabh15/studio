@@ -90,7 +90,7 @@ export default function BottomNav({ isSidebarOpen: externalSidebarOpen, onSideba
 
         {/* Icono con efectos mejorados */}
         <div className={cn(
-          "relative p-2 rounded-lg transition-all duration-300",
+          "relative p-2 rounded-lg transition-all duration-300 shadow-md transform -translate-y-3",
           isActive
             ? "bg-primary/20 text-primary shadow-lg shadow-primary/30"
             : "group-hover:bg-primary/10 group-hover:text-primary"
@@ -102,7 +102,7 @@ export default function BottomNav({ isSidebarOpen: externalSidebarOpen, onSideba
         </div>
 
         <span className={cn(
-          "text-xs font-medium text-center whitespace-pre-wrap leading-tight sm:text-sm transition-all duration-300",
+          "text-xs font-medium text-center whitespace-pre-wrap leading-tight sm:text-sm transition-all duration-300 shadow-sm transform -translate-y-1",
           isActive
             ? "text-primary font-semibold"
             : "group-hover:text-primary/90"
