@@ -220,23 +220,23 @@ export default function TransactionsPage() {
           </div>
           <Button onClick={() => setShowFilters(!showFilters)} variant="outline">
             <Filter className="mr-2 h-4 w-4" />
-            {t('filters')}
+            {t('transactions_page.show_filters')}
           </Button>
         </div>
 
         <Collapsible open={showFilters} onOpenChange={setShowFilters}>
           <CollapsibleContent>
-            <Card className="mb-4">
+            <Card className="mb-4 glass-card depth-2 hover-lift interactive-scale glow-primary">
               <CardHeader>
-                <CardTitle>{t('filters')}</CardTitle>
+                <CardTitle>{t('transactions_page.filter_title')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
                   <div>
-                    <Label htmlFor="category-filter">{t('filter_by_category')}</Label>
+                    <Label htmlFor="category-filter">{t('settings_page.filter_by_category')}</Label>
                     <Select value={filters.category} onValueChange={(value) => setFilters(prev => ({ ...prev, category: value }))}>
                       <SelectTrigger>
-                        <SelectValue placeholder={t('add_transaction_dialog.select_category')} />
+                        <SelectValue placeholder={t('transactions_page.select_category')} />
                       </SelectTrigger>
                       <SelectContent>
                         {categories.map(cat => (
@@ -252,10 +252,10 @@ export default function TransactionsPage() {
                     </Select>
                   </div>
                   <div>
-                    <Label htmlFor="type-filter">{t('filter_by_type')}</Label>
+                    <Label htmlFor="type-filter">{t('settings_page.filter_by_type')}</Label>
                     <Select value={filters.type} onValueChange={(value) => setFilters(prev => ({ ...prev, type: value }))}>
                       <SelectTrigger>
-                        <SelectValue placeholder={t('filter_by_type')} />
+                        <SelectValue placeholder={t('transactions_page.select_type')} />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="income">{t('common.income')}</SelectItem>
@@ -264,19 +264,19 @@ export default function TransactionsPage() {
                     </Select>
                   </div>
                   <div>
-                    <Label>{t('filter_by_date')}</Label>
+                    <Label>{t('settings_page.filter_by_date')}</Label>
                     <div className="flex gap-2">
                       <Popover>
                         <PopoverTrigger asChild>
                           <Button
                             variant="outline"
                             className={cn(
-                              'w-full justify-start text-left font-normal',
+                              'w-full justify-start text-left font-normal rounded-md bg-background text-sm hover:bg-background/80 hover:border-border focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
                               !filters.fromDate && 'text-muted-foreground'
                             )}
                           >
                             <CalendarIcon className="mr-2 h-4 w-4" />
-                            {filters.fromDate ? format(filters.fromDate, 'PPP') : t('from_date')}
+                            {filters.fromDate ? format(filters.fromDate, 'PPP') : t('settings_page.from_date')}
                           </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0">
@@ -293,12 +293,12 @@ export default function TransactionsPage() {
                           <Button
                             variant="outline"
                             className={cn(
-                              'w-full justify-start text-left font-normal',
+                              'w-full justify-start text-left font-normal rounded-md bg-background text-sm hover:bg-background/80 hover:border-border focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
                               !filters.toDate && 'text-muted-foreground'
                             )}
                           >
                             <CalendarIcon className="mr-2 h-4 w-4" />
-                            {filters.toDate ? format(filters.toDate, 'PPP') : t('to_date')}
+                            {filters.toDate ? format(filters.toDate, 'PPP') : t('settings_page.to_date')}
                           </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0">
@@ -313,26 +313,28 @@ export default function TransactionsPage() {
                     </div>
                   </div>
                   <div>
-                    <Label>{t('filter_by_amount')}</Label>
+                    <Label>{t('settings_page.filter_by_amount')}</Label>
                     <div className="flex gap-2">
                       <Input
                         type="number"
-                        placeholder={t('min_amount')}
+                        placeholder={t('settings_page.min_amount')}
                         value={filters.minAmount}
                         onChange={(e) => setFilters(prev => ({ ...prev, minAmount: e.target.value }))}
+                        className="rounded-md bg-background text-sm hover:border-border hover:bg-background/80 focus-visible:border-ring focus-visible:bg-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                       />
                       <Input
                         type="number"
-                        placeholder={t('max_amount')}
+                        placeholder={t('settings_page.max_amount')}
                         value={filters.maxAmount}
                         onChange={(e) => setFilters(prev => ({ ...prev, maxAmount: e.target.value }))}
+                        className="rounded-md bg-background text-sm hover:border-border hover:bg-background/80 focus-visible:border-ring focus-visible:bg-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                       />
                     </div>
                   </div>
                 </div>
                 <div className="mt-4">
                   <Button onClick={clearFilters} variant="outline">
-                    {t('clear_filters')}
+                    {t('settings_page.clear_filters')}
                   </Button>
                 </div>
               </CardContent>

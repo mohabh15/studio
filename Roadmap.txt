@@ -2,11 +2,8 @@
 
 - Añadir screen proyecciones en ahorros
 
-- Sombreado cards deudas al pasar el raton 
-
-- arreglar texto filtro transacciones
 - cambios fluidos entre screens con prefecth
-- arreglar errores de logo no se ve siempre, quitar el de firestore
+
 - corregir traducciones en pagina deuda
 
 - comprobar que al eliminar una deuda se eliminen las transacciones asociadas a esta
