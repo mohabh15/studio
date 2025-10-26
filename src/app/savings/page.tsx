@@ -361,7 +361,7 @@ export default function SavingsPage() {
 
         {/* Métricas principales */}
         <div className="grid gap-4 grid-cols-2 md:grid-cols-2 lg:grid-cols-4 mb-6">
-          <Card>
+          <Card className="glass-card depth-2 hover-lift interactive-scale glow-primary">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Ahorrado</CardTitle>
               <PiggyBank className="h-4 w-4 text-green-500" />
@@ -372,7 +372,7 @@ export default function SavingsPage() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="glass-card depth-2 hover-lift interactive-scale glow-primary">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Tasa de Ahorro</CardTitle>
               <Target className="h-4 w-4 text-blue-500" />
@@ -383,7 +383,7 @@ export default function SavingsPage() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="glass-card depth-2 hover-lift interactive-scale glow-primary">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Progreso Promedio</CardTitle>
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
@@ -394,7 +394,7 @@ export default function SavingsPage() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="glass-card depth-2 hover-lift interactive-scale glow-primary">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Próximos Objetivos</CardTitle>
               <Calendar className="h-4 w-4 text-muted-foreground" />
@@ -431,7 +431,7 @@ export default function SavingsPage() {
         </Tabs>
 
         {/* Lista de ahorros */}
-        <Card>
+        <Card className="glass-card depth-2 hover-lift interactive-scale glow-primary">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>

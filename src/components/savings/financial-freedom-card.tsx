@@ -119,7 +119,7 @@ export default function FinancialFreedomCard({ goal }: FinancialFreedomCardProps
   const StatusIcon = statusInfo.icon;
 
   return (
-    <Card className={`transition-all duration-300 ${statusInfo.bgColor}`}>
+    <Card className="glass-card depth-2 hover-lift interactive-scale glow-primary">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <div>
           <CardTitle className="text-lg font-semibold flex items-center gap-2">
@@ -130,7 +130,7 @@ export default function FinancialFreedomCard({ goal }: FinancialFreedomCardProps
             Tu camino hacia la independencia económica
           </CardDescription>
         </div>
-        <div className={`p-2 rounded-lg ${statusInfo.bgColor}`}>
+        <div className="p-2 rounded-lg bg-primary/20">
           <StatusIcon className={`h-5 w-5 ${statusInfo.color}`} />
         </div>
       </CardHeader>

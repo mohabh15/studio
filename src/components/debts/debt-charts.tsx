@@ -96,7 +96,7 @@ export default function DebtCharts({ debts }: DebtChartsProps) {
   return (
     <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
       {/* Gráfico de distribución por tipo */}
-      <Card className="md:col-span-2 lg:col-span-1">
+      <Card className="md:col-span-2 lg:col-span-1 glass-card depth-2 hover-lift interactive-scale glow-primary">
         <CardHeader>
           <CardTitle>{t('debt_charts.distribution_by_type')}</CardTitle>
           <CardDescription>{t('debt_charts.distribution_description')}</CardDescription>
@@ -133,7 +133,7 @@ export default function DebtCharts({ debts }: DebtChartsProps) {
       </Card>
 
       {/* Gráfico de pagos mínimos */}
-      <Card>
+      <Card className="glass-card depth-2 hover-lift interactive-scale glow-primary">
         <CardHeader>
           <CardTitle>{t('debt_charts.minimum_payments_chart')}</CardTitle>
           <CardDescription>{t('debt_charts.minimum_payments_description')}</CardDescription>
@@ -175,7 +175,7 @@ export default function DebtCharts({ debts }: DebtChartsProps) {
       </Card>
 
       {/* Gráfico de evolución de intereses */}
-      <Card>
+      <Card className="glass-card depth-2 hover-lift interactive-scale glow-primary">
         <CardHeader>
           <CardTitle>{t('debt_charts.interest_evolution')}</CardTitle>
           <CardDescription>{t('debt_charts.interest_evolution_description')}</CardDescription>

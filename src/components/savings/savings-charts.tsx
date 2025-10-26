@@ -131,7 +131,7 @@ export default function SavingsCharts({ savings, emergencyFund, financialFreedom
   return (
     <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
       {/* Gráfico de distribución por tipo */}
-      <Card className="md:col-span-2 lg:col-span-1">
+      <Card className="md:col-span-2 lg:col-span-1 glass-card depth-2 hover-lift interactive-scale glow-primary">
         <CardHeader>
           <CardTitle>Distribución por Tipo</CardTitle>
           <CardDescription>Composición de tus ahorros por categoría</CardDescription>
@@ -168,7 +168,7 @@ export default function SavingsCharts({ savings, emergencyFund, financialFreedom
       </Card>
 
       {/* Gráfico de progreso hacia objetivos */}
-      <Card>
+      <Card className="glass-card depth-2 hover-lift interactive-scale glow-primary">
         <CardHeader>
           <CardTitle>Progreso hacia Objetivos</CardTitle>
           <CardDescription>Avance en tus metas de ahorro</CardDescription>
@@ -210,7 +210,7 @@ export default function SavingsCharts({ savings, emergencyFund, financialFreedom
       </Card>
 
       {/* Gráfico de evolución de ahorros */}
-      <Card>
+      <Card className="glass-card depth-2 hover-lift interactive-scale glow-primary">
         <CardHeader>
           <CardTitle>Evolución de Ahorros</CardTitle>
           <CardDescription>Crecimiento acumulado mensual</CardDescription>

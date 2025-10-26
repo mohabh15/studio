@@ -1,23 +1,18 @@
 
 
+- Añadir screen proyecciones en ahorros
 
+- Sombreado cards deudas al pasar el raton 
+
+- arreglar texto filtro transacciones
 - cambios fluidos entre screens con prefecth
 - arreglar errores de logo no se ve siempre, quitar el de firestore
 - corregir traducciones en pagina deuda
+
 - comprobar que al eliminar una deuda se eliminen las transacciones asociadas a esta
 - al eliminar una transaccion de una deuda inactiva que se mire si vuelve a tener saldo aun por pagar y cambiar a activa
+
 - arreglar animacion carga screen modo movil
-
-
--Screen presupuesto
-   - total del presupuesto
-   - total del ahorro teniendo en cuenta lo presupuestado
-   - card presupuesto vs gastado real total
-
-
-
-
-
 
 
 
@@ -91,10 +86,10 @@ faltantes, priorizadas por impacto en UX, escalabilidad y funcionalidades core.
 
 
 --------------------------------------------------------------------------------
-8. IMPORTACIÓN/EXPORTACIÓN DE DATOS
+8. EXPORTACIÓN DE DATOS
 --------------------------------------------------------------------------------
 📝 DESCRIPCIÓN:
-   Importar desde bancos, exportar datos para contabilidad.
+   exportar datos para contabilidad.
 
 🎯 IMPACTO:
    Facilita adopción y backup.
@@ -238,5 +233,6 @@ faltantes, priorizadas por impacto en UX, escalabilidad y funcionalidades core.
    • Análisis de patrones históricos
    • Predicciones de presupuesto
    • Recomendaciones automáticas
+
 
 

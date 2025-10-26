@@ -81,7 +81,7 @@ export default function DebtStatus({ debts, userId }: DebtStatusProps) {
 
   if (debts.length === 0) {
     return (
-      <Card className="glass-card depth-3 hover-lift">
+      <Card className="glass-card depth-2 hover-lift interactive-scale glow-primary">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
           <CardTitle className="font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
             {t('dashboard.debt_status.title')}
@@ -106,7 +106,7 @@ export default function DebtStatus({ debts, userId }: DebtStatusProps) {
   }
 
   return (
-    <Card className="glass-card depth-3 hover-lift">
+    <Card className="glass-card depth-2 hover-lift interactive-scale glow-primary">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
         <CardTitle className="text-lg font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
           {t('dashboard.debt_status.title')}
