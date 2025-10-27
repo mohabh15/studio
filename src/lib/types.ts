@@ -24,6 +24,7 @@ export type Budget = {
   userId: string;
   category: string; // category id
   amount: number;
+  surplusStrategy?: SurplusStrategy;
 };
 
 export type DebtType = 'credit_card' | 'personal_loan' | 'mortgage' | 'student_loan' | 'car_loan' | 'other';
@@ -115,3 +116,30 @@ export type FinancialFreedomGoal = {
   fecha_creacion: string;
   status: 'active' | 'achieved' | 'paused';
 };
+
+export type SurplusStrategyType = 'redistribute' | 'save' | 'invest' | 'ignore';
+
+export type RedistributionTarget = {
+  categoryId: string;
+  percentage: number;
+};
+
+export type SurplusStrategy = {
+  type: SurplusStrategyType;
+  redistributionTargets?: RedistributionTarget[];
+  savingsGoalId?: string;
+  investmentId?: string;
+};
+
+export type BudgetSurplus = {
+  budgetId: string;
+  amount: number;
+  date: string; // ISO string
+  strategy: SurplusStrategy;
+  applied: boolean;
+};
+
+export function validateRedistributionTargets(targets: RedistributionTarget[]): boolean {
+  const totalPercentage = targets.reduce((sum, target) => sum + target.percentage, 0);
+  return totalPercentage === 100 && targets.every(target => target.percentage > 0);
+}

@@ -1,12 +1,13 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import type { Category, Budget } from '@/lib/types';
+import type { Category, Budget, SurplusStrategy } from '@/lib/types';
 import { useData } from '@/contexts/data-context';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
 import { PlusCircle, Trash2, Edit, MoreHorizontal, AlertCircle } from 'lucide-react';
 import {
   DropdownMenu,
@@ -154,6 +155,8 @@ export default function BudgetsPage() {
 
   const budgetVsActualDiff = totalBudget - currentMonthExpenses;
 
+
+
   if (authLoading || !isClient) {
     return <DashboardSkeleton />;
   }
@@ -208,6 +211,7 @@ export default function BudgetsPage() {
           </Card>
         </div>
 
+
         <Card className="glass-card depth-2 hover-lift interactive-scale glow-primary">
           <CardHeader>
             <CardTitle>{t('budgets_page.all_budgets')}</CardTitle>
@@ -216,12 +220,13 @@ export default function BudgetsPage() {
             {budgets.length > 0 ? (
               <Table>
                 <TableHeader>
-                  <TableRow>
-                    <TableHead>{t('common.category')}</TableHead>
-                    <TableHead className="text-right">{t('common.amount')}</TableHead>
-                    <TableHead className="text-right">{t('common.actions')}</TableHead>
-                  </TableRow>
-                </TableHeader>
+                   <TableRow>
+                     <TableHead>{t('common.category')}</TableHead>
+                     <TableHead className="text-right">{t('common.amount')}</TableHead>
+                     <TableHead>{t('budgets_page.strategy')}</TableHead>
+                     <TableHead className="text-right">{t('common.actions')}</TableHead>
+                   </TableRow>
+                 </TableHeader>
                 <TableBody>
                   {budgets.map(budget => {
                     const category = findCategory(budget.category);
@@ -239,6 +244,15 @@ export default function BudgetsPage() {
                           </div>
                         </TableCell>
                         <TableCell className="text-right">{formatCurrency(budget.amount)}</TableCell>
+                        <TableCell>
+                          {budget.surplusStrategy ? (
+                            <Badge variant="secondary">
+                              {budget.surplusStrategy.type}
+                            </Badge>
+                          ) : (
+                            <span className="text-muted-foreground">None</span>
+                          )}
+                        </TableCell>
                         <TableCell className="text-right">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>

@@ -73,3 +73,58 @@ export const commonIconNames = [
   'Utensils',
   'ShoppingBag'
 ];
+
+import type { Budget, Transaction, RedistributionTarget, Category } from '@/lib/types';
+import { validateRedistributionTargets } from '@/lib/types';
+
+export function applyRolloverStrategy(currentBudget: Budget, surplus: number, existingNextBudget?: Budget): Budget {
+  if (existingNextBudget) {
+    return {
+      ...existingNextBudget,
+      amount: existingNextBudget.amount + surplus,
+    };
+  } else {
+    return {
+      id: '',
+      userId: currentBudget.userId,
+      category: currentBudget.category,
+      amount: currentBudget.amount + surplus,
+      surplusStrategy: currentBudget.surplusStrategy,
+    };
+  }
+}
+
+export function applyRedistributionStrategy(
+  budget: Budget,
+  surplus: number,
+  redistributionTargets: RedistributionTarget[],
+  categories: Category[]
+): Transaction[] {
+  if (!validateRedistributionTargets(redistributionTargets)) {
+    throw new Error('Los porcentajes de redistribución deben sumar 100% y ser positivos');
+  }
+
+  const transactions: Transaction[] = [];
+  const categoryMap = new Map(categories.map(cat => [cat.id, cat]));
+
+  for (const target of redistributionTargets) {
+    const category = categoryMap.get(target.categoryId);
+    if (!category) {
+      throw new Error(`Categoría destino no encontrada: ${target.categoryId}`);
+    }
+
+    const amount = surplus * (target.percentage / 100);
+    const transaction: Transaction = {
+      id: '', // Se generará al guardar
+      userId: budget.userId,
+      type: 'expense', // Asumiendo que redistribuir es un gasto adicional
+      amount: amount,
+      date: new Date().toISOString(),
+      category: target.categoryId,
+      notes: `Redistribución de sobrante del presupuesto ${budget.category}`,
+    };
+    transactions.push(transaction);
+  }
+
+  return transactions;
+}

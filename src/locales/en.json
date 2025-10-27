@@ -228,7 +228,8 @@
     "total_savings": "Average Total Savings",
     "budget_vs_actual": "Budget vs Actual",
     "under_budget": "Under budget",
-    "over_budget": "Over budget"
+    "over_budget": "Over budget",
+    "strategy": "Strategy"
   },
   "budget_dialog": {
     "add_title": "Add Budget",
@@ -237,7 +238,16 @@
     "edit_description": "Update the amount for your budget.",
     "select_category": "Select a category",
     "category_type_income": "Income",
-    "category_type_expense": "Expense"
+    "category_type_expense": "Expense",
+    "surplus_strategy": "Surplus Strategy",
+    "select_strategy": "Select a surplus strategy",
+    "strategy_ignore": "Ignore",
+    "strategy_redistribute": "Redistribute",
+    "strategy_save": "Save",
+    "strategy_invest": "Invest",
+    "strategy_rollover": "Rollover",
+    "redistribution_targets": "Redistribution Targets",
+    "add_target": "Add Target"
   },
   "auth": {
     "logout": "Logout",

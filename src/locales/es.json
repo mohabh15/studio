@@ -228,7 +228,8 @@
     "total_savings": "Total Ahorro Promedio",
     "budget_vs_actual": "Presupuesto vs Real",
     "under_budget": "Por debajo del presupuesto",
-    "over_budget": "Por encima del presupuesto"
+    "over_budget": "Por encima del presupuesto",
+    "strategy": "Estrategia"
   },
   "budget_dialog": {
     "add_title": "Añadir Presupuesto",
@@ -237,7 +238,16 @@
     "edit_description": "Actualiza la cantidad de tu presupuesto.",
     "select_category": "Selecciona una categoría",
     "category_type_income": "Ingreso",
-    "category_type_expense": "Gasto"
+    "category_type_expense": "Gasto",
+    "surplus_strategy": "Estrategia de Sobrantes",
+    "select_strategy": "Selecciona una estrategia de sobrantes",
+    "strategy_ignore": "Ignorar",
+    "strategy_redistribute": "Redistribuir",
+    "strategy_save": "Ahorrar",
+    "strategy_invest": "Invertir",
+    "strategy_rollover": "Acumular",
+    "redistribution_targets": "Objetivos de Redistribución",
+    "add_target": "Añadir Objetivo"
   },
   "auth": {
     "logout": "Cerrar sesión",

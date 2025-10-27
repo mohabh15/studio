@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 import * as LucideIcons from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import type { Transaction, Budget, Category } from '@/lib/types';
+import type { Transaction, Budget, Category, SurplusStrategy } from '@/lib/types';
 import { useI18n } from '@/hooks/use-i18n';
 import { getIcon } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -39,13 +39,18 @@ export default function BudgetStatus({ transactions, budgets, categories, select
         .filter(t => t.category === budget.category)
         .reduce((sum, t) => sum + t.amount, 0);
       const remaining = budget.amount - spent;
+      const surplus = Math.max(0, remaining);
+      const deficit = Math.max(0, spent - budget.amount);
       const progress = Math.min((spent / budget.amount) * 100, 100);
       const category = categories.find(c => c.id === budget.category);
       const Icon = category ? getIcon(category.icon as keyof typeof LucideIcons) : LucideIcons.Package;
+      const strategy = budget.surplusStrategy || { type: 'ignore' };
       return {
         ...budget,
         spent,
         remaining,
+        surplus,
+        deficit,
         progress,
         categoryName: (() => {
           const stripped = category?.name.replace(/^categories\./, '') || '';
@@ -53,6 +58,7 @@ export default function BudgetStatus({ transactions, budgets, categories, select
           return translated === `categories.${stripped}` ? stripped.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) : translated;
         })(),
         Icon,
+        strategy,
       };
     });
   }, [transactions, budgets, categories, selectedYear, selectedMonth, t]);
