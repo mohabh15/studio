@@ -8,15 +8,16 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ArrowLeft, TrendingUp, Target, Calculator, BarChart3, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
-import { useFirestoreDebts, useFirestoreDebtPayments } from '@/hooks/use-firestore';
+import { useFirestoreSavings, useFirestoreSavingsContributions, useFirestoreEmergencyFund, useFirestoreFinancialFreedomGoals } from '@/hooks/use-firestore';
 import { useAuth } from '@/hooks/use-auth';
 import { useI18n } from '@/hooks/use-i18n';
 import AppLayout from '@/components/layout/app-layout';
-import StrategyComparison from '@/components/debts/projections/strategy-comparison';
-import PaymentSimulator from '@/components/debts/projections/payment-simulator';
-import { calculateDebtProjections } from '@/lib/debt-projections';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import SavingsSummary from '@/components/savings/projections/savings-summary';
+import SavingsGrowthSimulator from '@/components/savings/projections/savings-growth-simulator';
+import SavingsStrategyComparison from '@/components/savings/projections/savings-strategy-comparison';
+import { calculateSavingsProjections } from '@/lib/savings-projections';
 
 const formatCurrency = (amount: number) => {
   return `${new Intl.NumberFormat('es-ES', {
@@ -25,50 +26,70 @@ const formatCurrency = (amount: number) => {
   }).format(amount)} €`;
 };
 
-export default function DebtProjectionsPage() {
+export default function SavingsProjectionsPage() {
     const { t } = useI18n();
     const { user, loading: authLoading } = useAuth();
     const userId = user?.uid;
     const { toast } = useToast();
-    const { debts, loading: debtsLoading, error: debtsError } = useFirestoreDebts(userId || '');
-    const { debtPayments } = useFirestoreDebtPayments(userId || '');
+    const { savings, loading: savingsLoading, error: savingsError } = useFirestoreSavings(userId || '');
+    const { contributions } = useFirestoreSavingsContributions(userId || '');
+    const { emergencyFund } = useFirestoreEmergencyFund(userId || '');
+    const { goals } = useFirestoreFinancialFreedomGoals(userId || '');
     const [selectedType, setSelectedType] = useState<string>('all');
 
-  const debtSummary = useMemo(() => {
-    if (debts.length === 0) return null;
+  const savingsSummary = useMemo(() => {
+    if (savings.length === 0 && emergencyFund.length === 0) return null;
 
-    const totalCurrentDebt = debts.reduce((sum, debt) => sum + debt.monto_actual, 0);
-    const totalOriginalDebt = debts.reduce((sum, debt) => sum + debt.monto, 0);
-    const totalPaid = debtPayments.reduce((sum, payment) => sum + payment.amount, 0);
-    const totalMinimumPayments = debts.reduce((sum, debt) => sum + debt.pagos_minimos, 0);
+    const totalCurrentSavings = savings.reduce((sum, saving) => sum + saving.monto_actual, 0) +
+                               emergencyFund.reduce((sum, fund) => sum + fund.monto_actual, 0);
+    const totalTargetSavings = savings.reduce((sum, saving) => sum + (saving.monto_objetivo || 0), 0) +
+                              emergencyFund.reduce((sum, fund) => sum + fund.monto_objetivo, 0);
+    const totalContributions = contributions.reduce((sum, contribution) => sum + contribution.amount, 0);
+    const monthlyContributions = contributions
+      .filter(c => new Date(c.date).getMonth() === new Date().getMonth())
+      .reduce((sum, contribution) => sum + contribution.amount, 0);
 
-    // Estimación simple: tiempo para pagar con pagos mínimos
-    const monthsToPayOff = totalCurrentDebt > 0 ? Math.ceil(totalCurrentDebt / totalMinimumPayments) : 0;
+    // Estimación simple: tiempo para alcanzar objetivos con contribuciones mensuales
+    const remainingToTarget = Math.max(0, totalTargetSavings - totalCurrentSavings);
+    const monthsToTarget = monthlyContributions > 0 ? Math.ceil(remainingToTarget / monthlyContributions) : 0;
 
     return {
-      totalCurrentDebt,
-      totalOriginalDebt,
-      totalPaid,
-      totalMinimumPayments,
-      monthsToPayOff,
-      progress: totalOriginalDebt > 0 ? ((totalOriginalDebt - totalCurrentDebt) / totalOriginalDebt) * 100 : 0,
+      totalCurrentSavings,
+      totalTargetSavings,
+      totalContributions,
+      monthlyContributions,
+      monthsToTarget,
+      progress: totalTargetSavings > 0 ? ((totalCurrentSavings / totalTargetSavings) * 100) : 0,
     };
-  }, [debts, debtPayments]);
+  }, [savings, contributions, emergencyFund]);
 
-  const filteredDebts = useMemo(() => {
-    if (selectedType === 'all') return debts;
-    return debts.filter(debt => debt.tipo === selectedType);
-  }, [debts, selectedType]);
+  const filteredSavings = useMemo(() => {
+    if (selectedType === 'all') return [...savings, ...emergencyFund];
+    if (selectedType === 'emergency_fund') return emergencyFund;
+    return savings.filter(saving => saving.tipo === selectedType);
+  }, [savings, emergencyFund, selectedType]);
 
   const projections = useMemo(() => {
-    if (filteredDebts.length === 0) return [];
-    return calculateDebtProjections({ debts: filteredDebts });
-  }, [filteredDebts]);
+    if (!savingsSummary || savingsSummary.monthlyContributions === 0) return [];
 
-  const incomingProjections = useMemo(() => {
-    if (filteredDebts.length === 0) return [];
-    return calculateDebtProjections({ debts: filteredDebts, isIncoming: true });
-  }, [filteredDebts]);
+    // Calcular proyecciones basadas en datos reales
+    const strategies = ['conservative', 'moderate', 'aggressive'] as const;
+
+    return strategies.map(strategy =>
+      calculateSavingsProjections({
+        initialAmount: savingsSummary.totalCurrentSavings,
+        monthlyContribution: savingsSummary.monthlyContributions,
+        years: 10,
+        strategy,
+        targetAmount: savingsSummary.totalTargetSavings,
+      })
+    );
+  }, [savingsSummary]);
+
+  const scenarioProjections = useMemo(() => {
+    // Proyecciones para comparación de escenarios
+    return projections;
+  }, [projections]);
 
   if (authLoading) {
     return (
@@ -76,7 +97,7 @@ export default function DebtProjectionsPage() {
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-            <p>{t('debt_projections.loading')}</p>
+            <p>{t('savings_projections.loading')}</p>
           </div>
         </div>
       </AppLayout>
@@ -84,14 +105,14 @@ export default function DebtProjectionsPage() {
   }
 
   useEffect(() => {
-    if (debtsError) {
+    if (savingsError) {
       toast({
         title: "Error al cargar datos",
         description: "Algunos datos no pudieron cargarse. La aplicación sigue siendo funcional.",
         variant: "destructive",
       });
     }
-  }, [debtsError, toast]);
+  }, [savingsError, toast]);
 
   if (!user) {
     return (
@@ -108,43 +129,43 @@ export default function DebtProjectionsPage() {
     );
   }
 
-  if (debtsLoading) {
+  if (savingsLoading) {
     return (
       <AppLayout>
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-            <p>{t('debt_projections.loading_projections')}</p>
+            <p>{t('savings_projections.loading_projections')}</p>
           </div>
         </div>
       </AppLayout>
     );
   }
 
-  if (!debtSummary) {
+  if (!savingsSummary) {
     return (
       <AppLayout>
         <div className="max-w-4xl mx-auto p-6">
           <div className="flex items-center gap-4 mb-6">
-            <Link href="/debts">
+            <Link href="/savings">
               <Button variant="outline" size="sm">
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                {t('debt_projections.back')}
+                {t('savings_projections.back')}
               </Button>
             </Link>
-            <h1 className="text-2xl font-bold">{t('debt_projections.title')}</h1>
+            <h1 className="text-2xl font-bold">{t('savings_projections.title')}</h1>
           </div>
 
           <Card className="glass-card depth-2 hover-lift interactive-scale glow-primary">
             <CardContent className="flex flex-col items-center justify-center py-12">
               <Target className="h-12 w-12 text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold mb-2">{t('debt_projections.no_debts')}</h3>
+              <h3 className="text-lg font-semibold mb-2">{t('savings_projections.no_savings')}</h3>
               <p className="text-muted-foreground text-center mb-6">
-                {t('debt_projections.no_debts_description')}
+                {t('savings_projections.no_savings_description')}
               </p>
-              <Link href="/debts">
+              <Link href="/savings">
                 <Button>
-                  {t('debt_projections.manage_debts')}
+                  {t('savings_projections.manage_savings')}
                 </Button>
               </Link>
             </CardContent>
@@ -158,65 +179,65 @@ export default function DebtProjectionsPage() {
     <AppLayout>
       <div className="max-w-6xl mx-auto p-6">
         <div className="flex items-center gap-4 mb-6">
-          <Link href="/debts">
+          <Link href="/savings">
             <Button variant="outline" size="sm">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Volver
+              {t('savings_projections.back')}
             </Button>
           </Link>
-          <h1 className="text-2xl font-bold">{t('debt_projections.title')}</h1>
+          <h1 className="text-2xl font-bold">{t('savings_projections.title')}</h1>
         </div>
 
         {/* Resumen Principal */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <Card className="glass-card depth-2 hover-lift interactive-scale glow-primary">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{t('debt_projections.total_debt')}</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('savings_projections.total_savings')}</CardTitle>
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{formatCurrency(debtSummary.totalCurrentDebt)}</div>
+              <div className="text-2xl font-bold">{formatCurrency(savingsSummary.totalCurrentSavings)}</div>
               <p className="text-xs text-muted-foreground">
-                {debtSummary.progress.toFixed(1)}% reducido
+                {savingsSummary.progress.toFixed(1)}% {t('savings_projections.to_reach_goals')}
               </p>
             </CardContent>
           </Card>
 
           <Card className="glass-card depth-2 hover-lift interactive-scale glow-primary">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{t('debt_projections.total_paid')}</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('savings_projections.total_contributions')}</CardTitle>
               <Calculator className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">{formatCurrency(debtSummary.totalPaid)}</div>
+              <div className="text-2xl font-bold text-green-600">{formatCurrency(savingsSummary.totalContributions)}</div>
               <p className="text-xs text-muted-foreground">
-                De {formatCurrency(debtSummary.totalOriginalDebt)}
+                Total acumulado
               </p>
             </CardContent>
           </Card>
 
           <Card className="glass-card depth-2 hover-lift interactive-scale glow-primary">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{t('debt_projections.monthly_payment')}</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('savings_projections.monthly_contributions')}</CardTitle>
               <Target className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{formatCurrency(debtSummary.totalMinimumPayments)}</div>
+              <div className="text-2xl font-bold">{formatCurrency(savingsSummary.monthlyContributions)}</div>
               <p className="text-xs text-muted-foreground">
-                {t('debt_projections.minimum_payments_total')}
+                Este mes
               </p>
             </CardContent>
           </Card>
 
           <Card className="glass-card depth-2 hover-lift interactive-scale glow-primary">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{t('debt_projections.estimated_time')}</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('savings_projections.estimated_time')}</CardTitle>
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{debtSummary.monthsToPayOff} meses</div>
+              <div className="text-2xl font-bold">{savingsSummary.monthsToTarget} meses</div>
               <p className="text-xs text-muted-foreground">
-                {t('debt_projections.with_minimum_payments')}
+                {t('savings_projections.to_reach_goals')}
               </p>
             </CardContent>
           </Card>
@@ -231,49 +252,53 @@ export default function DebtProjectionsPage() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todos los tipos</SelectItem>
-              <SelectItem value="credit_card">Tarjeta de Crédito</SelectItem>
-              <SelectItem value="personal_loan">Préstamo Personal</SelectItem>
-              <SelectItem value="mortgage">Hipoteca</SelectItem>
-              <SelectItem value="student_loan">Préstamo Estudiantil</SelectItem>
-              <SelectItem value="car_loan">Préstamo de Auto</SelectItem>
+              <SelectItem value="emergency_fund">Fondo de Emergencia</SelectItem>
+              <SelectItem value="investment">Inversión</SelectItem>
+              <SelectItem value="retirement">Retiro</SelectItem>
+              <SelectItem value="vacation">Vacaciones</SelectItem>
               <SelectItem value="other">Otro</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         {/* Contenido Principal */}
-        <Tabs defaultValue="comparison" className="space-y-6">
+        <Tabs defaultValue="summary" className="space-y-6">
            <TabsList className="grid w-full grid-cols-3">
-             <TabsTrigger value="comparison" className="flex items-center gap-2">
+             <TabsTrigger value="summary" className="flex items-center gap-2">
                <BarChart3 className="h-4 w-4" />
-               {t('strategy_comparison.title')}
+               {t('savings_projections.summary')}
              </TabsTrigger>
              <TabsTrigger value="simulator" className="flex items-center gap-2">
                <Calculator className="h-4 w-4" />
-               {t('payment_simulator.title')}
+               {t('savings_projections.simulator')}
              </TabsTrigger>
-             <TabsTrigger value="incoming" className="flex items-center gap-2">
+             <TabsTrigger value="scenarios" className="flex items-center gap-2">
                <TrendingUp className="h-4 w-4" />
-               Cobros Entrantes
+               {t('savings_projections.scenarios')}
              </TabsTrigger>
            </TabsList>
 
-          <TabsContent value="comparison" className="space-y-6">
-            <StrategyComparison
-              projections={projections}
-              recommendedStrategy="avalanche"
-            />
+          <TabsContent value="summary" className="space-y-6">
+            <SavingsSummary />
           </TabsContent>
 
           <TabsContent value="simulator" className="space-y-6">
-            <PaymentSimulator debts={filteredDebts} />
+            <SavingsGrowthSimulator />
           </TabsContent>
 
-          <TabsContent value="incoming" className="space-y-6">
-            <StrategyComparison
-              projections={incomingProjections}
-              isIncoming={true}
-            />
+          <TabsContent value="scenarios" className="space-y-6">
+            {scenarioProjections.length > 0 ? (
+              <SavingsStrategyComparison
+                projections={scenarioProjections}
+                targetAmount={savingsSummary?.totalTargetSavings}
+              />
+            ) : (
+              <Card className="glass-card depth-2 hover-lift interactive-scale glow-primary">
+                <CardContent className="flex items-center justify-center py-12">
+                  <p className="text-muted-foreground">No hay datos suficientes para comparar escenarios</p>
+                </CardContent>
+              </Card>
+            )}
           </TabsContent>
         </Tabs>
       </div>

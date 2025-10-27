@@ -29,12 +29,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { PlusCircle, TrendingUp, DollarSign, Target, Calendar, PiggyBank, Shield, TrendingDown, MoreHorizontal, Edit, Trash2, Wallet } from 'lucide-react';
+import { PlusCircle, TrendingUp, DollarSign, Target, Calendar, PiggyBank, Shield, TrendingDown, MoreHorizontal, Edit, Trash2, Wallet, BarChart3 } from 'lucide-react';
 import SavingsDialog from '@/components/savings/savings-dialog';
 import SavingsCharts from '@/components/savings/savings-charts';
 import EmergencyFundCard from '@/components/savings/emergency-fund-card';
 import EmergencyFundDialog from '@/components/savings/emergency-fund-dialog';
 import ContributionDialog from '@/components/savings/contribution-dialog';
+import Link from 'next/link';
 
 const formatCurrency = (amount: number) => {
   return `${new Intl.NumberFormat('es-ES', {
@@ -341,22 +342,31 @@ export default function SavingsPage() {
             <p className="text-muted-foreground">{t('savings.description') || 'Gestión de ahorros e inversiones'}</p>
           </div>
           <div className="flex flex-col gap-2 md:flex-row">
-            <Button
-              variant="outline"
-              onClick={() => setContributionDialogOpen(true)}
-              className="h-8 px-3 text-sm md:h-9 md:px-3 md:text-sm"
-            >
-              <Wallet className="mr-1 h-4 w-4" />
-              Añadir Contribución
-            </Button>
-            <Button onClick={() => {
-              setEditingSavings(null);
-              setDialogOpen(true);
-            }} className="h-8 px-3 text-sm md:h-9 md:px-3 md:text-sm">
-              <PlusCircle className="mr-1 h-4 w-4" />
-              Añadir Ahorro
-            </Button>
-          </div>
+             <Link href="/savings/projections">
+               <Button
+                 variant="outline"
+                 className="h-8 px-3 text-sm md:h-9 md:px-3 md:text-sm"
+               >
+                 <BarChart3 className="mr-1 h-4 w-4" />
+                 Proyecciones
+               </Button>
+             </Link>
+             <Button
+               variant="outline"
+               onClick={() => setContributionDialogOpen(true)}
+               className="h-8 px-3 text-sm md:h-9 md:px-3 md:text-sm"
+             >
+               <Wallet className="mr-1 h-4 w-4" />
+               Añadir Contribución
+             </Button>
+             <Button onClick={() => {
+               setEditingSavings(null);
+               setDialogOpen(true);
+             }} className="h-8 px-3 text-sm md:h-9 md:px-3 md:text-sm">
+               <PlusCircle className="mr-1 h-4 w-4" />
+               Añadir Ahorro
+             </Button>
+           </div>
         </div>
 
         {/* Métricas principales */}
