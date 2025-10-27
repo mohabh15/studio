@@ -1,5 +1,6 @@
 
-- Arreglar errores logica proyecciones ahorro
+- sombreado en modo movil card proyecciones de ahorro
+- Arreglar errores logica i ui proyecciones ahorro
 - subir texto navbar
 - Añadir screen proyecciones en ahorros
 - corregir traducciones en pagina deuda

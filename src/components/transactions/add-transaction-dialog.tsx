@@ -70,6 +70,7 @@ export default function AddTransactionDialog({
   const { t } = useI18n();
   const [isScanning, setIsScanning] = useState(false);
   const [activeType, setActiveType] = useState<TransactionType>('expense');
+  const [datePopoverOpen, setDatePopoverOpen] = useState(false);
 
   const form = useForm<TransactionFormValues>({
     resolver: zodResolver(transactionSchema),
@@ -91,6 +92,7 @@ export default function AddTransactionDialog({
         notes: '',
       });
       setActiveType('expense');
+      setDatePopoverOpen(false);
     }
   }, [isOpen, form]);
 
@@ -259,10 +261,11 @@ export default function AddTransactionDialog({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-sm font-medium text-foreground/90">{t('add_transaction_dialog.date')}</FormLabel>
-                    <Popover>
+                    <Popover open={datePopoverOpen} onOpenChange={setDatePopoverOpen}>
                       <PopoverTrigger asChild>
                         <FormControl>
                           <Button
+                            type="button"
                             variant={'outline'}
                             className={cn(
                               'w-full pl-3 text-left font-normal glass-effect hover-lift transition-all duration-300 hover:bg-background/80 hover:border-primary/50',
@@ -278,13 +281,16 @@ export default function AddTransactionDialog({
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0 glass-card depth-2 border-border/40" align="start">
+                      <PopoverContent className="w-auto p-0 glass-card depth-2 border-border/40 z-[9999]" align="start">
                         <Calendar
                           mode="single"
                           selected={field.value}
-                          onSelect={field.onChange}
-                          disabled={(date) => date > new Date() || date < new Date('1900-01-01')}
-                          initialFocus
+                          onSelect={(date) => {
+                            field.onChange(date);
+                            setTimeout(() => setDatePopoverOpen(false), 100);
+                          }}
+                          disabled={(date) => date < new Date('1900-01-01')}
+                          initialFocus={typeof window !== 'undefined' && !/Safari/.test(navigator.userAgent)}
                         />
                       </PopoverContent>
                     </Popover>
