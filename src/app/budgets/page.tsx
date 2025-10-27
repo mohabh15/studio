@@ -177,7 +177,7 @@ export default function BudgetsPage() {
         </div>
 
         <div className="grid gap-4 grid-cols-2 md:grid-cols-3 mb-6">
-          <Card className="col-span-2 md:col-span-1">
+          <Card className="col-span-2 md:col-span-1 glass-card depth-2 hover-lift interactive-scale glow-primary">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">{t('budgets_page.total_budget')}</CardTitle>
             </CardHeader>
@@ -185,7 +185,7 @@ export default function BudgetsPage() {
               <div className="text-2xl font-bold">{formatCurrency(totalBudget)}</div>
             </CardContent>
           </Card>
-          <Card className="col-span-1 md:col-span-1">
+          <Card className="col-span-1 md:col-span-1 glass-card depth-2 hover-lift interactive-scale glow-primary">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">{t('budgets_page.total_savings')}</CardTitle>
             </CardHeader>
@@ -193,7 +193,7 @@ export default function BudgetsPage() {
               <div className="text-2xl font-bold">{formatCurrency(monthlySavings)}</div>
             </CardContent>
           </Card>
-          <Card className="col-span-1 md:col-span-1">
+          <Card className="col-span-1 md:col-span-1 glass-card depth-2 hover-lift interactive-scale glow-primary">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">{t('budgets_page.budget_vs_actual')}</CardTitle>
             </CardHeader>
@@ -208,7 +208,7 @@ export default function BudgetsPage() {
           </Card>
         </div>
 
-        <Card>
+        <Card className="glass-card depth-2 hover-lift interactive-scale glow-primary">
           <CardHeader>
             <CardTitle>{t('budgets_page.all_budgets')}</CardTitle>
           </CardHeader>

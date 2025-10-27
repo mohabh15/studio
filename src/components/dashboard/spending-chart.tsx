@@ -120,8 +120,8 @@ export default function SpendingChart({ transactions, categories, selectedYear, 
      } else {
        return {
          height: 280, // Reducido para mejor proporción
-         outerRadius: 120, // Reducido para mejor centrado y visibilidad
-         innerRadius: 60, // Proporcional al outerRadius
+         outerRadius: 130, // Aumentado para mejor visibilidad en PC
+         innerRadius: 65, // Proporcional al outerRadius
          legendHeight: 45, // Espacio adecuado para leyenda
          fontSize: 12, // Tamaño óptimo para desktop
          showLegend: true,
@@ -178,7 +178,7 @@ export default function SpendingChart({ transactions, categories, selectedYear, 
                     align={isMobile ? "center" : "center"}
                     height={responsiveConfig.legendHeight}
                     wrapperStyle={{
-                      paddingTop: isMobile ? '16px' : '12px', // Ajustado para móvil: espacio equilibrado entre gráfico y leyenda
+                      paddingTop: isMobile ? '16px' : '0px', // Ajustado para móvil: espacio equilibrado entre gráfico y leyenda
                       paddingBottom: isMobile ? '2px' : '4px',
                       fontSize: responsiveConfig.fontSize,
                       lineHeight: 1.3

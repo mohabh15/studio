@@ -11,6 +11,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer } fro
 import { calculateSavingsProjections, SAVINGS_STRATEGIES, SavingsStrategy, formatCurrency } from '@/lib/savings-projections';
 import { Calculator, TrendingUp, Clock, DollarSign, Target, Lightbulb } from 'lucide-react';
 import { useI18n } from '@/hooks/use-i18n';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const formatMonths = (months: number) => {
   const years = Math.floor(months / 12);
@@ -27,6 +28,7 @@ const formatMonths = (months: number) => {
 
 export default function SavingsGrowthSimulator() {
   const { t } = useI18n();
+  const isMobile = useIsMobile();
   const [monthlyContribution, setMonthlyContribution] = useState<number>(200);
   const [annualReturnRate, setAnnualReturnRate] = useState<number>(6);
   const [timeHorizon, setTimeHorizon] = useState<number>(10);
@@ -45,13 +47,15 @@ export default function SavingsGrowthSimulator() {
   }, [initialAmount, monthlyContribution, timeHorizon, selectedStrategy, targetAmount]);
 
   const chartData = useMemo(() => {
-    return projection.monthlyData.map(data => ({
+    const data = projection.monthlyData.map(data => ({
       year: data.year,
       balance: data.balance,
       contributions: data.contributions,
       returns: data.returns,
     }));
-  }, [projection]);
+    // Limitar a los primeros 5 años en móvil
+    return isMobile ? data.slice(0, 5) : data;
+  }, [projection, isMobile]);
 
   const strategies: { value: SavingsStrategy; label: string; description: string; rate: number }[] = [
     {
@@ -262,9 +266,9 @@ export default function SavingsGrowthSimulator() {
             </div>
 
             {/* Gráfico de Crecimiento */}
-            <div className="mb-6">
+            <div className="mb-6 overflow-x-auto">
               <h5 className="font-medium mb-3">{t('savings_growth_simulator.growth_projection')}</h5>
-              <ChartContainer config={chartConfig} className="h-[300px]">
+              <ChartContainer config={chartConfig} className={`h-[300px] w-full ${isMobile ? '' : 'min-w-[600px]'}`}>
                 <LineChart data={chartData}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis

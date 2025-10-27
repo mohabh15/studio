@@ -3,10 +3,11 @@
 import { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell, Legend } from 'recharts';
 import { SavingsProjectionResult, formatCurrency } from '@/lib/savings-projections';
 import { TrendingUp, BarChart3, PieChart as PieChartIcon, Target } from 'lucide-react';
 import { useI18n } from '@/hooks/use-i18n';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface SavingsProjectionChartsProps {
   projections: SavingsProjectionResult[];
@@ -28,15 +29,17 @@ export default function SavingsProjectionCharts({
   currentBalance = 0
 }: SavingsProjectionChartsProps) {
   const { t } = useI18n();
+  const isMobile = useIsMobile();
 
   // Datos para gráfico de crecimiento proyectado
   const growthChartData = useMemo(() => {
     if (projections.length === 0) return [];
 
     const maxYears = Math.max(...projections.map(p => p.monthlyData.length));
+    const yearsToShow = isMobile ? Math.min(maxYears, 5) : maxYears;
     const data = [];
 
-    for (let year = 1; year <= maxYears; year++) {
+    for (let year = 1; year <= yearsToShow; year++) {
       const yearData: any = { year: `Año ${year}` };
 
       projections.forEach(projection => {
@@ -52,7 +55,7 @@ export default function SavingsProjectionCharts({
     }
 
     return data;
-  }, [projections]);
+  }, [projections, isMobile]);
 
   // Datos para gráfico de comparación de escenarios
   const scenarioComparisonData = useMemo(() => {
@@ -80,13 +83,9 @@ export default function SavingsProjectionCharts({
   const progressData = useMemo(() => {
     if (!targetAmount || projections.length === 0) return 0;
 
-    const bestProjection = projections.reduce((best, current) =>
-      current.futureValue > best.futureValue ? current : best
-    );
-
-    const progress = Math.min((bestProjection.futureValue / targetAmount) * 100, 100);
+    const progress = Math.min((currentBalance / targetAmount) * 100, 100);
     return Math.round(progress);
-  }, [projections, targetAmount]);
+  }, [currentBalance, targetAmount]);
 
   const chartConfig = {
     balance: { label: 'Balance', color: 'hsl(var(--chart-1))' },
@@ -121,7 +120,7 @@ export default function SavingsProjectionCharts({
           </p>
         </CardHeader>
         <CardContent>
-          <ChartContainer config={chartConfig} className="h-[400px]">
+          <ChartContainer config={chartConfig} className="h-[400px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={growthChartData}>
                 <CartesianGrid strokeDasharray="3 3" />
@@ -136,6 +135,7 @@ export default function SavingsProjectionCharts({
                     ]}
                   />}
                 />
+                {!isMobile && <Legend />}
                 {projections.map((projection, index) => (
                   <Line
                     key={`${projection.strategy}_balance`}
@@ -144,7 +144,7 @@ export default function SavingsProjectionCharts({
                     stroke={COLORS[index % COLORS.length]}
                     strokeWidth={2}
                     dot={false}
-                    name={`${projection.strategy} - Balance`}
+                    name={`${projection.strategy}`}
                   />
                 ))}
               </LineChart>
@@ -165,7 +165,7 @@ export default function SavingsProjectionCharts({
           </p>
         </CardHeader>
         <CardContent>
-          <ChartContainer config={chartConfig} className="h-[300px]">
+          <ChartContainer config={chartConfig} className="h-[300px] w-full overflow-x-auto">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={scenarioComparisonData}>
                 <CartesianGrid strokeDasharray="3 3" />
@@ -195,30 +195,32 @@ export default function SavingsProjectionCharts({
           </p>
         </CardHeader>
         <CardContent>
-          <ChartContainer config={chartConfig} className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={compositionData}
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="value"
-                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                >
-                  {compositionData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <ChartTooltip
-                  content={<ChartTooltipContent
-                    formatter={(value) => [formatCurrency(Number(value)), '']}
-                  />}
-                />
-              </PieChart>
-            </ResponsiveContainer>
-          </ChartContainer>
+          <div className={isMobile ? "flex justify-center" : ""}>
+            <ChartContainer config={chartConfig} className="h-[300px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={compositionData}
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={80}
+                    fill="#8884d8"
+                    dataKey="value"
+                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                  >
+                    {compositionData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <ChartTooltip
+                    content={<ChartTooltipContent
+                      formatter={(value) => [formatCurrency(Number(value)), '']}
+                    />}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </ChartContainer>
+          </div>
         </CardContent>
       </Card>
 

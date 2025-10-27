@@ -7,7 +7,6 @@ import { ChartContainer } from '@/components/ui/chart';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { type Transaction } from '@/lib/types';
 import { useI18n } from '@/hooks/use-i18n';
-import { formatMonthName } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 
 type SpendingTrendsChartProps = {
@@ -41,7 +40,7 @@ export default function SpendingTrendsChart({ transactions }: SpendingTrendsChar
         months.push({
           year: date.getFullYear(),
           month: date.getMonth(),
-          label: formatMonthName(date.getFullYear(), date.getMonth(), locale, true),
+          label: `${date.getMonth() + 1}/${date.getFullYear()}`,
         });
       }
 
