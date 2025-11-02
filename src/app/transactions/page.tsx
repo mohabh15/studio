@@ -471,6 +471,7 @@ function EditTransactionForm({ transaction, categories, onSave, onCancel, t }: {
     merchant: transaction.merchant || '',
     notes: transaction.notes || '',
   });
+  const [datePopoverOpen, setDatePopoverOpen] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -506,7 +507,7 @@ function EditTransactionForm({ transaction, categories, onSave, onCancel, t }: {
 
       <div>
         <Label>{t('add_transaction_dialog.date')}</Label>
-        <Popover>
+        <Popover open={datePopoverOpen} onOpenChange={setDatePopoverOpen}>
           <PopoverTrigger asChild>
             <Button
               variant="outline"
@@ -519,12 +520,17 @@ function EditTransactionForm({ transaction, categories, onSave, onCancel, t }: {
               {formData.date ? format(formData.date, 'PPP') : t('add_transaction_dialog.pick_a_date')}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-0">
+          <PopoverContent className="w-auto p-0 z-[9999]" align="start">
             <Calendar
               mode="single"
               selected={formData.date}
-              onSelect={(date) => date && setFormData(prev => ({ ...prev, date }))}
-              initialFocus
+              onSelect={(date) => {
+                if (date) {
+                  setFormData(prev => ({ ...prev, date }));
+                  setTimeout(() => setDatePopoverOpen(false), 100);
+                }
+              }}
+              initialFocus={typeof window !== 'undefined' && !/Safari/.test(navigator.userAgent)}
             />
           </PopoverContent>
         </Popover>
