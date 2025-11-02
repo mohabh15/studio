@@ -71,9 +71,11 @@
       "average_rate": "Average rate: {{rate}}%"
     },
     "summary": {
-      "total_income": "Total Income",
-      "total_expenses": "Total Expenses",
+      "total_income": "Monthly Income",
+      "total_expenses": "Monthly Expenses",
       "balance": "Balance",
+      "total_balance": "Total Balance",
+      "accumulated_funds": "Total accumulated",
       "this_month": "This month",
       "remaining_funds": "Remaining funds",
       "daily_insight": "Daily Insight",

@@ -25,6 +25,20 @@ const formatCurrency = (amount: number) => {
 
 export default function SummaryCards({ income, expense, selectedYear, selectedMonth, allTransactions, categories }: SummaryCardsProps) {
   const { t, locale } = useI18n();
+  
+  // Calcular el saldo total acumulado usando todas las transacciones
+  const totalBalance = useMemo(() => {
+    return allTransactions.reduce((acc, transaction) => {
+      if (transaction.type === 'income') {
+        acc += transaction.amount;
+      } else {
+        acc -= transaction.amount;
+      }
+      return acc;
+    }, 0);
+  }, [allTransactions]);
+  
+  // Mantener el balance mensual para compatibilidad
   const balance = income - expense;
 
   const getMonthName = (month: number) => {
@@ -129,18 +143,18 @@ export default function SummaryCards({ income, expense, selectedYear, selectedMo
 
   return (
     <div className="grid gap-6 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-      <Card className={`glass-card depth-2 hover-lift interactive-scale ${balance >= 0 ? 'glow-primary' : 'glow-accent'}`}>
+      <Card className={`glass-card depth-2 hover-lift interactive-scale ${totalBalance >= 0 ? 'glow-primary' : 'glow-accent'}`}>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-          <CardTitle className="text-sm font-medium text-foreground/90">{t('dashboard.summary.balance')}</CardTitle>
-          <div className={`p-2 rounded-lg ${balance >= 0 ? 'bg-success/20' : 'bg-warning/20'}`}>
-            <DollarSign className={`h-5 w-5 ${balance >= 0 ? 'text-success' : 'text-warning'}`} />
+          <CardTitle className="text-sm font-medium text-foreground/90">{t('dashboard.summary.total_balance') || 'Saldo Total'}</CardTitle>
+          <div className={`p-2 rounded-lg ${totalBalance >= 0 ? 'bg-success/20' : 'bg-warning/20'}`}>
+            <DollarSign className={`h-5 w-5 ${totalBalance >= 0 ? 'text-success' : 'text-warning'}`} />
           </div>
         </CardHeader>
         <CardContent>
-          <div className={`text-3xl font-bold mb-1 ${balance >= 0 ? 'text-success' : 'text-warning'}`}>
-            {formatCurrency(balance)}
+          <div className={`text-3xl font-bold mb-1 ${totalBalance >= 0 ? 'text-success' : 'text-warning'}`}>
+            {formatCurrency(totalBalance)}
           </div>
-          <p className="text-xs text-muted-foreground/80">{t('dashboard.summary.remaining_funds')}</p>
+          <p className="text-xs text-muted-foreground/80">{t('dashboard.summary.accumulated_funds') || 'Acumulado total'}</p>
         </CardContent>
       </Card>
 

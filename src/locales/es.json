@@ -71,9 +71,11 @@
       "average_rate": "Tasa promedio: {{rate}}%"
     },
     "summary": {
-      "total_income": "Ingresos Totales",
-      "total_expenses": "Gastos Totales",
+      "total_income": "Ingresos mensuales",
+      "total_expenses": "Gastos mensuales",
       "balance": "Saldo",
+      "total_balance": "Saldo Total",
+      "accumulated_funds": "Acumulado total",
       "this_month": "Este mes",
       "remaining_funds": "Fondos restantes",
       "daily_insight": "Insight Diario",
