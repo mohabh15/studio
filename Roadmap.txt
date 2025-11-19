@@ -123,3 +123,17 @@
 
 
 
+Análisis de riesgo y scoring crediticio: Evaluación del perfil financiero del usuario con r
+ecomendaciones para mejorar el score crediticio.
+
+Modos de visualización alternativos: Opciones para cambiar entre vistas de lista, tarjetas, gráficos 
+interactivos o timeline, adaptadas a preferencias del usuario.
+
+Animaciones y microinteracciones: Transiciones suaves, feedback visual en botones y gestos, y 
+animaciones para cambios de estado (como completar un presupuesto).
+
+Personalización de dashboards: Permitir arrastrar y soltar componentes, crear vistas personalizadas y 
+guardar configuraciones por perfil.
+
+Feedback en tiempo real y gamificación visual: Indicadores de progreso animados, badges visuales 
+para logros y notificaciones contextuales con emojis o iconos.
