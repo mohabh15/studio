@@ -1,46 +1,17 @@
 
 
-- fecha modal edicion de transaccion
+
+- Definir como hacer con sobrante presupuestos
 
 - Añadir gestion sobrante del presupuesto para total -> falta probar cambios echos -> no funciona 
-- corregir traducciones en pagina deuda
+- revisar y corregir traducciones en toda la app añadir las que faltan
 - comprobar que al eliminar una deuda se eliminen las transacciones asociadas a esta
 - al eliminar una transaccion de una deuda inactiva que se mire si vuelve a tener saldo aun por pagar y cambiar a activa
 
 
+- Funcionalidad completa sin conexión a internet.
+- optimizacion: Lazy loading, virtualización, optimización de queries.
 
-
-================================================================================
-🚀                           ROADMAP COMPREHENSIVO
-================================================================================
-                           APP DE GESTIÓN DE PRESUPUESTOS
-
-Basándose en el análisis del código existente de la aplicación de gestión de
-presupuestos, aquí está un roadmap comprehensivo de características importantes
-faltantes, priorizadas por impacto en UX, escalabilidad y funcionalidades core.
-
---------------------------------------------------------------------------------
-4. NOTIFICACIONES Y RECORDATORIOS
---------------------------------------------------------------------------------
-📝 DESCRIPCIÓN:
-   Alertas para límites de presupuesto, recordatorios de pagos.
-
-🎯 IMPACTO:
-   Mejora retención y engagement.
-
-⏱️  ESFUERZO:
-   Medio (1 semana)
-
-🛠️  PASOS:
-   • Sistema de notificaciones in-app
-   • Integración con Service Workers para push notifications
-   • Configuración de umbrales personalizables
-   • Recordatorios recurrentes
-
-================================================================================
-📊                           PRIORIDAD MEDIA
-================================================================================
-                     MEJORAS DE UX Y FUNCIONALIDAD
 
 --------------------------------------------------------------------------------
 5. GESTIÓN DE CUENTAS Y SUBCUENTAS
@@ -61,25 +32,6 @@ faltantes, priorizadas por impacto en UX, escalabilidad y funcionalidades core.
    • Integración con dashboard
 
 --------------------------------------------------------------------------------
-6. CATEGORIZACIÓN AUTOMÁTICA CON IA
---------------------------------------------------------------------------------
-📝 DESCRIPCIÓN:
-   Usar IA para sugerir categorías basadas en descripción/merchant.
-
-🎯 IMPACTO:
-   Reduce fricción en data entry.
-
-⏱️  ESFUERZO:
-   Medio-Alto (1-2 semanas)
-
-🛠️  PASOS:
-   • Integrar con Google AI (ya configurado)
-   • Entrenar modelo con datos históricos
-   • Sugerencias automáticas en formulario de transacción
-   • Opción de corrección manual
-
-
---------------------------------------------------------------------------------
 8. EXPORTACIÓN DE DATOS
 --------------------------------------------------------------------------------
 📝 DESCRIPCIÓN:
@@ -96,42 +48,6 @@ faltantes, priorizadas por impacto en UX, escalabilidad y funcionalidades core.
    • Validación de datos importados
    • Exportación completa de datos
    • Backup automático a cloud
-
---------------------------------------------------------------------------------
-9. OFFLINE-FIRST ARCHITECTURE
---------------------------------------------------------------------------------
-📝 DESCRIPCIÓN:
-   Funcionalidad completa sin conexión a internet.
-
-🎯 IMPACTO:
-   Usabilidad en áreas con mala conectividad.
-
-⏱️  ESFUERZO:
-   Alto (2-3 semanas)
-
-🛠️  PASOS:
-   • Implementar service workers avanzados
-   • Sincronización automática al reconectar
-   • Conflict resolution para datos offline
-   • Cache inteligente de datos
-
---------------------------------------------------------------------------------
-10. OPTIMIZACIÓN DE RENDIMIENTO
---------------------------------------------------------------------------------
-📝 DESCRIPCIÓN:
-   Lazy loading, virtualización, optimización de queries.
-
-🎯 IMPACTO:
-   Mejor rendimiento con datos grandes.
-
-⏱️  ESFUERZO:
-   Medio (1 semana)
-
-🛠️  PASOS:
-   • Virtualización de listas largas
-   • Lazy loading de componentes
-   • Optimización de queries de Firestore
-   • Memoización inteligente
 
 --------------------------------------------------------------------------------
 11. SISTEMA DE BACKUP Y RECUPERACIÓN
@@ -185,30 +101,7 @@ faltantes, priorizadas por impacto en UX, escalabilidad y funcionalidades core.
    • Sistema de logros y badges
    • Streaks de presupuesto cumplido
    • Consejos basados en comportamiento
-   • Comparaciones sociales anónimas
-
-================================================================================
-📱                       PRIORIDAD BAJA
-================================================================================
-                     CARACTERÍSTICAS AVANZADAS
-
---------------------------------------------------------------------------------
-16. APLICACIÓN MÓVIL NATIVA
---------------------------------------------------------------------------------
-📝 DESCRIPCIÓN:
-   Apps iOS/Android nativas.
-
-🎯 IMPACTO:
-   Acceso móvil mejorado.
-
-⏱️  ESFUERZO:
-   Muy Alto (4-6 semanas)
-
-🛠️  PASOS:
-   • React Native o Flutter
-   • Sincronización con web app
-   • Notificaciones push nativas
-   • Integración con sensores (NFC para pagos)
+   • Comparaciones sociales anónimas      
 
 --------------------------------------------------------------------------------
 17. ANÁLISIS PREDICTIVO CON IA

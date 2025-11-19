@@ -78,11 +78,11 @@ export default function SavingsDialog({ isOpen, onOpenChange, onSave, savings }:
     defaultValues: {
       tipo: 'investment',
       nombre: '',
-      monto_actual: 0,
-      monto_objetivo: 0,
+      monto_actual: undefined,
+      monto_objetivo: undefined,
       fecha_objetivo: '',
       descripcion: '',
-      interes_anual: 0,
+      interes_anual: undefined,
       status: 'active',
     },
   });
@@ -103,11 +103,11 @@ export default function SavingsDialog({ isOpen, onOpenChange, onSave, savings }:
       form.reset({
         tipo: 'investment',
         nombre: '',
-        monto_actual: 0,
-        monto_objetivo: 0,
+        monto_actual: undefined,
+        monto_objetivo: undefined,
         fecha_objetivo: '',
         descripcion: '',
-        interes_anual: 0,
+        interes_anual: undefined,
         status: 'active',
       });
     }
@@ -254,6 +254,7 @@ export default function SavingsDialog({ isOpen, onOpenChange, onSave, savings }:
                         step="0.01"
                         placeholder="0.00"
                         className="glass-effect hover-lift transition-all duration-300"
+                        onFocus={(e) => e.target.select()}
                         {...field}
                         onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                       />
@@ -275,6 +276,7 @@ export default function SavingsDialog({ isOpen, onOpenChange, onSave, savings }:
                         step="0.01"
                         placeholder="0.00"
                         className="glass-effect hover-lift transition-all duration-300"
+                        onFocus={(e) => e.target.select()}
                         {...field}
                         onChange={(e) => field.onChange(e.target.value ? parseFloat(e.target.value) : 0)}
                       />
@@ -316,6 +318,7 @@ export default function SavingsDialog({ isOpen, onOpenChange, onSave, savings }:
                         step="0.01"
                         placeholder="0.00"
                         className="glass-effect hover-lift transition-all duration-300"
+                        onFocus={(e) => e.target.select()}
                         {...field}
                         onChange={(e) => field.onChange(e.target.value ? parseFloat(e.target.value) : 0)}
                       />

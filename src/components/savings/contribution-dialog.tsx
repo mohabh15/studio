@@ -72,7 +72,7 @@ export default function ContributionDialog({
     resolver: zodResolver(contributionSchema),
     defaultValues: {
       savings_id: '',
-      amount: 0,
+      amount: undefined,
       date: new Date().toISOString().split('T')[0],
       description: '',
       tipo: 'regular',
@@ -83,7 +83,7 @@ export default function ContributionDialog({
     if (!isOpen) {
       form.reset({
         savings_id: '',
-        amount: 0,
+        amount: undefined,
         date: new Date().toISOString().split('T')[0],
         description: '',
         tipo: 'regular',
@@ -189,6 +189,7 @@ export default function ContributionDialog({
                         step="0.01"
                         placeholder="0.00"
                         className="glass-effect hover-lift transition-all duration-300"
+                        onFocus={(e) => e.target.select()}
                         {...field}
                         onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                       />

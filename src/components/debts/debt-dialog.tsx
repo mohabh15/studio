@@ -68,22 +68,6 @@ export default function DebtDialog({ isOpen, onOpenChange, onSave, debt }: DebtD
      pagos_minimos: z.number().min(0, t('debt_dialog.validation.minimum_payment_required')),
      fecha_vencimiento: z.string().min(1, t('debt_dialog.validation.due_date_required')),
      descripcion: z.string().optional(),
-   }).refine((data) => {
-     if (data.direction === 'outgoing') {
-       return data.tasa_interes > 0;
-     }
-     return true;
-   }, {
-     message: t('debt_dialog.validation.interest_rate_required_for_outgoing'),
-     path: ['tasa_interes'],
-   }).refine((data) => {
-     if (data.direction === 'outgoing') {
-       return data.pagos_minimos >= 0.01;
-     }
-     return data.pagos_minimos >= 0;
-   }, {
-     message: t('debt_dialog.validation.minimum_payment_required_for_outgoing'),
-     path: ['pagos_minimos'],
    });
 
    type DebtFormValues = z.infer<typeof debtSchema>;
@@ -93,10 +77,10 @@ export default function DebtDialog({ isOpen, onOpenChange, onSave, debt }: DebtD
     defaultValues: {
       direction: 'outgoing',
       tipo: 'credit_card',
-      monto: 0,
-      monto_actual: 0,
-      tasa_interes: 0,
-      pagos_minimos: 0,
+      monto: undefined,
+      monto_actual: undefined,
+      tasa_interes: undefined,
+      pagos_minimos: undefined,
       fecha_vencimiento: '',
       descripcion: '',
     },
@@ -120,10 +104,10 @@ export default function DebtDialog({ isOpen, onOpenChange, onSave, debt }: DebtD
       form.reset({
         direction: 'outgoing',
         tipo: 'credit_card',
-        monto: 0,
-        monto_actual: 0,
-        tasa_interes: 0,
-        pagos_minimos: 0,
+        monto: undefined,
+        monto_actual: undefined,
+        tasa_interes: undefined,
+        pagos_minimos: undefined,
         fecha_vencimiento: '',
         descripcion: '',
       });
@@ -295,6 +279,7 @@ export default function DebtDialog({ isOpen, onOpenChange, onSave, debt }: DebtD
                         step="0.01"
                         placeholder="0.00"
                         className="glass-effect hover-lift transition-all duration-300 focus:bg-background/80 focus:border-primary/60 focus:ring-2 focus:ring-primary/20"
+                        onFocus={(e) => e.target.select()}
                         {...field}
                         onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                       />
@@ -316,6 +301,7 @@ export default function DebtDialog({ isOpen, onOpenChange, onSave, debt }: DebtD
                         step="0.01"
                         placeholder="0.00"
                         className="glass-effect hover-lift transition-all duration-300 focus:bg-background/80 focus:border-primary/60 focus:ring-2 focus:ring-primary/20"
+                        onFocus={(e) => e.target.select()}
                         {...field}
                         onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                       />
@@ -340,6 +326,7 @@ export default function DebtDialog({ isOpen, onOpenChange, onSave, debt }: DebtD
                           step="0.01"
                           placeholder="0.00"
                           className="glass-effect hover-lift transition-all duration-300 focus:bg-background/80 focus:border-primary/60 focus:ring-2 focus:ring-primary/20"
+                          onFocus={(e) => e.target.select()}
                           {...field}
                           onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                         />
@@ -364,6 +351,7 @@ export default function DebtDialog({ isOpen, onOpenChange, onSave, debt }: DebtD
                         step="0.01"
                         placeholder="0.00"
                         className="glass-effect hover-lift transition-all duration-300 focus:bg-background/80 focus:border-primary/60 focus:ring-2 focus:ring-primary/20"
+                        onFocus={(e) => e.target.select()}
                         {...field}
                         onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                       />

@@ -87,7 +87,7 @@ export default function BudgetDialog({
     resolver: zodResolver(budgetSchema),
     defaultValues: {
       category: '',
-      amount: 0,
+      amount: undefined,
       surplusStrategy: {
         type: 'rollover',
         redistributionTargets: [],
@@ -113,7 +113,7 @@ export default function BudgetDialog({
     } else {
       form.reset({
         category: '',
-        amount: 0,
+        amount: undefined,
         surplusStrategy: {
           type: undefined,
           redistributionTargets: [],
@@ -202,6 +202,7 @@ export default function BudgetDialog({
                        type="number"
                        placeholder="0.00"
                        className="glass-effect hover-lift transition-all duration-300 focus:bg-background/80 focus:border-primary/60 focus:ring-2 focus:ring-primary/20"
+                       onFocus={(e) => e.target.select()}
                        {...field}
                      />
                    </FormControl>
@@ -284,6 +285,7 @@ export default function BudgetDialog({
                               type="number"
                               placeholder="0.00"
                               className="glass-effect"
+                              onFocus={(e) => e.target.select()}
                               {...field}
                             />
                           </FormControl>
@@ -305,7 +307,7 @@ export default function BudgetDialog({
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => append({ categoryId: '', percentage: 0 })}
+                  onClick={() => append({ categoryId: '', percentage: undefined })}
                   className="w-full"
                 >
                   <Plus className="h-4 w-4 mr-2" />

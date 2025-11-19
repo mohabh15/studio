@@ -60,7 +60,7 @@ export default function DebtPaymentDialog({ isOpen, onOpenChange, onSave, debts 
      resolver: zodResolver(debtPaymentSchema),
     defaultValues: {
       debt_id: '',
-      amount: 0,
+      amount: undefined,
       date: new Date().toISOString().split('T')[0],
       tipo: 'regular',
       description: '',
@@ -75,7 +75,7 @@ export default function DebtPaymentDialog({ isOpen, onOpenChange, onSave, debts 
     if (!isOpen) {
       form.reset({
         debt_id: '',
-        amount: 0,
+        amount: undefined,
         date: new Date().toISOString().split('T')[0],
         tipo: 'regular',
         description: '',
@@ -192,6 +192,7 @@ export default function DebtPaymentDialog({ isOpen, onOpenChange, onSave, debts 
                         step="0.01"
                         placeholder="0.00"
                         className="glass-effect hover-lift transition-all duration-300 focus:bg-background/80 focus:border-primary/60 focus:ring-2 focus:ring-primary/20"
+                        onFocus={(e) => e.target.select()}
                         {...field}
                         onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                       />

@@ -76,7 +76,7 @@ export default function AddTransactionDialog({
     resolver: zodResolver(transactionSchema),
     defaultValues: {
       type: 'expense',
-      amount: 0,
+      amount: undefined,
       date: new Date(),
     },
   });
@@ -85,7 +85,7 @@ export default function AddTransactionDialog({
     if (isOpen) {
       form.reset({
         type: 'expense',
-        amount: 0,
+        amount: undefined,
         date: new Date(),
         category: '',
         merchant: '',
@@ -247,6 +247,7 @@ export default function AddTransactionDialog({
                       type="number"
                       placeholder="0.00"
                       className="glass-effect hover-lift transition-all duration-300 focus:bg-background/80 focus:border-primary/60 focus:ring-2 focus:ring-primary/20"
+                      onFocus={(e) => e.target.select()}
                       {...field}
                     />
                   </FormControl>

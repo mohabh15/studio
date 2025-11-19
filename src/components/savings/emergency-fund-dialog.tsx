@@ -55,10 +55,10 @@ export default function EmergencyFundDialog({
   const form = useForm<EmergencyFundFormValues>({
     resolver: zodResolver(emergencyFundSchema),
     defaultValues: {
-      monto_actual: 0,
-      monto_objetivo: 0,
-      gastos_mensuales: 0,
-      meses_cobertura_actual: 0,
+      monto_actual: undefined,
+      monto_objetivo: undefined,
+      gastos_mensuales: undefined,
+      meses_cobertura_actual: undefined,
     },
   });
 
@@ -72,10 +72,10 @@ export default function EmergencyFundDialog({
       });
     } else {
       form.reset({
-        monto_actual: 0,
-        monto_objetivo: 0,
-        gastos_mensuales: 0,
-        meses_cobertura_actual: 0,
+        monto_actual: undefined,
+        monto_objetivo: undefined,
+        gastos_mensuales: undefined,
+        meses_cobertura_actual: undefined,
       });
     }
   }, [emergencyFund, form]);
@@ -139,6 +139,7 @@ export default function EmergencyFundDialog({
                       step="0.01"
                       placeholder="0.00"
                       className="glass-effect hover-lift transition-all duration-300"
+                      onFocus={(e) => e.target.select()}
                       {...field}
                       onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                     />
@@ -160,6 +161,7 @@ export default function EmergencyFundDialog({
                       step="0.01"
                       placeholder="0.00"
                       className="glass-effect hover-lift transition-all duration-300"
+                      onFocus={(e) => e.target.select()}
                       {...field}
                       onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                     />
@@ -181,6 +183,7 @@ export default function EmergencyFundDialog({
                       step="0.01"
                       placeholder="0.00"
                       className="glass-effect hover-lift transition-all duration-300"
+                      onFocus={(e) => e.target.select()}
                       {...field}
                       onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                     />
@@ -202,6 +205,7 @@ export default function EmergencyFundDialog({
                       step="0.1"
                       placeholder="0"
                       className="glass-effect hover-lift transition-all duration-300"
+                      onFocus={(e) => e.target.select()}
                       {...field}
                       onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                     />
