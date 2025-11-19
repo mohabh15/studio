@@ -133,7 +133,7 @@ export default function SpendingChart({ transactions, categories, selectedYear, 
   return (
     <Card className="glass-card depth-3 hover-lift">
       <CardHeader className="pb-4">
-        <CardTitle className={`font-bold ${isMobile ? 'text-lg' : 'text-xl'} bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent`}>
+        <CardTitle className={`font-bold ${isMobile ? 'text-lg' : 'text-xl'} bg-gradient-to-r from-blue-600 to-cyan-400 bg-clip-text text-transparent`}>
           {t('dashboard.spending_overview.title')}
         </CardTitle>
         <CardDescription className={`${isMobile ? 'text-sm' : ''} text-muted-foreground/80`}>

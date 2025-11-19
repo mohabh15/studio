@@ -121,7 +121,7 @@ export default function SpendingTrendsChart({ transactions }: SpendingTrendsChar
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className={`font-bold ${isMobile ? 'text-lg' : 'text-xl'} bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent`}>
+            <CardTitle className={`font-bold ${isMobile ? 'text-lg' : 'text-xl'} bg-gradient-to-r from-blue-600 to-cyan-400 bg-clip-text text-transparent`}>
               {t('dashboard.spending_trends.title')}
             </CardTitle>
             <CardDescription className={`${isMobile ? 'text-sm' : ''} text-muted-foreground/80`}>

@@ -137,56 +137,100 @@ export default function DashboardPage() {
     return <DashboardSkeleton />;
   }
 
+  // Obtener el saludo según la hora del día
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return t('dashboard.greeting.morning') || 'Buenos días';
+    if (hour < 18) return t('dashboard.greeting.afternoon') || 'Buenas tardes';
+    return t('dashboard.greeting.evening') || 'Buenas noches';
+  };
+
+  // Obtener el nombre del usuario (primera palabra del email o displayName)
+  const getUserName = () => {
+    if (user?.displayName) return user.displayName.split(' ')[0];
+    if (user?.email) return user.email.split('@')[0];
+    return t('dashboard.greeting.user') || 'Usuario';
+  };
+
+  // Formato de fecha actual
+  const currentDate = new Date().toLocaleDateString('es-ES', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+
   return (
     <>
       <AppLayout>
-        <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-6 lg:p-8">
-          {isMobile && (
-            <div className="flex justify-end">
+        <main className="flex flex-1 flex-col gap-6 p-4 md:gap-8 md:p-6 lg:p-8 animate-in fade-in duration-500">
+          {/* Header modernizado con saludo */}
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div className="space-y-1 animate-in slide-in-from-left duration-500">
+              <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-400 bg-clip-text text-transparent animate-in fade-in duration-700">
+                {getGreeting()}, {getUserName()} 👋
+              </h1>
+              <p className="text-sm md:text-base text-muted-foreground/80 capitalize">
+                {currentDate}
+              </p>
+            </div>
+
+            <div className="animate-in slide-in-from-right duration-500">
               <MonthSelector
                 selectedYear={selectedYear}
                 selectedMonth={selectedMonth}
                 updateSelectedMonth={updateSelectedMonth}
               />
             </div>
-          )}
-          {!isMobile && (
-            <div className="flex items-center justify-end">
-              <MonthSelector
-                selectedYear={selectedYear}
-                selectedMonth={selectedMonth}
-                updateSelectedMonth={updateSelectedMonth}
-              />
+          </div>
+
+          {/* Tarjetas de resumen con animación */}
+          <div className="animate-in slide-in-from-bottom duration-700" style={{ animationDelay: '100ms' }}>
+            <SummaryCards
+              income={summary.income}
+              expense={summary.expense}
+              selectedYear={selectedYear}
+              selectedMonth={selectedMonth}
+              allTransactions={allTransactions}
+              categories={categories}
+            />
+          </div>
+
+          {/* Grid principal con diseño mejorado */}
+          <div className="grid grid-cols-1 gap-6 md:gap-8 lg:grid-cols-3 animate-in slide-in-from-bottom duration-700" style={{ animationDelay: '200ms' }}>
+            <div className="flex flex-col gap-6 lg:col-span-2">
+              <div className="transform transition-all duration-300 hover:scale-[1.01]">
+                <SpendingChart
+                  transactions={transactions}
+                  categories={categories}
+                  selectedYear={selectedYear}
+                  selectedMonth={selectedMonth}
+                />
+              </div>
+
+              <div className="transform transition-all duration-300 hover:scale-[1.01]">
+                <SpendingTrendsChart transactions={allTransactions} />
+              </div>
+
+              <div className="transform transition-all duration-300 hover:scale-[1.01]">
+                <RecentTransactions transactions={transactions} categories={categories} />
+              </div>
+
+              <div className="transform transition-all duration-300 hover:scale-[1.01]">
+                <DebtStatus debts={debts} userId={userId || ''} />
+              </div>
             </div>
-          )}
-          <SummaryCards
-            income={summary.income}
-            expense={summary.expense}
-            selectedYear={selectedYear}
-            selectedMonth={selectedMonth}
-            allTransactions={allTransactions}
-            categories={categories}
-          />
-          <div className="grid grid-cols-1 gap-4 md:gap-8 lg:grid-cols-3">
-            <div className="flex flex-col gap-4 lg:col-span-2">
-              <SpendingChart
-                transactions={transactions}
-                categories={categories}
-                selectedYear={selectedYear}
-                selectedMonth={selectedMonth}
-              />
-              <SpendingTrendsChart transactions={allTransactions} />
-              <RecentTransactions transactions={transactions} categories={categories} />
-            </div>
-            <div className="flex flex-col gap-4">
-              <BudgetStatus
-                transactions={transactions}
-                budgets={budgets}
-                categories={categories}
-                selectedYear={selectedYear}
-                selectedMonth={selectedMonth}
-              />
-              <DebtStatus debts={debts} userId={userId || ''} />
+
+            <div className="flex flex-col gap-6">
+              <div className="transform transition-all duration-300 hover:scale-[1.01]">
+                <BudgetStatus
+                  transactions={transactions}
+                  budgets={budgets}
+                  categories={categories}
+                  selectedYear={selectedYear}
+                  selectedMonth={selectedMonth}
+                />
+              </div>
             </div>
           </div>
         </main>

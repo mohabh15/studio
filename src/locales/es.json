@@ -55,6 +55,12 @@
     "change_language": "Cambiar Idioma"
   },
   "dashboard": {
+    "greeting": {
+      "morning": "Buenos días",
+      "afternoon": "Buenas tardes",
+      "evening": "Buenas noches",
+      "user": "Usuario"
+    },
     "debt_status": {
       "title": "Estado de Deudas",
       "no_debts": "Sin deudas",
@@ -64,7 +70,7 @@
       "total_paid": "Total pagado",
       "minimum_monthly_payments": "Pagos mínimos mensuales",
       "upcoming_due_dates": "Vencimientos próximos",
-      "view_projections": "📊 Ver Proyecciones",
+      "view_projections": "Ver Proyecciones",
       "view_details": "Ver Detalles",
       "debts_count": "{{count}} deuda",
       "debts_count_plural": "{{count}} deudas",

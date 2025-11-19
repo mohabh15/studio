@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { TrendingUp, DollarSign, AlertTriangle, CreditCard } from 'lucide-react';
+import { TrendingUp, DollarSign, AlertTriangle, CreditCard, BarChart3, Eye } from 'lucide-react';
 import { Debt } from '@/lib/types';
 import { useI18n } from '@/hooks/use-i18n';
 import { useFirestoreDebtPayments } from '@/hooks/use-firestore';
@@ -83,7 +83,7 @@ export default function DebtStatus({ debts, userId }: DebtStatusProps) {
     return (
       <Card className="glass-card depth-2 hover-lift interactive-scale glow-primary">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-          <CardTitle className="font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+          <CardTitle className="font-bold bg-gradient-to-r from-blue-600 to-cyan-400 bg-clip-text text-transparent">
             {t('dashboard.debt_status.title')}
           </CardTitle>
           <div className="p-2 rounded-lg bg-primary/20">
@@ -95,8 +95,12 @@ export default function DebtStatus({ debts, userId }: DebtStatusProps) {
           <p className="text-xs text-muted-foreground mb-4">
             {t('dashboard.debt_status.no_debts_description')}
           </p>
-          <Link href="/debts">
-            <Button size="sm" className="w-full">
+          <Link href="/debts" className="group">
+            <Button
+              size="sm"
+              className="w-full bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 transition-all duration-300 shadow-lg hover:shadow-xl group-hover:scale-[1.02] transform"
+            >
+              <CreditCard className="mr-2 h-4 w-4 group-hover:rotate-12 transition-transform duration-300" />
               {t('dashboard.debt_status.manage_debts')}
             </Button>
           </Link>
@@ -108,7 +112,7 @@ export default function DebtStatus({ debts, userId }: DebtStatusProps) {
   return (
     <Card className="glass-card depth-2 hover-lift interactive-scale glow-primary">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-        <CardTitle className="text-lg font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+        <CardTitle className="text-lg font-bold bg-gradient-to-r from-blue-600 to-cyan-400 bg-clip-text text-transparent">
           {t('dashboard.debt_status.title')}
         </CardTitle>
         <div className="p-2 rounded-lg bg-primary/20">
@@ -209,14 +213,23 @@ export default function DebtStatus({ debts, userId }: DebtStatusProps) {
           </div>
         </div>
 
-        <div className="space-y-3 pt-4">
-          <Link href="/debts/projections" className="block">
-            <Button size="sm" className="w-full text-sm hover-lift interactive-scale">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-4 border-t border-border/50">
+          <Link href="/debts/projections" className="group">
+            <Button
+              size="sm"
+              className="w-full text-sm bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 transition-all duration-300 shadow-lg hover:shadow-xl group-hover:scale-[1.02] transform"
+            >
+              <BarChart3 className="mr-2 h-4 w-4 group-hover:rotate-12 transition-transform duration-300" />
               {t('dashboard.debt_status.view_projections')}
             </Button>
           </Link>
-          <Link href="/debts" className="block">
-            <Button size="sm" variant="outline" className="w-full text-sm glass-effect hover-lift interactive-scale">
+          <Link href="/debts" className="group">
+            <Button
+              size="sm"
+              variant="outline"
+              className="w-full text-sm glass-effect border-primary/50 hover:bg-primary/10 hover:border-primary transition-all duration-300 group-hover:scale-[1.02] transform"
+            >
+              <Eye className="mr-2 h-4 w-4 group-hover:scale-110 transition-transform duration-300" />
               {t('dashboard.debt_status.view_details')}
             </Button>
           </Link>

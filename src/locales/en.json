@@ -55,6 +55,12 @@
     "change_language": "Change Language"
   },
   "dashboard": {
+    "greeting": {
+      "morning": "Good morning",
+      "afternoon": "Good afternoon",
+      "evening": "Good evening",
+      "user": "User"
+    },
     "debt_status": {
       "title": "Debt Status",
       "no_debts": "No debts",
@@ -64,7 +70,7 @@
       "total_paid": "Total Paid",
       "minimum_monthly_payments": "Minimum Monthly Payments",
       "upcoming_due_dates": "Upcoming Due Dates",
-      "view_projections": "📊 View Projections",
+      "view_projections": "View Projections",
       "view_details": "View Details",
       "debts_count": "{{count}} debt",
       "debts_count_plural": "{{count}} debts",

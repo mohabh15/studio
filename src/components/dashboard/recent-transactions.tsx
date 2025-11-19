@@ -30,7 +30,7 @@ export default function RecentTransactions({ transactions, categories }: RecentT
   return (
      <Card className="glass-card depth-3 hover-lift">
        <CardHeader className="pb-4">
-         <CardTitle className="font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+         <CardTitle className="font-bold bg-gradient-to-r from-blue-600 to-cyan-400 bg-clip-text text-transparent">
            {t('dashboard.recent_transactions.title')}
          </CardTitle>
          <CardDescription className="text-muted-foreground/80">
