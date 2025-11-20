@@ -335,7 +335,7 @@ export default function SavingsPage() {
 
   return (
     <AppLayout>
-      <main className="flex flex-1 flex-col gap-6 p-4 md:gap-8 md:p-6 lg:p-8 animate-in fade-in duration-500">
+      <main className="flex flex-1 flex-col gap-4 p-4 md:gap-5 md:p-6 lg:p-8 animate-in fade-in duration-500">
         {/* Header modernizado */}
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="space-y-1 animate-in slide-in-from-left duration-500">
@@ -375,7 +375,7 @@ export default function SavingsPage() {
         </div>
 
         {/* Métricas principales con animación */}
-        <div className="grid gap-4 grid-cols-2 md:grid-cols-2 lg:grid-cols-4 mb-6 animate-in slide-in-from-bottom duration-700" style={{ animationDelay: '100ms' }}>
+        <div className="grid gap-4 grid-cols-2 md:grid-cols-2 lg:grid-cols-4 animate-in slide-in-from-bottom duration-700" style={{ animationDelay: '100ms' }}>
           <Card className="glass-card depth-2 hover-lift interactive-scale glow-primary transform transition-all duration-300 hover:scale-[1.02]">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Ahorrado</CardTitle>
@@ -422,7 +422,7 @@ export default function SavingsPage() {
         </div>
 
         {/* Cards especiales con animación */}
-        <div className="grid gap-6 grid-cols-1 mb-6 animate-in slide-in-from-bottom duration-700" style={{ animationDelay: '200ms' }}>
+        <div className="grid gap-4 grid-cols-1 animate-in slide-in-from-bottom duration-700" style={{ animationDelay: '200ms' }}>
           <div className="transform transition-all duration-300 hover:scale-[1.01]">
             <EmergencyFundCard
               emergencyFund={emergencyFund[0]}
@@ -439,11 +439,9 @@ export default function SavingsPage() {
           </div>
         </div>
 
-        <div className="my-8" />
-
         {/* Filtros de ahorros con animación */}
         <div className="animate-in slide-in-from-bottom duration-700" style={{ animationDelay: '400ms' }}>
-          <Tabs value={filter} onValueChange={setFilter} className="mb-4">
+          <Tabs value={filter} onValueChange={setFilter}>
             <TabsList>
               <TabsTrigger value="all">Todos</TabsTrigger>
               <TabsTrigger value="active">Activos</TabsTrigger>
