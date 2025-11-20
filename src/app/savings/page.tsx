@@ -335,13 +335,18 @@ export default function SavingsPage() {
 
   return (
     <AppLayout>
-      <main className="flex-1 p-4 md:p-6 lg:p-8">
-        <div className="mb-6 flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">{t('savings.title') || 'Ahorros'}</h1>
-            <p className="text-muted-foreground">{t('savings.description') || 'Gestión de ahorros e inversiones'}</p>
+      <main className="flex flex-1 flex-col gap-6 p-4 md:gap-8 md:p-6 lg:p-8 animate-in fade-in duration-500">
+        {/* Header modernizado */}
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div className="space-y-1 animate-in slide-in-from-left duration-500">
+            <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-green-600 via-emerald-500 to-teal-400 bg-clip-text text-transparent animate-in fade-in duration-700">
+              {t('savings.title') || 'Ahorros'}
+            </h1>
+            <p className="text-sm md:text-base text-muted-foreground/80">
+              {t('savings.description') || 'Gestión de ahorros e inversiones'}
+            </p>
           </div>
-          <div className="flex flex-col gap-2 md:flex-row">
+          <div className="flex flex-col gap-2 md:flex-row animate-in slide-in-from-right duration-500">
              <Link href="/savings/projections">
                <Button
                  variant="outline"
@@ -369,9 +374,9 @@ export default function SavingsPage() {
            </div>
         </div>
 
-        {/* Métricas principales */}
-        <div className="grid gap-4 grid-cols-2 md:grid-cols-2 lg:grid-cols-4 mb-6">
-          <Card className="glass-card depth-2 hover-lift interactive-scale glow-primary">
+        {/* Métricas principales con animación */}
+        <div className="grid gap-4 grid-cols-2 md:grid-cols-2 lg:grid-cols-4 mb-6 animate-in slide-in-from-bottom duration-700" style={{ animationDelay: '100ms' }}>
+          <Card className="glass-card depth-2 hover-lift interactive-scale glow-primary transform transition-all duration-300 hover:scale-[1.02]">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Ahorrado</CardTitle>
               <PiggyBank className="h-4 w-4 text-green-500" />
@@ -382,7 +387,7 @@ export default function SavingsPage() {
             </CardContent>
           </Card>
 
-          <Card className="glass-card depth-2 hover-lift interactive-scale glow-primary">
+          <Card className="glass-card depth-2 hover-lift interactive-scale glow-primary transform transition-all duration-300 hover:scale-[1.02]">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Tasa de Ahorro</CardTitle>
               <Target className="h-4 w-4 text-blue-500" />
@@ -393,7 +398,7 @@ export default function SavingsPage() {
             </CardContent>
           </Card>
 
-          <Card className="glass-card depth-2 hover-lift interactive-scale glow-primary">
+          <Card className="glass-card depth-2 hover-lift interactive-scale glow-primary transform transition-all duration-300 hover:scale-[1.02]">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Progreso Promedio</CardTitle>
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
@@ -404,7 +409,7 @@ export default function SavingsPage() {
             </CardContent>
           </Card>
 
-          <Card className="glass-card depth-2 hover-lift interactive-scale glow-primary">
+          <Card className="glass-card depth-2 hover-lift interactive-scale glow-primary transform transition-all duration-300 hover:scale-[1.02]">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Próximos Objetivos</CardTitle>
               <Calendar className="h-4 w-4 text-muted-foreground" />
@@ -416,107 +421,117 @@ export default function SavingsPage() {
           </Card>
         </div>
 
-        {/* Cards especiales */}
-        <div className="grid gap-6 grid-cols-1 mb-6">
-          <EmergencyFundCard
-            emergencyFund={emergencyFund[0]}
-            monthlyExpenses={2000} // Esto debería calcularse de los gastos reales
-            onEdit={() => handleEditEmergencyFund(emergencyFund[0])}
-          />
+        {/* Cards especiales con animación */}
+        <div className="grid gap-6 grid-cols-1 mb-6 animate-in slide-in-from-bottom duration-700" style={{ animationDelay: '200ms' }}>
+          <div className="transform transition-all duration-300 hover:scale-[1.01]">
+            <EmergencyFundCard
+              emergencyFund={emergencyFund[0]}
+              monthlyExpenses={2000} // Esto debería calcularse de los gastos reales
+              onEdit={() => handleEditEmergencyFund(emergencyFund[0])}
+            />
+          </div>
         </div>
 
-        {/* Gráficos de ahorros */}
-        <SavingsCharts savings={savings} />
+        {/* Gráficos de ahorros con animación */}
+        <div className="animate-in slide-in-from-bottom duration-700" style={{ animationDelay: '300ms' }}>
+          <div className="transform transition-all duration-300 hover:scale-[1.01]">
+            <SavingsCharts savings={savings} />
+          </div>
+        </div>
 
         <div className="my-8" />
 
-        {/* Filtros de ahorros */}
-        <Tabs value={filter} onValueChange={setFilter} className="mb-4">
-          <TabsList>
-            <TabsTrigger value="all">Todos</TabsTrigger>
-            <TabsTrigger value="active">Activos</TabsTrigger>
-            <TabsTrigger value="completed">Completados</TabsTrigger>
-            <TabsTrigger value="investment">Inversiones</TabsTrigger>
-          </TabsList>
-        </Tabs>
+        {/* Filtros de ahorros con animación */}
+        <div className="animate-in slide-in-from-bottom duration-700" style={{ animationDelay: '400ms' }}>
+          <Tabs value={filter} onValueChange={setFilter} className="mb-4">
+            <TabsList>
+              <TabsTrigger value="all">Todos</TabsTrigger>
+              <TabsTrigger value="active">Activos</TabsTrigger>
+              <TabsTrigger value="completed">Completados</TabsTrigger>
+              <TabsTrigger value="investment">Inversiones</TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
 
-        {/* Lista de ahorros */}
-        <Card className="glass-card depth-2 hover-lift interactive-scale glow-primary">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle>Mis Ahorros</CardTitle>
-                <CardDescription>Gestión de tus objetivos de ahorro</CardDescription>
+        {/* Lista de ahorros con animación */}
+        <div className="animate-in slide-in-from-bottom duration-700" style={{ animationDelay: '500ms' }}>
+          <Card className="glass-card depth-2 hover-lift interactive-scale glow-primary transform transition-all duration-300 hover:scale-[1.01]">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Mis Ahorros</CardTitle>
+                  <CardDescription>Gestión de tus objetivos de ahorro</CardDescription>
+                </div>
               </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            {filteredSavings.length > 0 ? (
-              <div className="space-y-4">
-                {filteredSavings.map((saving) => (
-                  <div key={saving.id} className="flex items-center justify-between p-4 border rounded-lg">
-                    <div className="space-y-1 flex-1">
-                      <div className="flex items-center gap-2">
-                        <p className="font-medium">{saving.nombre}</p>
-                        <Badge variant={saving.status === 'active' ? 'default' : saving.status === 'completed' ? 'secondary' : 'outline'}>
-                          {saving.status === 'active' ? 'Activo' : saving.status === 'completed' ? 'Completado' : 'Pausado'}
-                        </Badge>
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        Tipo: {saving.tipo.replace('_', ' ').toUpperCase()}
-                        {saving.fecha_objetivo && ` • Objetivo: ${new Date(saving.fecha_objetivo).toLocaleDateString()}`}
-                      </p>
-                      {saving.descripcion && (
-                        <p className="text-sm text-muted-foreground">{saving.descripcion}</p>
-                      )}
-                    </div>
-                    <div className="text-right space-y-1 mr-4">
-                      <p className="font-bold">{formatCurrency(saving.monto_actual)}</p>
-                      {saving.monto_objetivo && (
-                        <p className="text-sm text-muted-foreground">
-                          Objetivo: {formatCurrency(saving.monto_objetivo)}
-                        </p>
-                      )}
-                      {saving.monto_objetivo && (
-                        <div className="w-20 bg-gray-200 rounded-full h-2">
-                          <div
-                            className="bg-green-500 h-2 rounded-full"
-                            style={{ width: `${Math.min((saving.monto_actual / saving.monto_objetivo) * 100, 100)}%` }}
-                          ></div>
+            </CardHeader>
+            <CardContent>
+              {filteredSavings.length > 0 ? (
+                <div className="space-y-4">
+                  {filteredSavings.map((saving) => (
+                    <div key={saving.id} className="flex items-center justify-between p-4 border rounded-lg">
+                      <div className="space-y-1 flex-1">
+                        <div className="flex items-center gap-2">
+                          <p className="font-medium">{saving.nombre}</p>
+                          <Badge variant={saving.status === 'active' ? 'default' : saving.status === 'completed' ? 'secondary' : 'outline'}>
+                            {saving.status === 'active' ? 'Activo' : saving.status === 'completed' ? 'Completado' : 'Pausado'}
+                          </Badge>
                         </div>
-                      )}
+                        <p className="text-sm text-muted-foreground">
+                          Tipo: {saving.tipo.replace('_', ' ').toUpperCase()}
+                          {saving.fecha_objetivo && ` • Objetivo: ${new Date(saving.fecha_objetivo).toLocaleDateString()}`}
+                        </p>
+                        {saving.descripcion && (
+                          <p className="text-sm text-muted-foreground">{saving.descripcion}</p>
+                        )}
+                      </div>
+                      <div className="text-right space-y-1 mr-4">
+                        <p className="font-bold">{formatCurrency(saving.monto_actual)}</p>
+                        {saving.monto_objetivo && (
+                          <p className="text-sm text-muted-foreground">
+                            Objetivo: {formatCurrency(saving.monto_objetivo)}
+                          </p>
+                        )}
+                        {saving.monto_objetivo && (
+                          <div className="w-20 bg-gray-200 rounded-full h-2">
+                            <div
+                              className="bg-green-500 h-2 rounded-full"
+                              style={{ width: `${Math.min((saving.monto_actual / saving.monto_objetivo) * 100, 100)}%` }}
+                            ></div>
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-shrink-0">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent>
+                            <DropdownMenuItem onClick={() => handleEditSavings(saving)}>
+                              <Edit className="mr-2 h-4 w-4" />
+                              <span>Editar</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleDeleteSavings(saving)} className="text-destructive">
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              <span>Eliminar</span>
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
                     </div>
-                    <div className="flex-shrink-0">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                          <DropdownMenuItem onClick={() => handleEditSavings(saving)}>
-                            <Edit className="mr-2 h-4 w-4" />
-                            <span>Editar</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleDeleteSavings(saving)} className="text-destructive">
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            <span>Eliminar</span>
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="flex h-[200px] w-full items-center justify-center rounded-md border-2 border-dashed">
-                <p className="text-muted-foreground">
-                  {filter === 'all' ? 'No tienes ahorros registrados' : 'No hay ahorros en esta categoría'}
-                </p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex h-[200px] w-full items-center justify-center rounded-md border-2 border-dashed">
+                  <p className="text-muted-foreground">
+                    {filter === 'all' ? 'No tienes ahorros registrados' : 'No hay ahorros en esta categoría'}
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       </main>
 
       <SavingsDialog

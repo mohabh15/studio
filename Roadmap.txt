@@ -123,8 +123,8 @@
 
 
 
-Análisis de riesgo y scoring crediticio: Evaluación del perfil financiero del usuario con r
-ecomendaciones para mejorar el score crediticio.
+Análisis de riesgo y scoring crediticio: Evaluación del perfil financiero del usuario con 
+recomendaciones para mejorar el score crediticio.
 
 Modos de visualización alternativos: Opciones para cambiar entre vistas de lista, tarjetas, gráficos 
 interactivos o timeline, adaptadas a preferencias del usuario.

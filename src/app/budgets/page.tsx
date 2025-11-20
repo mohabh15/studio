@@ -167,20 +167,28 @@ export default function BudgetsPage() {
 
   return (
     <AppLayout>
-      <main className="flex-1 p-4 md:p-6 lg:p-8">
-        <div className="mb-6 flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">{t('budgets_page.title')}</h1>
-            <p className="text-muted-foreground">{t('budgets_page.description')}</p>
+      <main className="flex flex-1 flex-col gap-6 p-4 md:gap-8 md:p-6 lg:p-8 animate-in fade-in duration-500">
+        {/* Header modernizado */}
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div className="space-y-1 animate-in slide-in-from-left duration-500">
+            <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 via-sky-500 to-cyan-400 bg-clip-text text-transparent animate-in fade-in duration-700">
+              {t('budgets_page.title')}
+            </h1>
+            <p className="text-sm md:text-base text-muted-foreground/80">
+              {t('budgets_page.description')}
+            </p>
           </div>
-          <Button size="sm" onClick={handleAddBudget}>
-            <PlusCircle className="mr-1 h-4 w-4" />
-            {t('budgets_page.add_budget')}
-          </Button>
+          <div className="animate-in slide-in-from-right duration-500">
+            <Button size="sm" onClick={handleAddBudget}>
+              <PlusCircle className="mr-1 h-4 w-4" />
+              {t('budgets_page.add_budget')}
+            </Button>
+          </div>
         </div>
 
-        <div className="grid gap-4 grid-cols-2 md:grid-cols-3 mb-6">
-          <Card className="col-span-2 md:col-span-1 glass-card depth-2 hover-lift interactive-scale glow-primary">
+        {/* Métricas con animación */}
+        <div className="grid gap-4 grid-cols-2 md:grid-cols-3 animate-in slide-in-from-bottom duration-700" style={{ animationDelay: '100ms' }}>
+          <Card className="col-span-2 md:col-span-1 glass-card depth-2 hover-lift interactive-scale glow-primary transform transition-all duration-300 hover:scale-[1.02]">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">{t('budgets_page.total_budget')}</CardTitle>
             </CardHeader>
@@ -188,7 +196,7 @@ export default function BudgetsPage() {
               <div className="text-2xl font-bold">{formatCurrency(totalBudget)}</div>
             </CardContent>
           </Card>
-          <Card className="col-span-1 md:col-span-1 glass-card depth-2 hover-lift interactive-scale glow-primary">
+          <Card className="col-span-1 md:col-span-1 glass-card depth-2 hover-lift interactive-scale glow-primary transform transition-all duration-300 hover:scale-[1.02]">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">{t('budgets_page.total_savings')}</CardTitle>
             </CardHeader>
@@ -196,7 +204,7 @@ export default function BudgetsPage() {
               <div className="text-2xl font-bold">{formatCurrency(monthlySavings)}</div>
             </CardContent>
           </Card>
-          <Card className="col-span-1 md:col-span-1 glass-card depth-2 hover-lift interactive-scale glow-primary">
+          <Card className="col-span-1 md:col-span-1 glass-card depth-2 hover-lift interactive-scale glow-primary transform transition-all duration-300 hover:scale-[1.02]">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">{t('budgets_page.budget_vs_actual')}</CardTitle>
             </CardHeader>
@@ -211,8 +219,9 @@ export default function BudgetsPage() {
           </Card>
         </div>
 
-
-        <Card className="glass-card depth-2 hover-lift interactive-scale glow-primary">
+        {/* Tabla de presupuestos con animación */}
+        <div className="animate-in slide-in-from-bottom duration-700" style={{ animationDelay: '200ms' }}>
+          <Card className="glass-card depth-2 hover-lift interactive-scale glow-primary transform transition-all duration-300 hover:scale-[1.01]">
           <CardHeader>
             <CardTitle>{t('budgets_page.all_budgets')}</CardTitle>
           </CardHeader>
@@ -284,6 +293,7 @@ export default function BudgetsPage() {
             )}
           </CardContent>
         </Card>
+        </div>
       </main>
 
       <BudgetDialog
